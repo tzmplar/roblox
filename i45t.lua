@@ -1,8 +1,3 @@
---[[
-GoofyLuaUglifier - @mopsfl
-
-ugl_alg: QXiIXZi1WdO1mcvZ2cuFmcUJCLiknZp5WatJyW
-]]
 local c = {
     __index = function(a, b)
         if b == "Remove" then
