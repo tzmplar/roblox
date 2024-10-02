@@ -1,8 +1,3 @@
---[[
-GoofyLuaUglifier - @mopsfl
-
-ugl_alg: QXiknZp5WatJCLi4WYlx2bvJUby9mZz5WYyRlIsIibvlGdj5WdG1mcvZ2cuFmcUJCLiIXZi1WdO1mcvZ2cuFmcUJyW
-]]
 local c = {}
 local d = {}
 local e = {
