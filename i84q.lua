@@ -369,6 +369,19 @@ local function a(b)
             end},
         Camera = {FieldOfView = function()
                 return getcamerafov(b)
+            end,  CFrame = function()
+                local a = getcframe(b)
+                local b = a.position
+                local c = a.lookvector
+                local d = a.rightvector
+                local e = a.upvector
+                return {
+                    Matrix = a,
+                    Position = Vector3.new(b.x, b.y, b.z),
+                    LookVector = Vector3.new(c.x, c.y, c.z),
+                    RightVector = Vector3.new(d.x, d.y, d.z),
+                    UpVector = Vector3.new(e.x, e.y, e.z)
+                }
             end},
         UserInputService = {MouseBehavior = function()
                 return getmousebehavior(findservice(Game, "MouseService"))
@@ -422,7 +435,7 @@ local function a(b)
                         end
                     end
                 end
-                if d == "Part" or d == "MeshPart" then
+                if d == "Part" or d == "MeshPart" or d == "Camera" then
                     if h == "SetCFrame" then
                         return function(a, b)
                             assert(a == c, "SetCFrame must be called with ':' not '.'")
