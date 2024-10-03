@@ -620,7 +620,7 @@ _G.print = function(...)
         if type(a) ~= "string" then
             error("'tostring' must return a string - print function")
         end
-        c = c .. a
+        c = c .. a .. " "
     end
     return print(c)
 end
@@ -640,7 +640,7 @@ _G.warn = function(...)
         if type(a) ~= "string" then
             error("'tostring' must return a string - warn function")
         end
-        c = c .. a
+        c = c .. a .. " "
     end
     return warn(c)
 end
