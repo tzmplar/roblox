@@ -214,10 +214,10 @@ b.zAxis = setmetatable({x = 0, y = 0, z = 1}, b)
 function b.new(a, c, d)
     return setmetatable({x = a or 0, y = c or 0, z = d or 0}, b)
 end
-function b:GetMagnitude()
+function b:Magnitude()
     return math.sqrt(self.x ^ 2 + self.y ^ 2 + self.z ^ 2)
 end
-function b:GetUnit()
+function b:Unit()
     local a = self:GetMagnitude()
     if a > 0 then
         return b.new(self.x / a, self.y / a, self.z / a)
@@ -231,6 +231,7 @@ function b:Normalize()
     end
     return b.new(0, 0, 0)
 end
+
 function b:Abs()
     return b.new(math.abs(self.x), math.abs(self.y), math.abs(self.z))
 end
@@ -253,9 +254,20 @@ end
 function b:Dot(a)
     return self.x * a.x + self.y * a.y + self.z * a.z
 end
+function b:Lerp(a, c)
+    return b.new(self.X + (a.X - self.X) * c, self.Y + (a.Y - self.Y) * c, self.Z + (a.Z - self.Z) * c)
+end
 function b:FuzzyEq(a, b)
     b = b or 1e-5
     return math.abs(self.x - a.x) < b and math.abs(self.y - a.y) < b and math.abs(self.z - a.z) < b
+end
+function b:Angle(a, e)
+    local c = self:Dot(a)
+    local c = math.acos(c / (self:Magnitude() * a:Magnitude()))
+    if e then
+        return c * (self:Cross(a) < 0 and -1 or 1)
+    end
+    return c
 end
 function b:__add(a)
     return b.new(self.x + a.x, self.y + a.y, self.z + a.z)
