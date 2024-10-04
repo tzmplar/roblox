@@ -418,7 +418,7 @@ local function a(b)
                 end
                 if
                     d == "BoolValue" or d == "IntValue" or d == "NumberValue" or d == "Vector3Value" or
-                        d == "ObjectValue"
+                        d == "ObjectValue" or d == "StringValue"
                  then
                     if h == "Value" then
                         if d == "ObjectValue" then
