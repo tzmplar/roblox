@@ -356,6 +356,28 @@ local function a(b)
                 return gettextureid(b)
             end
         },
+        UnionOperation = {
+            CFrame = function()
+                local a = getcframe(b)
+                local b = a.position
+                local c = a.lookvector
+                local d = a.rightvector
+                local e = a.upvector
+                return {
+                    Matrix = a,
+                    Position = Vector3.new(b.x, b.y, b.z),
+                    LookVector = Vector3.new(c.x, c.y, c.z),
+                    RightVector = Vector3.new(d.x, d.y, d.z),
+                    UpVector = Vector3.new(e.x, e.y, e.z)
+                }
+            end,
+            Size = function()
+                return getsize(b)
+            end,
+            Velocity = function()
+                return getvelocity(b)
+            end
+        },
         Players = {localPlayer = function()
                 return e(getlocalplayer)
             end},
@@ -447,7 +469,7 @@ local function a(b)
                         end
                     end
                 end
-                if d == "Part" or d == "MeshPart" or d == "Camera" then
+                if d == "Part" or d == "MeshPart" or d == "Camera" or d == "UnionOperation" then
                     if h == "SetCFrame" then
                         return function(a, b)
                             assert(a == c, "SetCFrame must be called with ':' not '.'")
