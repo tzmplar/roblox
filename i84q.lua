@@ -286,10 +286,18 @@ function b:__div(a)
     return b.new(self.x / a, self.y / a, self.z / a)
 end
 _G.Vector3 = b
+
+_G.lua_cache = {}
 local function a(b)
     if type(b) ~= "userdata" then
         return nil
     end
+
+    -- Check if the object is already cached and return it if so
+    if lua_cache[b] then
+        return lua_cache[b]
+    end
+        
     local c = {}
     local d = getclassname(b)
     local function e(b, ...)
@@ -647,6 +655,8 @@ local function a(b)
             end
         }
     )
+     -- Cache the object before returning it
+    lua_cache[b] = c
     return c
 end
 _G.game = a(Game)
