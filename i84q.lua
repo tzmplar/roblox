@@ -648,19 +648,19 @@ local function a(b)
                 if h == "Destroy" then
                     return function(a, b)
                         assert(a == c, "Destroy must be called with ':' not '.'")
-                        return e(destroy, a.Data)
+                        destroy(a.Data)
                     end
                 end
                 if h == "GetMemoryValue" then
                     return function(a, b, g)
                         assert(a == c, "GetMemoryValue must be called with ':' not '.'")
-                        return e(getmemoryvalue, a.Data, b, g)
+                        return getmemoryvalue(a.Data, b, g)
                     end
                 end
                 if h == "SetMemoryValue" then
                     return function(a, b, g, d)
                         assert(a == c, "SetMemoryValue must be called with ':' not '.'")
-                        return e(setmemoryvalue, a.Data, b, g, d)
+                        setmemoryvalue(a.Data, b, g, d)
                     end
                 end           
                 return a(findfirstchild(b, h))
