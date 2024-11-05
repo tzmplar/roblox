@@ -651,6 +651,18 @@ local function a(b)
                         return e(destroy, a.Data)
                     end
                 end
+                if h == "GetMemoryValue" then
+                    return function(a, b, c)
+                        assert(a == c, "GetMemoryValue must be called with ':' not '.'")
+                        return e(getmemoryvalue, a.Data, b, c)
+                    end
+                end
+                if h == "SetMemoryValue" then
+                    return function(a, b, c, d)
+                        assert(a == c, "SetMemoryValue must be called with ':' not '.'")
+                        return e(setmemoryvalue, a.Data, b, c, d)
+                    end
+                end           
                 return a(findfirstchild(b, h))
             end
         }
