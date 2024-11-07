@@ -533,7 +533,7 @@ local function a(b)
                     if h == "SetMouseLocation" then
                         return function(a, k, l)
                             assert(a == c, "SetMouseLocation must be called with ':' not '.'")
-                            return setmouselocation(findservice(Game, "MouseService"), k, l)
+                            setmouselocation(findservice(Game, "MouseService"), k, l)
                         end
                     end
                     if h == "SetMouseIconEnabled" then
