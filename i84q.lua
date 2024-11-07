@@ -680,7 +680,7 @@ end
 _G.game = a(Game)
 _G.workspace = a(Workspace)
 _G.pointer_to_table_data = function(n)
-   return a(number_to_user_data(n))
+   return a(pointer_to_user_data(n))
 end
 _G.print = function(...)
     local a, b = {...}, select("#", ...)
