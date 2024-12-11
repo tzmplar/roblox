@@ -1,6 +1,6 @@
-local cast_offset = 0x300 -- this offset may need updating after roblox updates
+local cast_offset = 0x2F0 -- this offset may need updating after roblox updates
 
-local reel_offset = 0x2E8 -- this offset may need updating after roblox updates
+local reel_offset = 0x2D8 -- this offset may need updating after roblox updates
 
 local shake_speed = 0.1 -- decrese this if you want shake to go faster or increase to go slower!
 
