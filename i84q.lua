@@ -555,6 +555,20 @@ local function a(b)
                         end
                     end
                 end
+                 if d == "HttpService" then
+                    if h == "JSONDecode" then
+                        return function(a, b)
+                            assert(a == c, "JSONDecode must be called with ':' not '.'")
+                            return JSONDecode(b)
+                        end
+                    end 
+                    if h == "JSONEncode" then
+                        return function(a, b)
+                            assert(a == c, "JSONEncode must be called with ':' not '.'")
+                            return JSONEncode(b)
+                        end
+                    end 
+                end            
                 if d == "DataModel" then
                     if h == "FindService" then
                         return function(a, b)
