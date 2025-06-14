@@ -136,6 +136,335 @@ local c = {new = function(a)
     end}
 _G.Drawing = c
 
+local Vector2 = {}
+Vector2.__index = Vector2
+
+-- Constructors
+function Vector2.new(x, y)
+    return setmetatable({X = x or 0, Y = y or 0}, Vector2)
+end
+
+-- Constants
+Vector2.zero = Vector2.new(0, 0)
+Vector2.one = Vector2.new(1, 1)
+Vector2.xAxis = Vector2.new(1, 0)
+Vector2.yAxis = Vector2.new(0, 1)
+
+-- Properties
+function Vector2:Magnitude()
+    return math.sqrt(self.X^2 + self.Y^2)
+end
+
+function Vector2:Unit()
+    local m = self:Magnitude()
+    if m > 0 then
+        return Vector2.new(self.X / m, self.Y / m)
+    end
+    return Vector2.zero
+end
+
+-- Methods
+function Vector2:Dot(v)
+    return self.X * v.X + self.Y * v.Y
+end
+
+function Vector2:Cross(v)
+    return self.X * v.Y - self.Y * v.X
+end
+
+function Vector2:Angle(v, isSigned)
+    local dot = self:Dot(v)
+    local magProduct = self:Magnitude() * v:Magnitude()
+    local angle = math.acos(math.clamp(dot / magProduct, -1, 1))
+    if isSigned then
+        return angle * (self:Cross(v) < 0 and -1 or 1)
+    end
+    return angle
+end
+
+function Vector2:Lerp(v, alpha)
+    return Vector2.new(
+        self.X + (v.X - self.X) * alpha,
+        self.Y + (v.Y - self.Y) * alpha
+    )
+end
+
+function Vector2:Abs()
+    return Vector2.new(math.abs(self.X), math.abs(self.Y))
+end
+
+function Vector2:Ceil()
+    return Vector2.new(math.ceil(self.X), math.ceil(self.Y))
+end
+
+function Vector2:Floor()
+    return Vector2.new(math.floor(self.X), math.floor(self.Y))
+end
+
+function Vector2:Sign()
+    local sign = function(v) return v > 0 and 1 or (v < 0 and -1 or 0) end
+    return Vector2.new(sign(self.X), sign(self.Y))
+end
+
+function Vector2:Max(...)
+    local args = {...}
+    local maxX, maxY = self.X, self.Y
+    for _, v in ipairs(args) do
+        maxX = math.max(maxX, v.X)
+        maxY = math.max(maxY, v.Y)
+    end
+    return Vector2.new(maxX, maxY)
+end
+
+function Vector2:Min(...)
+    local args = {...}
+    local minX, minY = self.X, self.Y
+    for _, v in ipairs(args) do
+        minX = math.min(minX, v.X)
+        minY = math.min(minY, v.Y)
+    end
+    return Vector2.new(minX, minY)
+end
+
+function Vector2:FuzzyEq(v, epsilon)
+    epsilon = epsilon or 1e-5
+    return math.abs(self.X - v.X) < epsilon and math.abs(self.Y - v.Y) < epsilon
+end
+
+-- Operators
+function Vector2:__add(v)
+    return Vector2.new(self.X + v.X, self.Y + v.Y)
+end
+
+function Vector2:__sub(v)
+    return Vector2.new(self.X - v.X, self.Y - v.Y)
+end
+
+function Vector2:__mul(v)
+    if type(v) == "number" then
+        return Vector2.new(self.X * v, self.Y * v)
+    elseif getmetatable(v) == Vector2 then
+        return Vector2.new(self.X * v.X, self.Y * v.Y)
+    end
+end
+
+function Vector2:__div(v)
+    if type(v) == "number" then
+        return Vector2.new(self.X / v, self.Y / v)
+    elseif getmetatable(v) == Vector2 then
+        return Vector2.new(self.X / v.X, self.Y / v.Y)
+    end
+end
+
+function Vector2:__floordiv(v)
+    if type(v) == "number" then
+        return Vector2.new(math.floor(self.X / v), math.floor(self.Y / v))
+    elseif getmetatable(v) == Vector2 then
+        return Vector2.new(math.floor(self.X / v.X), math.floor(self.Y / v.Y))
+    end
+end
+
+function Vector2:__unm()
+    return Vector2.new(-self.X, -self.Y)
+end
+
+function Vector2:__tostring()
+    return string.format("Vector2.new(%.3f, %.3f)", self.X, self.Y)
+end
+
+-- Clamp fallback
+math.clamp = math.clamp or function(x, min, max)
+    return math.max(min, math.min(max, x))
+end
+
+-- Global binding (optional)
+_G.Vector2 = Vector2
+
+local Vector3 = {}
+Vector3.__index = Vector3
+
+-- Enums for normal and axis
+local Enum = {
+    NormalId = {
+        Top = "Top", Bottom = "Bottom", Left = "Left",
+        Right = "Right", Front = "Front", Back = "Back"
+    },
+    Axis = {
+        X = "X", Y = "Y", Z = "Z"
+    }
+}
+
+-- Constructor
+function Vector3.new(x, y, z)
+    return setmetatable({X = x or 0, Y = y or 0, Z = z or 0}, Vector3)
+end
+
+-- FromNormalId
+function Vector3.FromNormalId(normal)
+    local map = {
+        [Enum.NormalId.Top] = Vector3.new(0, 1, 0),
+        [Enum.NormalId.Bottom] = Vector3.new(0, -1, 0),
+        [Enum.NormalId.Left] = Vector3.new(-1, 0, 0),
+        [Enum.NormalId.Right] = Vector3.new(1, 0, 0),
+        [Enum.NormalId.Front] = Vector3.new(0, 0, -1),
+        [Enum.NormalId.Back] = Vector3.new(0, 0, 1),
+    }
+    return map[normal] or Vector3.zero
+end
+
+-- FromAxis
+function Vector3.FromAxis(axis)
+    local map = {
+        [Enum.Axis.X] = Vector3.new(1, 0, 0),
+        [Enum.Axis.Y] = Vector3.new(0, 1, 0),
+        [Enum.Axis.Z] = Vector3.new(0, 0, 1),
+    }
+    return map[axis] or Vector3.zero
+end
+
+-- Properties
+Vector3.zero = Vector3.new(0, 0, 0)
+Vector3.one = Vector3.new(1, 1, 1)
+Vector3.xAxis = Vector3.new(1, 0, 0)
+Vector3.yAxis = Vector3.new(0, 1, 0)
+Vector3.zAxis = Vector3.new(0, 0, 1)
+
+function Vector3:Magnitude()
+    return math.sqrt(self.X^2 + self.Y^2 + self.Z^2)
+end
+
+function Vector3:Unit()
+    local m = self:Magnitude()
+    if m > 0 then
+        return Vector3.new(self.X / m, self.Y / m, self.Z / m)
+    end
+    return Vector3.zero
+end
+
+-- Methods
+function Vector3:Abs()
+    return Vector3.new(math.abs(self.X), math.abs(self.Y), math.abs(self.Z))
+end
+
+function Vector3:Ceil()
+    return Vector3.new(math.ceil(self.X), math.ceil(self.Y), math.ceil(self.Z))
+end
+
+function Vector3:Floor()
+    return Vector3.new(math.floor(self.X), math.floor(self.Y), math.floor(self.Z))
+end
+
+function Vector3:Sign()
+    local sign = function(v) return v > 0 and 1 or (v < 0 and -1 or 0) end
+    return Vector3.new(sign(self.X), sign(self.Y), sign(self.Z))
+end
+
+function Vector3:Cross(v)
+    return Vector3.new(
+        self.Y * v.Z - self.Z * v.Y,
+        self.Z * v.X - self.X * v.Z,
+        self.X * v.Y - self.Y * v.X
+    )
+end
+
+function Vector3:Angle(v, axis)
+    local dot = self:Dot(v)
+    local magProduct = self:Magnitude() * v:Magnitude()
+    local angle = math.acos(math.clamp(dot / magProduct, -1, 1))
+    if axis then
+        return angle * (self:Cross(v):Dot(axis) < 0 and -1 or 1)
+    end
+    return angle
+end
+
+function Vector3:Dot(v)
+    return self.X * v.X + self.Y * v.Y + self.Z * v.Z
+end
+
+function Vector3:FuzzyEq(v, epsilon)
+    epsilon = epsilon or 1e-5
+    local diffSq = (self - v):Magnitude()^2
+    return diffSq <= epsilon^2 * math.max(self:Magnitude()^2, v:Magnitude()^2, 1)
+end
+
+function Vector3:Lerp(v, alpha)
+    return Vector3.new(
+        self.X + (v.X - self.X) * alpha,
+        self.Y + (v.Y - self.Y) * alpha,
+        self.Z + (v.Z - self.Z) * alpha
+    )
+end
+
+function Vector3:Max(v)
+    return Vector3.new(
+        math.max(self.X, v.X),
+        math.max(self.Y, v.Y),
+        math.max(self.Z, v.Z)
+    )
+end
+
+function Vector3:Min(v)
+    return Vector3.new(
+        math.min(self.X, v.X),
+        math.min(self.Y, v.Y),
+        math.min(self.Z, v.Z)
+    )
+end
+
+-- Math Operations
+function Vector3:__add(v)
+    return Vector3.new(self.X + v.X, self.Y + v.Y, self.Z + v.Z)
+end
+
+function Vector3:__sub(v)
+    return Vector3.new(self.X - v.X, self.Y - v.Y, self.Z - v.Z)
+end
+
+function Vector3:__mul(v)
+    if type(v) == "number" then
+        return Vector3.new(self.X * v, self.Y * v, self.Z * v)
+    elseif getmetatable(v) == Vector3 then
+        return Vector3.new(self.X * v.X, self.Y * v.Y, self.Z * v.Z)
+    end
+end
+
+function Vector3:__div(v)
+    if type(v) == "number" then
+        return Vector3.new(self.X / v, self.Y / v, self.Z / v)
+    elseif getmetatable(v) == Vector3 then
+        return Vector3.new(self.X / v.X, self.Y / v.Y, self.Z / v.Z)
+    end
+end
+
+function Vector3:__mod(v)
+    return Vector3.new(self.X % v.X, self.Y % v.Y, self.Z % v.Z)
+end
+
+function Vector3:__floordiv(v)
+    if type(v) == "number" then
+        return Vector3.new(math.floor(self.X / v), math.floor(self.Y / v), math.floor(self.Z / v))
+    elseif getmetatable(v) == Vector3 then
+        return Vector3.new(math.floor(self.X / v.X), math.floor(self.Y / v.Y), math.floor(self.Z / v.Z))
+    end
+end
+
+function Vector3:__unm()
+    return Vector3.new(-self.X, -self.Y, -self.Z)
+end
+
+function Vector3:__tostring()
+    return string.format("Vector3.new(%.3f, %.3f, %.3f)", self.X, self.Y, self.Z)
+end
+
+-- Clamp fallback for Lua environments
+math.clamp = math.clamp or function(x, min, max)
+    return math.max(min, math.min(max, x))
+end
+
+-- Register to global if needed
+_G.Vector3 = Vector3
+_G.Enum = Enum
+
 _G.lua_cache = {}
 local function a(b)
     if type(b) ~= "userdata" then
