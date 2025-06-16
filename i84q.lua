@@ -887,6 +887,9 @@ _G.print = function(...)
             c = c .. "" .. getname(a[b]) .. " | "
         end
         local a = tostring(a[b])
+        if type(a) ~= "string" then
+            error("'tostring' must return a string - print function")
+        end
         c = c .. a .. " "
     end
     return print(c)
@@ -904,6 +907,9 @@ _G.warn = function(...)
             c = c .. "" .. getname(a[b]) .. " | "
         end
         local a = tostring(a[b])
+        if type(a) ~= "string" then
+            error("'tostring' must return a string - warn function")
+        end
         c = c .. a .. " "
     end
     return warn(c)
