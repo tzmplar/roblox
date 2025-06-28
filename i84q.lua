@@ -1,141 +1,3 @@
-local c = {__index = function(a, b)
-        if b == "Remove" then
-            return function()
-                DesOB(rawget(a, "OBJC_"))
-            end
-        end
-        return RetOB(rawget(a, "OBJC_"), b)
-    end, __newindex = function(a, b, c)
-        return SetOB(rawget(a, "OBJC_"), b, c)
-    end, __gc = function(a)
-        return DesOB(rawget(a, "OBJC_"))
-    end, __type = "Text"}
-local d = {__index = function(a, b)
-        if b == "Remove" then
-            return function()
-                DesOB(rawget(a, "OBJC_"))
-            end
-        end
-        return RetOB(rawget(a, "OBJC_"), b)
-    end, __newindex = function(a, b, c)
-        return SetOB(rawget(a, "OBJC_"), b, c)
-    end, __gc = function(a)
-        return DesOB(rawget(a, "OBJC_"))
-    end, __type = "Image"}
-local e = {__index = function(a, b)
-        if b == "Remove" then
-            return function()
-                DesOB(rawget(a, "OBJC_"))
-            end
-        end
-        return RetOB(rawget(a, "OBJC_"), b)
-    end, __newindex = function(a, b, c)
-        return SetOB(rawget(a, "OBJC_"), b, c)
-    end, __gc = function(a)
-        return DesOB(rawget(a, "OBJC_"))
-    end, __type = "Line"}
-local f = {__index = function(a, b)
-        if b == "Remove" then
-            return function()
-                DesOB(rawget(a, "OBJC_"))
-            end
-        end
-        return RetOB(rawget(a, "OBJC_"), b)
-    end, __newindex = function(a, b, c)
-        return SetOB(rawget(a, "OBJC_"), b, c)
-    end, __gc = function(a)
-        return DesOB(rawget(a, "OBJC_"))
-    end, __type = "Square"}
-local g = {__index = function(a, b)
-        if b == "Remove" then
-            return function()
-                DesOB(rawget(a, "OBJC_"))
-            end
-        end
-        return RetOB(rawget(a, "OBJC_"), b)
-    end, __newindex = function(a, b, c)
-        return SetOB(rawget(a, "OBJC_"), b, c)
-    end, __gc = function(a)
-        return DesOB(rawget(a, "OBJC_"))
-    end, __type = "Circle"}
-local g = {__index = function(a, b)
-        if b == "Remove" then
-            return function()
-                DesOB(rawget(a, "OBJC_"))
-            end
-        end
-        return RetOB(rawget(a, "OBJC_"), b)
-    end, __newindex = function(a, b, c)
-        return SetOB(rawget(a, "OBJC_"), b, c)
-    end, __gc = function(a)
-        return DesOB(rawget(a, "OBJC_"))
-    end, __type = "Triangle"}
-local h = {__index = function(a, b)
-        if b == "Remove" then
-            return function()
-                DesOB(rawget(a, "OBJC_"))
-            end
-        end
-        return RetOB(rawget(a, "OBJC_"), b)
-    end, __newindex = function(a, b, c)
-        return SetOB(rawget(a, "OBJC_"), b, c)
-    end, __gc = function(a)
-        return DesOB(rawget(a, "OBJC_"))
-    end, __type = "Circle"}
-local i = {__index = function(a, b)
-        if b == "Remove" then
-            return function()
-                DesOB(rawget(a, "OBJC_"))
-            end
-        end
-        return RetOB(rawget(a, "OBJC_"), b)
-    end, __newindex = function(a, b, c)
-        return SetOB(rawget(a, "OBJC_"), b, c)
-    end, __gc = function(a)
-        return DesOB(rawget(a, "OBJC_"))
-    end, __type = "Quad"}
-local c = {new = function(a)
-        if a == "Text" then
-            local a = CrtOB(a)
-            local a = {OBJC_ = a}
-            return setmetatable(a, c)
-        end
-        if a == "Image" then
-            local a = CrtOB(a)
-            local a = {OBJC_ = a}
-            return setmetatable(a, d)
-        end
-        if a == "Line" then
-            local a = CrtOB(a)
-            local a = {OBJC_ = a}
-            return setmetatable(a, e)
-        end
-        if a == "Square" then
-            local a = CrtOB(a)
-            local a = {OBJC_ = a}
-            return setmetatable(a, f)
-        end
-        if a == "Circle" then
-            local a = CrtOB(a)
-            local a = {OBJC_ = a}
-            return setmetatable(a, h)
-        end
-        if a == "Triangle" then
-            local a = CrtOB(a)
-            local a = {OBJC_ = a}
-            return setmetatable(a, g)
-        end
-        if a == "Quad" then
-            local a = CrtOB(a)
-            local a = {OBJC_ = a}
-            return setmetatable(a, i)
-        end
-        error('invalid method: "' .. tostring(a) .. '"')
-    end, clear = function()
-        return ClrOB()
-    end}
-_G.Drawing = c
-
 local Vector2 = {}
 Vector2.__index = Vector2
 
@@ -874,43 +736,55 @@ _G.workspace = a(Workspace)
 _G.pointer_to_table_data = function(n)
    return a(pointer_to_user_data(n))
 end
+
 _G.print = function(...)
-    local a, b = {...}, select("#", ...)
-    local c = ""
-    for b = 1, b do
-        if type(a[b]) == "table" then
-            if a[b].Name and a[b].Data then
-                c = c .. "" .. a[b].Name .. " | "
+    local args, count = {...}, select("#", ...)
+    local output = ""
+
+    for i = 1, count do
+        local v = args[i]
+
+        if type(v) == "table" then
+            if v.Name and v.Data then
+                output = output .. v.Name .. " | "
             end
+        elseif type(v) == "userdata" then
+            output = output .. getname(v) .. " | "
         end
-        if type(a[b]) == "userdata" then
-            c = c .. "" .. getname(a[b]) .. " | "
-        end
-        local a = tostring(a[b])
-        if type(a) ~= "string" then
+
+        local str = tostring(v)
+        if type(str) ~= "string" then
             error("'tostring' must return a string - print function")
         end
-        c = c .. a .. " "
+
+        output = output .. str .. " "
     end
-    return print(c)
+
+    return print(output)
 end
+
 _G.warn = function(...)
-    local a, b = {...}, select("#", ...)
-    local c = ""
-    for b = 1, b do
-        if type(a[b]) == "table" then
-            if a[b].Name and a[b].Data then
-                c = c .. "" .. a[b].Name .. " | "
+    local args, count = {...}, select("#", ...)
+    local output = ""
+
+    for i = 1, count do
+        local v = args[i]
+
+        if type(v) == "table" then
+            if v.Name and v.Data then
+                output = output .. v.Name .. " | "
             end
+        elseif type(v) == "userdata" then
+            output = output .. getname(v) .. " | "
         end
-        if type(a[b]) == "userdata" then
-            c = c .. "" .. getname(a[b]) .. " | "
-        end
-        local a = tostring(a[b])
-        if type(a) ~= "string" then
+
+        local str = tostring(v)
+        if type(str) ~= "string" then
             error("'tostring' must return a string - warn function")
         end
-        c = c .. a .. " "
+
+        output = output .. str .. " "
     end
-    return warn(c)
+
+    return warn(output)
 end
