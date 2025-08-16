@@ -829,11 +829,6 @@ do
         return string.format("Vector3.new(%.3f, %.3f, %.3f)", self.X, self.Y, self.Z)
     end
 
-    -- Clamp fallback for Lua environments
-    math.clamp = math.clamp or function(x, min, max)
-        return math.max(min, math.min(max, x))
-    end
-
     -- Register to global if needed
     _G.Vector3 = Vector3
     _G.Enum = Enum
