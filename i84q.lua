@@ -1,790 +1,896 @@
-local Vector2 = {}
-Vector2.__index = Vector2
+---- functions ----
 
--- Constructors
-function Vector2.new(x, y)
-    return setmetatable({X = x or 0, Y = y or 0}, Vector2)
-end
+local function merge(a, b)
+    if not a then return b elseif not b then return a end
 
--- Constants
-Vector2.zero = Vector2.new(0, 0)
-Vector2.one = Vector2.new(1, 1)
-Vector2.xAxis = Vector2.new(1, 0)
-Vector2.yAxis = Vector2.new(0, 1)
-
--- Properties
-function Vector2:Magnitude()
-    return math.sqrt(self.X^2 + self.Y^2)
-end
-
-function Vector2:Unit()
-    local m = self:Magnitude()
-    if m > 0 then
-        return Vector2.new(self.X / m, self.Y / m)
-    end
-    return Vector2.zero
-end
-
--- Methods
-function Vector2:Dot(v)
-    return self.X * v.X + self.Y * v.Y
-end
-
-function Vector2:Cross(v)
-    return self.X * v.Y - self.Y * v.X
-end
-
-function Vector2:Angle(v, isSigned)
-    local dot = self:Dot(v)
-    local magProduct = self:Magnitude() * v:Magnitude()
-    local angle = math.acos(math.clamp(dot / magProduct, -1, 1))
-    if isSigned then
-        return angle * (self:Cross(v) < 0 and -1 or 1)
-    end
-    return angle
-end
-
-function Vector2:Lerp(v, alpha)
-    return Vector2.new(
-        self.X + (v.X - self.X) * alpha,
-        self.Y + (v.Y - self.Y) * alpha
-    )
-end
-
-function Vector2:Abs()
-    return Vector2.new(math.abs(self.X), math.abs(self.Y))
-end
-
-function Vector2:Ceil()
-    return Vector2.new(math.ceil(self.X), math.ceil(self.Y))
-end
-
-function Vector2:Floor()
-    return Vector2.new(math.floor(self.X), math.floor(self.Y))
-end
-
-function Vector2:Sign()
-    local sign = function(v) return v > 0 and 1 or (v < 0 and -1 or 0) end
-    return Vector2.new(sign(self.X), sign(self.Y))
-end
-
-function Vector2:Max(...)
-    local args = {...}
-    local maxX, maxY = self.X, self.Y
-    for _, v in ipairs(args) do
-        maxX = math.max(maxX, v.X)
-        maxY = math.max(maxY, v.Y)
-    end
-    return Vector2.new(maxX, maxY)
-end
-
-function Vector2:Min(...)
-    local args = {...}
-    local minX, minY = self.X, self.Y
-    for _, v in ipairs(args) do
-        minX = math.min(minX, v.X)
-        minY = math.min(minY, v.Y)
-    end
-    return Vector2.new(minX, minY)
-end
-
-function Vector2:FuzzyEq(v, epsilon)
-    epsilon = epsilon or 1e-5
-    return math.abs(self.X - v.X) < epsilon and math.abs(self.Y - v.Y) < epsilon
-end
-
--- Operators
-function Vector2:__add(v)
-    return Vector2.new(self.X + v.X, self.Y + v.Y)
-end
-
-function Vector2:__sub(v)
-    return Vector2.new(self.X - v.X, self.Y - v.Y)
-end
-
-function Vector2:__mul(v)
-    if type(v) == "number" then
-        return Vector2.new(self.X * v, self.Y * v)
-    elseif getmetatable(v) == Vector2 then
-        return Vector2.new(self.X * v.X, self.Y * v.Y)
-    end
-end
-
-function Vector2:__div(v)
-    if type(v) == "number" then
-        return Vector2.new(self.X / v, self.Y / v)
-    elseif getmetatable(v) == Vector2 then
-        return Vector2.new(self.X / v.X, self.Y / v.Y)
-    end
-end
-
-function Vector2:__floordiv(v)
-    if type(v) == "number" then
-        return Vector2.new(math.floor(self.X / v), math.floor(self.Y / v))
-    elseif getmetatable(v) == Vector2 then
-        return Vector2.new(math.floor(self.X / v.X), math.floor(self.Y / v.Y))
-    end
-end
-
-function Vector2:__unm()
-    return Vector2.new(-self.X, -self.Y)
-end
-
-function Vector2:__tostring()
-    return string.format("Vector2.new(%.3f, %.3f)", self.X, self.Y)
-end
-
--- Clamp fallback
-math.clamp = math.clamp or function(x, min, max)
-    return math.max(min, math.min(max, x))
-end
-
--- Global binding (optional)
-_G.Vector2 = Vector2
-
-local Vector3 = {}
-Vector3.__index = Vector3
-
--- Enums for normal and axis
-local Enum = {
-    NormalId = {
-        Top = "Top", Bottom = "Bottom", Left = "Left",
-        Right = "Right", Front = "Front", Back = "Back"
-    },
-    Axis = {
-        X = "X", Y = "Y", Z = "Z"
-    }
-}
-
--- Constructor
-function Vector3.new(x, y, z)
-    return setmetatable({X = x or 0, Y = y or 0, Z = z or 0}, Vector3)
-end
-
--- FromNormalId
-function Vector3.FromNormalId(normal)
-    local map = {
-        [Enum.NormalId.Top] = Vector3.new(0, 1, 0),
-        [Enum.NormalId.Bottom] = Vector3.new(0, -1, 0),
-        [Enum.NormalId.Left] = Vector3.new(-1, 0, 0),
-        [Enum.NormalId.Right] = Vector3.new(1, 0, 0),
-        [Enum.NormalId.Front] = Vector3.new(0, 0, -1),
-        [Enum.NormalId.Back] = Vector3.new(0, 0, 1),
-    }
-    return map[normal] or Vector3.zero
-end
-
--- FromAxis
-function Vector3.FromAxis(axis)
-    local map = {
-        [Enum.Axis.X] = Vector3.new(1, 0, 0),
-        [Enum.Axis.Y] = Vector3.new(0, 1, 0),
-        [Enum.Axis.Z] = Vector3.new(0, 0, 1),
-    }
-    return map[axis] or Vector3.zero
-end
-
--- Properties
-Vector3.zero = Vector3.new(0, 0, 0)
-Vector3.one = Vector3.new(1, 1, 1)
-Vector3.xAxis = Vector3.new(1, 0, 0)
-Vector3.yAxis = Vector3.new(0, 1, 0)
-Vector3.zAxis = Vector3.new(0, 0, 1)
-
-function Vector3:Magnitude()
-    return math.sqrt(self.X^2 + self.Y^2 + self.Z^2)
-end
-
-function Vector3:Unit()
-    local m = self:Magnitude()
-    if m > 0 then
-        return Vector3.new(self.X / m, self.Y / m, self.Z / m)
-    end
-    return Vector3.zero
-end
-
--- Methods
-function Vector3:Abs()
-    return Vector3.new(math.abs(self.X), math.abs(self.Y), math.abs(self.Z))
-end
-
-function Vector3:Ceil()
-    return Vector3.new(math.ceil(self.X), math.ceil(self.Y), math.ceil(self.Z))
-end
-
-function Vector3:Floor()
-    return Vector3.new(math.floor(self.X), math.floor(self.Y), math.floor(self.Z))
-end
-
-function Vector3:Sign()
-    local sign = function(v) return v > 0 and 1 or (v < 0 and -1 or 0) end
-    return Vector3.new(sign(self.X), sign(self.Y), sign(self.Z))
-end
-
-function Vector3:Cross(v)
-    return Vector3.new(
-        self.Y * v.Z - self.Z * v.Y,
-        self.Z * v.X - self.X * v.Z,
-        self.X * v.Y - self.Y * v.X
-    )
-end
-
-function Vector3:Angle(v, axis)
-    local dot = self:Dot(v)
-    local magProduct = self:Magnitude() * v:Magnitude()
-    local angle = math.acos(math.clamp(dot / magProduct, -1, 1))
-    if axis then
-        return angle * (self:Cross(v):Dot(axis) < 0 and -1 or 1)
-    end
-    return angle
-end
-
-function Vector3:Dot(v)
-    return self.X * v.X + self.Y * v.Y + self.Z * v.Z
-end
-
-function Vector3:FuzzyEq(v, epsilon)
-    epsilon = epsilon or 1e-5
-    local diffSq = (self - v):Magnitude()^2
-    return diffSq <= epsilon^2 * math.max(self:Magnitude()^2, v:Magnitude()^2, 1)
-end
-
-function Vector3:Lerp(v, alpha)
-    return Vector3.new(
-        self.X + (v.X - self.X) * alpha,
-        self.Y + (v.Y - self.Y) * alpha,
-        self.Z + (v.Z - self.Z) * alpha
-    )
-end
-
-function Vector3:Max(v)
-    return Vector3.new(
-        math.max(self.X, v.X),
-        math.max(self.Y, v.Y),
-        math.max(self.Z, v.Z)
-    )
-end
-
-function Vector3:Min(v)
-    return Vector3.new(
-        math.min(self.X, v.X),
-        math.min(self.Y, v.Y),
-        math.min(self.Z, v.Z)
-    )
-end
-
--- Math Operations
-function Vector3:__add(v)
-    return Vector3.new(self.X + v.X, self.Y + v.Y, self.Z + v.Z)
-end
-
-function Vector3:__sub(v)
-    return Vector3.new(self.X - v.X, self.Y - v.Y, self.Z - v.Z)
-end
-
-function Vector3:__mul(v)
-    if type(v) == "number" then
-        return Vector3.new(self.X * v, self.Y * v, self.Z * v)
-    elseif getmetatable(v) == Vector3 then
-        return Vector3.new(self.X * v.X, self.Y * v.Y, self.Z * v.Z)
-    end
-end
-
-function Vector3:__div(v)
-    if type(v) == "number" then
-        return Vector3.new(self.X / v, self.Y / v, self.Z / v)
-    elseif getmetatable(v) == Vector3 then
-        return Vector3.new(self.X / v.X, self.Y / v.Y, self.Z / v.Z)
-    end
-end
-
-function Vector3:__mod(v)
-    return Vector3.new(self.X % v.X, self.Y % v.Y, self.Z % v.Z)
-end
-
-function Vector3:__floordiv(v)
-    if type(v) == "number" then
-        return Vector3.new(math.floor(self.X / v), math.floor(self.Y / v), math.floor(self.Z / v))
-    elseif getmetatable(v) == Vector3 then
-        return Vector3.new(math.floor(self.X / v.X), math.floor(self.Y / v.Y), math.floor(self.Z / v.Z))
-    end
-end
-
-function Vector3:__unm()
-    return Vector3.new(-self.X, -self.Y, -self.Z)
-end
-
-function Vector3:__tostring()
-    return string.format("Vector3.new(%.3f, %.3f, %.3f)", self.X, self.Y, self.Z)
-end
-
--- Clamp fallback for Lua environments
-math.clamp = math.clamp or function(x, min, max)
-    return math.max(min, math.min(max, x))
-end
-
--- Register to global if needed
-_G.Vector3 = Vector3
-_G.Enum = Enum
-
-_G.lua_cache = {}
-local function a(b)
-    if type(b) ~= "userdata" then
-        return nil
+    for k, v in pairs(b) do 
+        a[k] = v 
     end
 
-    -- Check if the object is already cached and return it if so
-    if lua_cache[b] then
-        return lua_cache[b]
+    return a
+end
+
+local function map(t, f)
+    local result = {}
+
+    for k, v in t do
+        result[k] = f(v, k)
     end
+
+    return result
+end
+
+---- classes ----
+
+local Instance = {}; do
+    --- constants ---
+
+    local declarations = { global = {} }
+
+    --- constructor ---
+
+    local function constructor(userdata: any)
+        userdata = "userdata" == type(userdata) and userdata or "table" == type(userdata) and rawget(userdata, "Data")
+        assert("userdata" == type(userdata), `Instance.new: userdata must be a userdata, got {type(userdata)}`)
+
+        return setmetatable( { ClassName = getclassname(userdata), Data = userdata }, { __index = Instance.__index } )
+    end
+
+    --- functions ---
+
+    Instance.new = constructor
+
+    function Instance.declare<T>(value: "property" | "method", class: string | { string }, name: string, definition: T | (self: typeof(Instance)) -> any)
+        -- assertions --
+
+        assert("string" == type(name), `Instance.declare: name must be a string, got {type(name)}`)
+        assert("property" == value or "method" == value, `Instance.declare: value must be "property" or "method", got {value}`)
+        assert("table" == type(class) or "string" == type(class), `Instance.declare: class must be a string or a table of strings, got {type(class)}`)
+
+        -- declaration --
+
+        if "string" == type(class) then
+            declarations[class] = merge(declarations[class], {
+                [name] = {
+                    [value] = definition
+                }
+            })
+        else
+            for index, class in class do
+                declarations[class] = merge(declarations[class], {
+                    [name] = {
+                        [value] = definition
+                    }
+                })
+            end
+        end
+    end
+
+    --- metatables ---
+
+    function Instance:__index(key: string)
+        assert("string" == type(key), `Instance:__index: key must be a string, got {type(key)}`)
         
-    local c = {}
-    local d = getclassname(b)
-    local function e(b, ...)
-        local b = b(...)
-        return b and a(b) or nil
+        do
+            local class = self.ClassName
+            local declaration = declarations.global[key] or (declarations[class] and declarations[class][key])
+
+            if declaration then
+                local property = declaration.property
+                local method = declaration.method
+
+                if property and property.getter then
+                    return property.getter(self)
+                elseif method then
+                    return method
+                end
+            end
+        end
+
+        return rawget(self, key) or rawget(self, "Data") and
+            constructor(findfirstchild(self.Data, key)) or
+            Instance[key]
     end
-    local f = {Data = function()
-            return b
-        end, Parent = function()
-            return a(getparent(b))
-        end, Name = function()
-            return getname(b)
-        end, ClassName = function()
-            return d
-        end}
-    local g = {
-        Part = {
-            CFrame = function()
-                local a = getcframe(b)
-                local b = a.position
-                local c = a.lookvector
-                local d = a.rightvector
-                local e = a.upvector
-                return {
-                    Matrix = a,
-                    Position = Vector3.new(b.x, b.y, b.z),
-                    LookVector = Vector3.new(c.x, c.y, c.z),
-                    RightVector = Vector3.new(d.x, d.y, d.z),
-                    UpVector = Vector3.new(e.x, e.y, e.z)
-                }
-            end,
-            Size = function()
-                return getsize(b)
-            end,
-            Velocity = function()
-                return getvelocity(b)
+end
+
+---- declarations ----
+
+local constructor = Instance.new
+
+do
+    --- properties ---
+
+    Instance.declare("property", "global", "Name", {
+        getter = function(self)
+            return getname(self.Data)
+        end
+    })
+
+    Instance.declare("property", "global", "Parent", {
+        getter = function(self)
+            return constructor(getparent(self.Data))
+        end
+    })
+
+    --- methods ---
+
+    Instance.declare("method", "global", "GetChildren", function(self)
+        return map(getchildren(self.Data), constructor)
+    end)
+
+    Instance.declare("method", "global", "GetDescendants", function(self)
+        return map(getdescendants(self.Data), constructor)
+    end)
+
+    do
+        local generate = function(f)
+            return function(self, ...)
+                print(self, ...)
+                return constructor(f(self.Data, ...))
             end
+        end
+
+        Instance.declare("method", "global", "FindFirstChild", generate(findfirstchild))
+        Instance.declare("method", "global", "FindFirstAncestor", generate(findfirstancestor))
+        Instance.declare("method", "global", "FindFirstChildOfClass", generate(findfirstchildofclass))
+        Instance.declare("method", "global", "FindFirstAncestorOfClass", generate(findfirstancestorofclass))
+        Instance.declare("method", "global", "WaitForChild", generate(waitforchild))
+    end
+
+    do
+        local generate = function(f)
+            return function(self, ...)
+                return f(self.Data, ...)
+            end
+        end
+
+        Instance.declare("method", "global", "SetMemoryValue", generate(setmemoryvalue))
+        Instance.declare("method", "global", "GetMemoryValue", generate(getmemoryvalue))
+        Instance.declare("method", "global", "Read", generate(getmemoryvalue))
+        Instance.declare("method", "global", "Write", generate(setmemoryvalue))
+    end
+
+    Instance.declare("method", "global", "IsA", function(self, class: string)
+        assert("string" == type(class), `Instance:IsA: class must be a string, got {type(class)}`)
+
+        return self.ClassName == class
+    end)
+
+    Instance.declare("method", "global", "IsAncestorOf", function(self, other)
+        assert("userdata" == type(other) or type(other) == "table" and other.Data, `Instance:IsAncestorOf: other must be a userdata or an Instance, got {type(other)}`)
+
+        return isancestorof(self.Data, type(other) == "userdata" and other or other.Data)
+    end)
+
+    Instance.declare("method", "global", "IsDescendantOf", function(self, other)
+        assert("userdata" == type(other) or type(other) == "table" and other.Data, `Instance:IsDescendantOf: other must be a userdata or an Instance, got {type(other)}`)
+
+        return isdescendantof(self.Data, type(other) == "userdata" and other or other.Data)
+    end)
+    
+    Instance.declare("method", "global", "Destroy", function(self)
+        return destroy(self.Data)
+    end)
+end
+
+do
+    --- properties ---
+
+    Instance.declare("property", "DataModel", "PlaceId", {
+        getter = function(self)
+            return getplaceid()
+        end
+    })
+
+    Instance.declare("property", "DataModel", "GameId", {
+        getter = function(self)
+            return getgameid()
+        end
+    })
+
+    --- methods ---
+
+    Instance.declare("method", "DataModel", "GetService", function(self, name: string)
+        return constructor(findservice(self.Data, name))
+    end)
+
+    Instance.declare("method", "DataModel", "FindService", function(self, name: string)
+        return constructor(findservice(self.Data, name))
+    end)
+
+    Instance.declare("method", "DataModel", "HttpGet", function(self, url: string)
+        assert("string" == type(url), `DataModel:HttpGet: url must be a string, got {type(url)}`)
+
+        return httpget(url)
+    end)
+
+    Instance.declare("method", "DataModel", "HttpPost", function(self, url: string, data: string, ...)
+        assert("string" == type(url), `DataModel:HttpPost: url must be a string, got {type(url)}`)
+        assert("string" == type(data), `DataModel:HttpPost: data must be a string, got {type(data)}`)
+
+        return httppost(url, data, ...)
+    end)
+end
+
+do
+    --- methods ---
+
+    Instance.declare("method", "HttpService", "JSONEncode", function(self, value: any)
+        assert("table" == type(value), `HttpService:JSONEncode: value must be a table, got {type(value)}`)
+
+        return JSONEncode(value)
+    end)
+
+    Instance.declare("method", "HttpService", "JSONDecode", function(self, value: string)
+        assert("string" == type(value), `HttpService:JSONDecode: value must be a string, got {type(value)}`)
+
+        return JSONDecode(value)
+    end)
+end
+
+do
+    --- properties ---
+
+    Instance.declare("property", { "UnionOperation", "MeshPart", "TrussPart", "Part" }, "Size", {
+        getter = function(self)
+            local size = getsize(self.Data)
+
+            return vector.create(size.x, size.y, size.z)
+        end
+    })
+
+    Instance.declare("property", { "UnionOperation", "MeshPart", "TrussPart", "Part", "Camera" }, "Position", {
+        getter = function(self)
+            local position = getposition(self.Data)
+
+            return vector.create(position.x, position.y, position.z)
+        end,
+
+        setter = function(self, value: vector | { x: number, y: number, z: number })
+            assert("table" == type(value) and value.x and value.y and value.z, `Instance:Position: value must be a Vector3, got {type(value)}`)
+
+            setposition(self.Data, value)
+        end
+    })
+
+    Instance.declare("property", { "UnionOperation", "MeshPart", "TrussPart", "Part", "Camera" }, "CFrame", {
+        getter = function(self)
+            local position = getposition(self.Data)
+            local up_vector = getupvector(self.Data)
+            local right_vector = getrightvector(self.Data)
+            local look_vector = getlookvector(self.Data)
+
+            return {
+                Position = vector.create(position.x, position.y, position.z),
+                UpVector = vector.create(up_vector.x, up_vector.y, up_vector.z),
+                RightVector = vector.create(right_vector.x, right_vector.y, right_vector.z),
+                LookVector = vector.create(look_vector.x, look_vector.y, look_vector.z)
+            }
+        end,
+
+        setter = function(self, value: any)
+            setcframe(self.Data, value)
+        end
+    })
+
+    Instance.declare("property", { "UnionOperation", "MeshPart", "TrussPart", "Part" }, "Transparency", {
+        getter = function(self)
+            return gettransparency(self.Data)
+        end,
+
+        setter = function(self, value: number)
+            settransparency(self.Data, value)
+        end
+    })
+end
+
+do
+    --- properties ---
+
+    Instance.declare("property", "Player", "Character", {
+        getter = function(self)
+            return constructor(getcharacter(self.Data))
+        end
+    })
+
+    Instance.declare("property", "Player", "Team", {
+        getter = function(self)
+            return constructor(getteam(self.Data))
+        end
+    })
+
+    Instance.declare("property", "Player", "DisplayName", {
+        getter = function(self)
+            return getdisplayname(self.Data)
+        end
+    })
+
+    Instance.declare("property", "Player", "UserId", {
+        getter = function(self)
+            return getuserid(self.Data)
+        end
+    })
+end
+
+do
+    --- properties ---
+
+    Instance.declare("property", "Workspace", "CurrentCamera", {
+        getter = function(self)
+            return constructor(findfirstchildofclass(self.Data, "Camera"))
+        end
+    })
+end
+
+do
+    --- properties ---
+
+    Instance.declare("property", "Camera", "FieldOfView", {
+        getter = function(self)
+            return getcamerafov(self.Data)
+        end
+    })
+
+    Instance.declare("method", "Camera", "SetCameraSubject", function(self, subject)
+        assert(type(subject) == "table" and subject.Data, `Camera:SetCameraSubject: subject must be an Instance, got {type(subject)}`)
+        
+        return setcamerasubject(subject.Data)
+    end)
+end
+
+do
+    --- properties ---
+
+    Instance.declare("property", { "UnionOperation", "MeshPart", "TrussPart", "Part" }, "CanCollide", {
+        getter = function(self)
+            return getcancollide(self.Data)
+        end,
+
+        setter = function(self, value: boolean)
+            assert(type(value) == "boolean", `Instance:CanCollide: value must be a boolean, got {type(value)}`)
+
+            setcancollide(self.Data, value)
+        end
+    })
+
+    Instance.declare("property", { "UnionOperation", "MeshPart", "TrussPart", "Part" }, "Velocity", {
+        getter = function(self)
+            local velocity = getvelocity(self.Data)
+
+            return vector.create(velocity.x, velocity.y, velocity.z)
+        end,
+
+        setter = function(self, value: vector | { x: number, y: number, z: number })
+            assert("table" == type(value) and value.x and value.y and value.z, `Instance:Velocity: value must be a Vector3, got {type(value)}`)
+
+            setvelocity(self.Data, value)
+        end
+    })
+end
+
+do
+    --- properties ---
+
+    Instance.declare("property", "MeshPart", "TextureID", {
+        getter = function(self)
+            return gettextureid(self.Data)
+        end
+    })
+
+    Instance.declare("property", "MeshPart", "MeshID", {
+        getter = function(self)
+            return getmeshid(self.Data)
+        end
+    })
+end
+
+do
+    --- properties ---
+
+    Instance.declare("property", "Humanoid", "Health", {
+        getter = function(self)
+            return gethealth(self.Data)
+        end
+    })
+
+    Instance.declare("property", "Humanoid", "MaxHealth", {
+        getter = function(self)
+            return getmaxhealth(self.Data)
+        end
+    })
+end
+
+do
+    --- properties ---
+
+    Instance.declare("property", "Model", "PrimaryPart", {
+        getter = function(self)
+            return constructor(getprimarypart(self.Data))
+        end
+    })
+end
+
+do
+    --- properties ---
+
+    Instance.declare("property", "BillboardGui", "Adornee", {
+        getter = function(self)
+            return constructor(getadornee(self.Data))
+        end
+    })
+end
+
+do
+    --- methods ---
+
+    Instance.declare("property", "Players", "LocalPlayer", {
+        getter = function(self)
+            return constructor(getlocalplayer())
+        end
+    })
+end
+
+do
+    --- methods ---
+
+    Instance.declare("method", "MouseService", "GetMousePosition", function(self)
+        local position = getmouseposition()
+        return vector.create(position.x, position.y)
+    end)
+
+    Instance.declare("method", "MouseService", "GetMouseLocation", function(self)
+        local location = getmouselocation(self.Data)
+        return vector.create(location.x, location.y)
+    end)
+
+    Instance.declare("method", "MouseService", "GetMouseBehavior", function(self)
+        return getmousebehavior(self.Data)
+    end)
+
+    Instance.declare("method", "MouseService", "GetMouseDeltaSensitivity", function(self)
+        return getmousedeltasensitivity(self.Data)
+    end)
+
+    Instance.declare("method", "MouseService", "IsMouseIconEnabled", function(self)
+        return ismouseiconenabled(self.Data)
+    end)
+
+    Instance.declare("method", "MouseService", "SetMouseLocation", function(self, x, y)
+        assert("number" == type(x), `MouseService:SetMouseLocation: x must be a number, got {type(x)}`)
+        assert("number" == type(y), `MouseService:SetMouseLocation: y must be a number, got {type(y)}`)
+        
+        setmouselocation(self.Data, x, y)
+    end)
+
+    Instance.declare("method", "MouseService", "SetMouseIconEnabled", function(self, enabled)
+        assert("boolean" == type(enabled), `MouseService:SetMouseIconEnabled: enabled must be a boolean, got {type(enabled)}`)
+        
+        setmouseiconenabled(self.Data, enabled)
+    end)
+
+    Instance.declare("method", "MouseService", "SetMouseBehavior", function(self, behavior)
+        assert("number" == type(behavior), `MouseService:SetMouseBehavior: behavior must be a number, got {type(behavior)}`)
+        
+        setmousebehaviour(self.Data, behavior)
+    end)
+
+    Instance.declare("method", "MouseService", "SetMouseDeltaSensitivity", function(self, sensitivity)
+        assert("number" == type(sensitivity), `MouseService:SetMouseDeltaSensitivity: sensitivity must be a number, got {type(sensitivity)}`)
+        
+        setmousedeltasensitivity(self.Data, sensitivity)
+    end)
+    
+    Instance.declare("method", "MouseService", "SmoothMouseExponential", function(self, origin, point, speed)
+        assert("table" == type(origin) and #origin >= 2, `MouseService:SmoothMouseExponential: origin must be a table with at least 2 numbers, got {type(origin)}`)
+        assert("table" == type(point) and #point >= 2, `MouseService:SmoothMouseExponential: point must be a table with at least 2 numbers, got {type(point)}`)
+        assert("number" == type(speed), `MouseService:SmoothMouseExponential: speed must be a number, got {type(speed)}`)
+        
+        local result = smoothmouse_exponential(origin, point, speed)
+        return vector.create(result.x, result.y)
+    end)
+
+    Instance.declare("method", "MouseService", "SmoothMouseLinear", function(self, origin, point, sensitivity, smoothness)
+        assert("table" == type(origin) and #origin >= 2, `MouseService:SmoothMouseLinear: origin must be a table with at least 2 numbers, got {type(origin)}`)
+        assert("table" == type(point) and #point >= 2, `MouseService:SmoothMouseLinear: point must be a table with at least 2 numbers, got {type(point)}`)
+        assert("number" == type(sensitivity), `MouseService:SmoothMouseLinear: sensitivity must be a number, got {type(sensitivity)}`)
+        assert("number" == type(smoothness), `MouseService:SmoothMouseLinear: smoothness must be a number, got {type(smoothness)}`)
+        
+        local result = smoothmouse_linear(origin, point, sensitivity, smoothness)
+        return vector.create(result.x, result.y)
+    end)
+end
+
+_G.game = Instance.new(Game)
+_G.workspace = Instance.new(Workspace)
+
+function _G.pointer_to_table_data(n)
+    assert("number" == type(n), `pointer_to_table_data: n must be a number, got {type(n)}`)
+
+    local data = pointer_to_user_data(n)
+    return data and Instance.new(data) or nil
+end
+
+---- to rewrite ----
+
+do
+    local Vector2 = {}
+    Vector2.__index = Vector2
+
+    -- Constructors
+    function Vector2.new(x, y)
+        return setmetatable({X = x or 0, Y = y or 0}, Vector2)
+    end
+
+    -- Constants
+    Vector2.zero = Vector2.new(0, 0)
+    Vector2.one = Vector2.new(1, 1)
+    Vector2.xAxis = Vector2.new(1, 0)
+    Vector2.yAxis = Vector2.new(0, 1)
+
+    -- Properties
+    function Vector2:Magnitude()
+        return math.sqrt(self.X^2 + self.Y^2)
+    end
+
+    function Vector2:Unit()
+        local m = self:Magnitude()
+        if m > 0 then
+            return Vector2.new(self.X / m, self.Y / m)
+        end
+        return Vector2.zero
+    end
+
+    -- Methods
+    function Vector2:Dot(v)
+        return self.X * v.X + self.Y * v.Y
+    end
+
+    function Vector2:Cross(v)
+        return self.X * v.Y - self.Y * v.X
+    end
+
+    function Vector2:Angle(v, isSigned)
+        local dot = self:Dot(v)
+        local magProduct = self:Magnitude() * v:Magnitude()
+        local angle = math.acos(math.clamp(dot / magProduct, -1, 1))
+        if isSigned then
+            return angle * (self:Cross(v) < 0 and -1 or 1)
+        end
+        return angle
+    end
+
+    function Vector2:Lerp(v, alpha)
+        return Vector2.new(
+            self.X + (v.X - self.X) * alpha,
+            self.Y + (v.Y - self.Y) * alpha
+        )
+    end
+
+    function Vector2:Abs()
+        return Vector2.new(math.abs(self.X), math.abs(self.Y))
+    end
+
+    function Vector2:Ceil()
+        return Vector2.new(math.ceil(self.X), math.ceil(self.Y))
+    end
+
+    function Vector2:Floor()
+        return Vector2.new(math.floor(self.X), math.floor(self.Y))
+    end
+
+    function Vector2:Sign()
+        local sign = function(v) return v > 0 and 1 or (v < 0 and -1 or 0) end
+        return Vector2.new(sign(self.X), sign(self.Y))
+    end
+
+    function Vector2:Max(...)
+        local args = {...}
+        local maxX, maxY = self.X, self.Y
+        for _, v in ipairs(args) do
+            maxX = math.max(maxX, v.X)
+            maxY = math.max(maxY, v.Y)
+        end
+        return Vector2.new(maxX, maxY)
+    end
+
+    function Vector2:Min(...)
+        local args = {...}
+        local minX, minY = self.X, self.Y
+        for _, v in ipairs(args) do
+            minX = math.min(minX, v.X)
+            minY = math.min(minY, v.Y)
+        end
+        return Vector2.new(minX, minY)
+    end
+
+    function Vector2:FuzzyEq(v, epsilon)
+        epsilon = epsilon or 1e-5
+        return math.abs(self.X - v.X) < epsilon and math.abs(self.Y - v.Y) < epsilon
+    end
+
+    -- Operators
+    function Vector2:__add(v)
+        return Vector2.new(self.X + v.X, self.Y + v.Y)
+    end
+
+    function Vector2:__sub(v)
+        return Vector2.new(self.X - v.X, self.Y - v.Y)
+    end
+
+    function Vector2:__mul(v)
+        if type(v) == "number" then
+            return Vector2.new(self.X * v, self.Y * v)
+        elseif getmetatable(v) == Vector2 then
+            return Vector2.new(self.X * v.X, self.Y * v.Y)
+        end
+    end
+
+    function Vector2:__div(v)
+        if type(v) == "number" then
+            return Vector2.new(self.X / v, self.Y / v)
+        elseif getmetatable(v) == Vector2 then
+            return Vector2.new(self.X / v.X, self.Y / v.Y)
+        end
+    end
+
+    function Vector2:__floordiv(v)
+        if type(v) == "number" then
+            return Vector2.new(math.floor(self.X / v), math.floor(self.Y / v))
+        elseif getmetatable(v) == Vector2 then
+            return Vector2.new(math.floor(self.X / v.X), math.floor(self.Y / v.Y))
+        end
+    end
+
+    function Vector2:__unm()
+        return Vector2.new(-self.X, -self.Y)
+    end
+
+    function Vector2:__tostring()
+        return string.format("Vector2.new(%.3f, %.3f)", self.X, self.Y)
+    end
+
+    -- Clamp fallback
+    math.clamp = math.clamp or function(x, min, max)
+        return math.max(min, math.min(max, x))
+    end
+
+    -- Global binding (optional)
+    _G.Vector2 = Vector2
+
+    local Vector3 = {}
+    Vector3.__index = Vector3
+
+    -- Enums for normal and axis
+    local Enum = {
+        NormalId = {
+            Top = "Top", Bottom = "Bottom", Left = "Left",
+            Right = "Right", Front = "Front", Back = "Back"
         },
-        MeshPart = {
-            CFrame = function()
-                local a = getcframe(b)
-                local b = a.position
-                local c = a.lookvector
-                local d = a.rightvector
-                local e = a.upvector
-                return {
-                    Matrix = a,
-                    Position = Vector3.new(b.x, b.y, b.z),
-                    LookVector = Vector3.new(c.x, c.y, c.z),
-                    RightVector = Vector3.new(d.x, d.y, d.z),
-                    UpVector = Vector3.new(e.x, e.y, e.z)
-                }
-            end,
-            Size = function()
-                return getsize(b)
-            end,
-            Velocity = function()
-                return getvelocity(b)
-            end,
-            MeshId = function()
-                return getmeshid(b)
-            end,
-            TextureId = function()
-                return gettextureid(b)
-            end
-        },
-        UnionOperation = {
-            CFrame = function()
-                local a = getcframe(b)
-                local b = a.position
-                local c = a.lookvector
-                local d = a.rightvector
-                local e = a.upvector
-                return {
-                    Matrix = a,
-                    Position = Vector3.new(b.x, b.y, b.z),
-                    LookVector = Vector3.new(c.x, c.y, c.z),
-                    RightVector = Vector3.new(d.x, d.y, d.z),
-                    UpVector = Vector3.new(e.x, e.y, e.z)
-                }
-            end,
-            Size = function()
-                return getsize(b)
-            end,
-            Velocity = function()
-                return getvelocity(b)
-            end
-        },
-        Players = {localPlayer = function()
-                return e(getlocalplayer)
-            end},
-        Model = {PrimaryPart = function()
-                return e(getprimarypart, b)
-            end},
-        Humanoid = {Health = function()
-                return gethealth(b)
-            end, MaxHealth = function()
-                return getmaxhealth(b)
-            end},
-        BillboardGui = {Adornee = function()
-                return e(getadornee, b)
-            end},
-        Player = {Character = function()
-                return e(getcharacter, b)
-            end, UserId = function()
-                return getuserid(b)
-            end, Team = function()
-                return getteam(b)
-            end, DisplayName = function()
-                return getdisplayname(b)
-            end},
-        Camera = {FieldOfView = function()
-                return getcamerafov(b)
-            end,  CFrame = function()
-                local a = getcframe(b)
-                local b = a.position
-                local c = a.lookvector
-                local d = a.rightvector
-                local e = a.upvector
-                return {
-                    Matrix = a,
-                    Position = Vector3.new(b.x, b.y, b.z),
-                    LookVector = Vector3.new(c.x, c.y, c.z),
-                    RightVector = Vector3.new(d.x, d.y, d.z),
-                    UpVector = Vector3.new(e.x, e.y, e.z)
-                }
-            end},
-        UserInputService = {MouseBehavior = function()
-                return getmousebehavior(findservice(Game, "MouseService"))
-            end, MouseIconEnabled = function()
-                return ismouseiconenabled(findservice(Game, "MouseService"))
-            end, MouseDeltaSensitivity = function()
-                return getmousedeltasensitivity(findservice(Game, "MouseService"))
-            end},
-        Workspace = {CurrentCamera = function()
-                return e(findfirstchildofclass, findservice(Game, "Workspace"), "Camera")
-            end}
-    }
-    setmetatable(
-        c,
-        {
-            __index = function(h, h)
-                if f[h] then
-                    return f[h]()
-                end
-                if g[d] and g[d][h] then
-                    return g[d][h]()
-                end
-                if
-                    d == "BoolValue" or d == "IntValue" or d == "NumberValue" or d == "Vector3Value" or
-                        d == "ObjectValue" or d == "StringValue"
-                 then
-                    if h == "Value" then
-                        if d == "ObjectValue" then
-                            return e(getvalue, b)
-                        end
-                        return getvalue(b)
-                    end
-                    if h == "SetValue" then
-                        return function(a, b)
-                            assert(a == c, "SetValue must be called with ':' not '.'")
-                            setvalue(a.Data, b)
-                        end
-                    end
-                end
-                if d == "Camera" then
-                    if h == "WorldToScreenPoint" then
-                        return function(a, b)
-                            assert(a == c, "WorldToScreenPoint must be called with ':' not '.'")
-                            return worldtoscreenpoint({b.x, b.y, b.z})
-                        end
-                    end
-                    if h == "SetCameraSubject" then
-                        return function(a, b)
-                            assert(a == c, "SetCameraSubject must be called with ':' not '.'")
-                            setcamerasubject(a.Data, b)
-                        end
-                    end
-                end
-                if d == "Part" or d == "MeshPart" or d == "Camera" or d == "UnionOperation" then
-                    if h == "SetCFrame" then
-                        return function(a, b)
-                            assert(a == c, "SetCFrame must be called with ':' not '.'")
-                            setcframe(
-                                a.Data,
-                                {
-                                    position = b.Position,
-                                    lookvector = b.LookVector,
-                                    upvector = b.UpVector,
-                                    rightvector = b.RightVector
-                                }
-                            )
-                        end
-                    end
-                    if h == "SetPosition" then
-                        return function(a, b)
-                            assert(a == c, "SetPosition must be called with ':' not '.'")
-                            setposition(a.Data, {b.x, b.y, b.z})
-                        end
-                    end
-                    if h == "SetVelocity" then
-                        return function(a, b)
-                            assert(a == c, "SetVelocity must be called with ':' not '.'")
-                            setvelocity(a.Data, {b.x, b.y, b.z})
-                        end
-                    end
-                    if h == "SetLookVector" then
-                        return function(a, b)
-                            assert(a == c, "SetLookVector must be called with ':' not '.'")
-                            setlookvector(a.Data, {b.x, b.y, b.z})
-                        end
-                    end
-                    if h == "SetUpVector" then
-                        return function(a, b)
-                            assert(a == c, "SetUpVector must be called with ':' not '.'")
-                            setupvector(a.Data, {b.x, b.y, b.z})
-                        end
-                    end
-                    if h == "SetRightVector" then
-                        return function(a, b)
-                            assert(a == c, "SetRightVector must be called with ':' not '.'")
-                            setrightvector(a.Data, {b.x, b.y, b.z})
-                        end
-                    end
-                end
-                if d == "UserInputService" then
-                    if h == "GetMouseLocation" then
-                        return function(a)
-                            assert(a == c, "GetMouseLocation must be called with ':' not '.'")
-                            return getmouselocation(findservice(Game, "MouseService"))
-                        end
-                    end
-                    if h == "SetMouseLocation" then
-                        return function(a, k, l)
-                            assert(a == c, "SetMouseLocation must be called with ':' not '.'")
-                            setmouselocation(findservice(Game, "MouseService"), k, l)
-                        end
-                    end
-                    if h == "SetMouseIconEnabled" then
-                        return function(a, b)
-                            assert(a == c, "SetMouseIconEnabled must be called with ':' not '.'")
-                            setmouseiconenabled(a.Data, b)
-                        end
-                    end
-                    if h == "SetMouseBehavior" then
-                        return function(a, b)
-                            assert(a == c, "SetMouseBehavior must be called with ':' not '.'")
-                            setmousebehavior(a.Data, b)
-                        end
-                    end
-                    if h == "SetMouseDeltaSensitivity" then
-                        return function(a, b)
-                            assert(a == c, "SetMouseDeltaSensitivity must be called with ':' not '.'")
-                            SetMouseDeltaSensitivity(a.Data, b)
-                        end
-                    end
-                end
-                 if d == "HttpService" then
-                    if h == "JSONDecode" then
-                        return function(a, b)
-                            assert(a == c, "JSONDecode must be called with ':' not '.'")
-                            return JSONDecode(b)
-                        end
-                    end 
-                    if h == "JSONEncode" then
-                        return function(a, b)
-                            assert(a == c, "JSONEncode must be called with ':' not '.'")
-                            return JSONEncode(b)
-                        end
-                    end 
-                end            
-                if d == "DataModel" then
-                    if h == "FindService" then
-                        return function(a, b)
-                            assert(a == c, "FindService must be called with ':' not '.'")
-                            return e(findservice, a.Data, b)
-                        end
-                    end
-                    if h == "GetService" then
-                        return function(a, b)
-                            assert(a == c, "GetService must be called with ':' not '.'")
-                            return e(findservice, a.Data, b)
-                        end
-                    end
-                    if h == "HttpGet" then
-                        return function(a, b)
-                            assert(a == c, "HttpGet must be called with ':' not '.'")
-                            return httpget(b)
-                        end
-                    end
-                    if h == "HttpPost" then
-                        return function(a, b, d, e, f, ...)
-                            assert(a == c, "HttpPost must be called with ':' not '.'")
-                            return httppost(b, d, e, f, ...)
-                        end
-                    end
-                end
-                if h == "GetChildren" then
-                    return function(d)
-                        assert(d == c, "GetChildren must be called with ':' not '.'")
-                        local b = getchildren(b)
-                        local c = {}
-                        for b, b in ipairs(b) do
-                            table.insert(c, a(b))
-                        end
-                        return c
-                    end
-                end
-                if h == "GetDescendants" then
-                    return function(d)
-                        assert(d == c, "GetDescendants must be called with ':' not '.'")
-                        local b = getdescendants(b)
-                        local c = {}
-                        for b, b in ipairs(b) do
-                            table.insert(c, a(b))
-                        end
-                        return c
-                    end
-                end
-                if h == "FindFirstChild" then
-                    return function(a, b)
-                        assert(a == c, "FindFirstChild must be called with ':' not '.'")
-                        return e(findfirstchild, a.Data, b)
-                    end
-                end
-                if h == "FindFirstChildOfClass" then
-                    return function(a, b)
-                        assert(a == c, "FindFirstChildOfClass must be called with ':' not '.'")
-                        return e(findfirstchildofclass, a.Data, b)
-                    end
-                end
-                if h == "FindFirstAncestorOfClass" then
-                    return function(a, b)
-                        assert(a == c, "FindFirstAncestorOfClass must be called with ':' not '.'")
-                        return e(findfirstancestorofclass, a.Data, b)
-                    end
-                end
-                if h == "FindFirstDescendant" then
-                    return function(a, b)
-                        assert(a == c, "FindFirstDescendant must be called with ':' not '.'")
-                        return e(findfirstdescendant, a.Data, b)
-                    end
-                end
-                if h == "FindFirstAncestor" then
-                    return function(a, b)
-                        assert(a == c, "FindFirstAncestor must be called with ':' not '.'")
-                        return e(findfirstancestor, a.Data, b)
-                    end
-                end
-                if h == "WaitForChild" then
-                    return function(a, b, d)
-                        assert(a == c, "WaitForChild must be called with ':' not '.'")
-                        return e(waitforchild, a.Data, b, d)
-                    end
-                end
-                if h == "IsAncestorOf" then
-                    return function(a, b)
-                        assert(a == c, "IsAncestorOf must be called with ':' not '.'")
-                        return e(isancestorof, a.Data, b)
-                    end
-                end
-                if h == "IsDescendantOf" then
-                    return function(a, b)
-                        assert(a == c, "IsDescendantOf must be called with ':' not '.'")
-                        return e(isdescendantof, a.Data, b)
-                    end
-                end
-                if h == "Destroy" then
-                    return function(a, b)
-                        assert(a == c, "Destroy must be called with ':' not '.'")
-                        destroy(a.Data)
-                    end
-                end
-                if h == "GetMemoryValue" then
-                    return function(a, b, g)
-                        assert(a == c, "GetMemoryValue must be called with ':' not '.'")
-                        return getmemoryvalue(a.Data, b, g)
-                    end
-                end
-                if h == "SetMemoryValue" then
-                    return function(a, b, g, d)
-                        assert(a == c, "SetMemoryValue must be called with ':' not '.'")
-                        setmemoryvalue(a.Data, b, g, d)
-                    end
-                end           
-                return a(findfirstchild(b, h))
-            end
+        Axis = {
+            X = "X", Y = "Y", Z = "Z"
         }
-    )
-     -- Cache the object before returning it
-    lua_cache[b] = c
-    return c
-end
-_G.game = a(Game)
-_G.workspace = a(Workspace)
-_G.pointer_to_table_data = function(n)
-   return a(pointer_to_user_data(n))
-end
+    }
 
-_G.print = function(...)
-    local args, count = {...}, select("#", ...)
-    local output = ""
-
-    for i = 1, count do
-        local v = args[i]
-
-        if type(v) == "table" then
-            if v.Name and v.Data then
-                output = output .. v.Name .. " | "
-            end
-        elseif type(v) == "userdata" then
-            output = output .. getname(v) .. " | "
-        end
-
-        local str = tostring(v)
-        if type(str) ~= "string" then
-            error("'tostring' must return a string - print function")
-        end
-
-        output = output .. str .. " "
+    -- Constructor
+    function Vector3.new(x, y, z)
+        return setmetatable({X = x or 0, Y = y or 0, Z = z or 0}, Vector3)
     end
 
-    return print(output)
-end
-
-_G.warn = function(...)
-    local args, count = {...}, select("#", ...)
-    local output = ""
-
-    for i = 1, count do
-        local v = args[i]
-
-        if type(v) == "table" then
-            if v.Name and v.Data then
-                output = output .. v.Name .. " | "
-            end
-        elseif type(v) == "userdata" then
-            output = output .. getname(v) .. " | "
-        end
-
-        local str = tostring(v)
-        if type(str) ~= "string" then
-            error("'tostring' must return a string - warn function")
-        end
-
-        output = output .. str .. " "
+    -- FromNormalId
+    function Vector3.FromNormalId(normal)
+        local map = {
+            [Enum.NormalId.Top] = Vector3.new(0, 1, 0),
+            [Enum.NormalId.Bottom] = Vector3.new(0, -1, 0),
+            [Enum.NormalId.Left] = Vector3.new(-1, 0, 0),
+            [Enum.NormalId.Right] = Vector3.new(1, 0, 0),
+            [Enum.NormalId.Front] = Vector3.new(0, 0, -1),
+            [Enum.NormalId.Back] = Vector3.new(0, 0, 1),
+        }
+        return map[normal] or Vector3.zero
     end
 
-    return warn(output)
+    -- FromAxis
+    function Vector3.FromAxis(axis)
+        local map = {
+            [Enum.Axis.X] = Vector3.new(1, 0, 0),
+            [Enum.Axis.Y] = Vector3.new(0, 1, 0),
+            [Enum.Axis.Z] = Vector3.new(0, 0, 1),
+        }
+        return map[axis] or Vector3.zero
+    end
+
+    -- Properties
+    Vector3.zero = Vector3.new(0, 0, 0)
+    Vector3.one = Vector3.new(1, 1, 1)
+    Vector3.xAxis = Vector3.new(1, 0, 0)
+    Vector3.yAxis = Vector3.new(0, 1, 0)
+    Vector3.zAxis = Vector3.new(0, 0, 1)
+
+    function Vector3:Magnitude()
+        return math.sqrt(self.X^2 + self.Y^2 + self.Z^2)
+    end
+
+    function Vector3:Unit()
+        local m = self:Magnitude()
+        if m > 0 then
+            return Vector3.new(self.X / m, self.Y / m, self.Z / m)
+        end
+        return Vector3.zero
+    end
+
+    -- Methods
+    function Vector3:Abs()
+        return Vector3.new(math.abs(self.X), math.abs(self.Y), math.abs(self.Z))
+    end
+
+    function Vector3:Ceil()
+        return Vector3.new(math.ceil(self.X), math.ceil(self.Y), math.ceil(self.Z))
+    end
+
+    function Vector3:Floor()
+        return Vector3.new(math.floor(self.X), math.floor(self.Y), math.floor(self.Z))
+    end
+
+    function Vector3:Sign()
+        local sign = function(v) return v > 0 and 1 or (v < 0 and -1 or 0) end
+        return Vector3.new(sign(self.X), sign(self.Y), sign(self.Z))
+    end
+
+    function Vector3:Cross(v)
+        return Vector3.new(
+            self.Y * v.Z - self.Z * v.Y,
+            self.Z * v.X - self.X * v.Z,
+            self.X * v.Y - self.Y * v.X
+        )
+    end
+
+    function Vector3:Angle(v, axis)
+        local dot = self:Dot(v)
+        local magProduct = self:Magnitude() * v:Magnitude()
+        local angle = math.acos(math.clamp(dot / magProduct, -1, 1))
+        if axis then
+            return angle * (self:Cross(v):Dot(axis) < 0 and -1 or 1)
+        end
+        return angle
+    end
+
+    function Vector3:Dot(v)
+        return self.X * v.X + self.Y * v.Y + self.Z * v.Z
+    end
+
+    function Vector3:FuzzyEq(v, epsilon)
+        epsilon = epsilon or 1e-5
+        local diffSq = (self - v):Magnitude()^2
+        return diffSq <= epsilon^2 * math.max(self:Magnitude()^2, v:Magnitude()^2, 1)
+    end
+
+    function Vector3:Lerp(v, alpha)
+        return Vector3.new(
+            self.X + (v.X - self.X) * alpha,
+            self.Y + (v.Y - self.Y) * alpha,
+            self.Z + (v.Z - self.Z) * alpha
+        )
+    end
+
+    function Vector3:Max(v)
+        return Vector3.new(
+            math.max(self.X, v.X),
+            math.max(self.Y, v.Y),
+            math.max(self.Z, v.Z)
+        )
+    end
+
+    function Vector3:Min(v)
+        return Vector3.new(
+            math.min(self.X, v.X),
+            math.min(self.Y, v.Y),
+            math.min(self.Z, v.Z)
+        )
+    end
+
+    -- Math Operations
+    function Vector3:__add(v)
+        return Vector3.new(self.X + v.X, self.Y + v.Y, self.Z + v.Z)
+    end
+
+    function Vector3:__sub(v)
+        return Vector3.new(self.X - v.X, self.Y - v.Y, self.Z - v.Z)
+    end
+
+    function Vector3:__mul(v)
+        if type(v) == "number" then
+            return Vector3.new(self.X * v, self.Y * v, self.Z * v)
+        elseif getmetatable(v) == Vector3 then
+            return Vector3.new(self.X * v.X, self.Y * v.Y, self.Z * v.Z)
+        end
+    end
+
+    function Vector3:__div(v)
+        if type(v) == "number" then
+            return Vector3.new(self.X / v, self.Y / v, self.Z / v)
+        elseif getmetatable(v) == Vector3 then
+            return Vector3.new(self.X / v.X, self.Y / v.Y, self.Z / v.Z)
+        end
+    end
+
+    function Vector3:__mod(v)
+        return Vector3.new(self.X % v.X, self.Y % v.Y, self.Z % v.Z)
+    end
+
+    function Vector3:__floordiv(v)
+        if type(v) == "number" then
+            return Vector3.new(math.floor(self.X / v), math.floor(self.Y / v), math.floor(self.Z / v))
+        elseif getmetatable(v) == Vector3 then
+            return Vector3.new(math.floor(self.X / v.X), math.floor(self.Y / v.Y), math.floor(self.Z / v.Z))
+        end
+    end
+
+    function Vector3:__unm()
+        return Vector3.new(-self.X, -self.Y, -self.Z)
+    end
+
+    function Vector3:__tostring()
+        return string.format("Vector3.new(%.3f, %.3f, %.3f)", self.X, self.Y, self.Z)
+    end
+
+    -- Clamp fallback for Lua environments
+    math.clamp = math.clamp or function(x, min, max)
+        return math.max(min, math.min(max, x))
+    end
+
+    -- Register to global if needed
+    _G.Vector3 = Vector3
+    _G.Enum = Enum
+
+    _G.print = function(...)
+        local args, count = {...}, select("#", ...)
+        local output = ""
+
+        for i = 1, count do
+            local v = args[i]
+
+            if type(v) == "table" then
+                if v.Name and v.Data then
+                    output = output .. v.Name .. " | "
+                end
+            elseif type(v) == "userdata" then
+                output = output .. getname(v) .. " | "
+            end
+
+            local str = tostring(v)
+            if type(str) ~= "string" then
+                error("'tostring' must return a string - print function")
+            end
+
+            output = output .. str .. " "
+        end
+
+        return print(output)
+    end
+
+    _G.warn = function(...)
+        local args, count = {...}, select("#", ...)
+        local output = ""
+
+        for i = 1, count do
+            local v = args[i]
+
+            if type(v) == "table" then
+                if v.Name and v.Data then
+                    output = output .. v.Name .. " | "
+                end
+            elseif type(v) == "userdata" then
+                output = output .. getname(v) .. " | "
+            end
+
+            local str = tostring(v)
+            if type(str) ~= "string" then
+                error("'tostring' must return a string - warn function")
+            end
+
+            output = output .. str .. " "
+        end
+
+        return warn(output)
+    end
 end
