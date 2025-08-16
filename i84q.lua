@@ -893,14 +893,14 @@ local Color3 = {} do
         assert(type(R) == "number" and type(G) == "number" and type(B) == "number", "can't construct color with non-numeric arguments")
 
         local This = setmetatable({
-            R = math.clamp(math.floor(R), 0, 255),
-            G = math.clamp(math.floor(G), 0, 255),
-            B = math.clamp(math.floor(B), 0, 255)
+            math.clamp(math.floor(R), 0, 255),
+            math.clamp(math.floor(G), 0, 255),
+             math.clamp(math.floor(B), 0, 255)
         }, Color3); do
-            function This.unpack(This) return { This.R, This.G, This.B } end
+            function This.unpack(This) return { This[1], This[2], This[3] } end
             function This.lerp(This, Target, T) return This + (Target - This) * T end
-            function This.distance(This, Other) return math.sqrt((This.R - Other.R) ^ 2 + (This.G - Other.G) ^ 2 + (This.B - Other.B) ^ 2) end
-            function This.dword(This) return bit32.bor(This.R, bit32.lshift(This.G, 8), bit32.lshift(This.B, 16)) end
+            function This.distance(This, Other) return math.sqrt((This[1] - Other[1]) ^ 2 + (This[2] - Other[2]) ^ 2 + (This[3] - Other[3]) ^ 2) end
+            function This.dword(This) return bit32.bor(This[1], bit32.lshift(This[2], 8), bit32.lshift(This[3], 16)) end
         end
 
         return This
@@ -916,11 +916,11 @@ local Color3 = {} do
     function Color3.__newindex(This, Key, Value) if Key == "R" or Key == "G" or Key == "B" then rawset(This, Key, math.clamp(math.floor(Value), 0, 255)) else rawset(This, Key, Value) end end
     function Color3.__eq(This, Other) return This.R == Other.R and This.G == Other.G and This.B == Other.B end
     function Color3.__tostring(This) return `Color.new({This.R}, {This.G}, {This.B})` end
-    
-    function Color3.__add(This, Other) if type(Other) == "table" and Other.R and Other.G and Other.B then return Color3.fromRGB(This.R + Other.R, This.G + Other.G, This.B + Other.B) end return error(`can't add {type(Other)} to Color`) end
-    function Color3.__sub(This, Other) if type(Other) == "table" and Other.R and Other.G and Other.B then return Color3.fromRGB(This.R - Other.R, This.G - Other.G, This.B - Other.B) end return error(`can't subtract {type(Other)} from Color`) end
-    function Color3.__mul(This, Other) if type(Other) == "table" and Other.R and Other.G and Other.B then return Color3.fromRGB(This.R * Other.R, This.G * Other.G, This.B * Other.B) elseif type(Other) == "number" then return Color3.fromRGB(This.R * Other, This.G * Other, This.B * Other) end return error(`can't multiply {type(Other)} with Color`) end
-    function Color3.__div(This, Other) if type(Other) == "table" and Other.R and Other.G and Other.B then return Color3.fromRGB(This.R / Other.R, This.G / Other.G, This.B / Other.B) elseif type(Other) == "number" then return Color3.fromRGB(This.R / Other, This.G / Other, This.B / Other) end return error(`can't divide {type(Other)} from Color`) end
+
+    function Color3.__add(This, Other) if type(Other) == "table" and Other.R and Other.G and Other.B then return Color3.fromRGB(This[1] + Other[1], This[2] + Other[2], This[3] + Other[3]) end return error(`can't add {type(Other)} to Color`) end
+    function Color3.__sub(This, Other) if type(Other) == "table" and Other.R and Other.G and Other.B then return Color3.fromRGB(This[1] - Other[1], This[2] - Other[2], This[3] - Other[3]) end return error(`can't subtract {type(Other)} from Color`) end
+    function Color3.__mul(This, Other) if type(Other) == "table" and Other.R and Other.G and Other.B then return Color3.fromRGB(This[1] * Other[1], This[2] * Other[2], This[3] * Other[3]) elseif type(Other) == "number" then return Color3.fromRGB(This[1] * Other, This[2] * Other, This[3] * Other) end return error(`can't multiply {type(Other)} with Color`) end
+    function Color3.__div(This, Other) if type(Other) == "table" and Other.R and Other.G and Other.B then return Color3.fromRGB(This[1] / Other[1], This[2] / Other[2], This[3] / Other[3]) elseif type(Other) == "number" then return Color3.fromRGB(This[1] / Other, This[2] / Other, This[3] / Other) end return error(`can't divide {type(Other)} from Color`) end
 
     Color3.__index = Color3
 end
