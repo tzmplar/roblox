@@ -500,6 +500,7 @@ do
     end)
 end
 
+_G.Instance = Instance
 _G.game = Instance.new(Game)
 _G.workspace = Instance.new(Workspace)
 
@@ -647,11 +648,6 @@ do
 
     function Vector2:__tostring()
         return string.format("Vector2.new(%.3f, %.3f)", self.X, self.Y)
-    end
-
-    -- Clamp fallback
-    math.clamp = math.clamp or function(x, min, max)
-        return math.max(min, math.min(max, x))
     end
 
     -- Global binding (optional)
