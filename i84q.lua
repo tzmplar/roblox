@@ -9,88 +9,38 @@ type(i)}`)f[h]=f[h]or{}table.insert(f[h],i)return{disconnect=function()assert(
 'function'==type(i),`connection:disconnect: callback must be a function, got {
 type(i)}`)local j=table.find(f[h],i)if j then table.remove(f[h],j)end end}end
 function e.close(g)websocket_close(d)end end return e end end return b end
-function a.b()local b={}do local function constructor()return setmetatable({_map
-={}},{__index=b})end b.new=constructor function b.emit<T...>(c,...:T...)for d=#c
-,1,-1 do local e=c[d]if e then if'function'==type(e)then coroutine.wrap(e)(...)
-elseif'thread'==type(e)then coroutine.resume(e,...)end end end return c end
-function b.bind<T...>(c,d:(T...)->()):connection__DARKLUA_TYPE_a table.insert(c,
-d)return{unbind=function()local e=table.find(c,d)if e then table.remove(c,e)end
-end}end function b.once<T...>(c,d:(T...)->()):connection__DARKLUA_TYPE_a local e
-do e=c:bind(function(...)d(...)e:unbind()end)end return e end function b.wait<T
-...>(c):T...local d=coroutine.running()c:once(function(...)coroutine.resume(d,
-...)end)return coroutine.yield()end setmetatable(b,{__call=constructor})end
-return b end function a.c()return function(b,c)assert('table'==type(b),`map(t, callback): expected a table, got {
-type(b)}`)assert('function'==type(c),`map(t, callback): expected a function, got {
-type(c)}`)local d={}do for e,f in b do d[e]=c(f,e,b)end end return d end end
-function a.d()local b={}local c={__index=b}function c.__add(d,e)return b.new(d.x
-+e.x,d.y+e.y,d.z+e.z)end function c.__sub(d,e)return b.new(d.x-e.x,d.y-e.y,d.z-e
-.z)end function c.__unm(d)return b.new(-d.x,-d.y,-d.z)end function c.__eq(d,e)if
-d.x==e.x and d.y==e.y and d.z==e.z then return true else return false end end
-function c.__tostring(d)return'('..d.x..', '..d.y..', '..d.z..')'end function c.
-__concat(d,e)return tostring(d)..tostring(e)end function c.__mul(d,e)if type(e)
-=='number'then return b.new(d.x*e,d.y*e,d.z*e)end return b.new(d.x*e.x,d.y*e.y,d
-.z*e.z)end function c.__div(d,e)if type(e)=='number'then if e==0 then print
-'Attempted to divide by zero. Returning nil'return nil end return b.new(d.x/e,d.
-y/e,d.z/e)end if e.x==0 or e.y==0 or e.z==0 then print
-'Attempted to divide by zero. Returning nil.'return nil end return b.new(d.x/e.x
-,d.y/e.y,d.z/e.z)end function b.new(d,e,f)return setmetatable({x=d or 0,y=e or 0
-,z=f or 0},c)end function b.lerp(d,e,f)return b.new(d.x+(e.x-d.x)*f,d.y+(e.y-d.y
-)*f,d.z+(e.z-d.z)*f)end function b.distance(d,e)return math.sqrt((d.x-e.x)^2+(d.
-y-e.y)^2+(d.z-e.z)^2)end function b.magnitude(d)return math.sqrt(d.x^2+d.y^2+d.z
-^2)end function b.normalized(d)local e=d:magnitude()if e==0 then return b.new()
-end return b.new(d.x/e,d.y/e,d.z/e)end function b.dot(d,e)return((d.x*e.x)+(d.y*
-e.y)+(d.z*e.z))end function b.cross(d,e)local f=b.new((d.y*e.z)-(d.z*e.y),(d.z*e
-.x)-(d.x*e.z),(d.x*e.y)-(d.y*e.x))if f.x==0 then f.x=0 end if f.y==0 then f.y=0
-end if f.z==0 then f.z=0 end return f end function b.tostring(d)return tostring(
-d)end b.zero=b.new(0,0,0)b.up=b.new(0,1,0)b.down=b.new(0,-1,0)b.left=b.new(-1,0,
-0)b.right=b.new(1,0,0)b.forward=b.new(0,0,1)b.back=b.new(0,0,-1)return b end
-function a.e()local b={}local c=math.sqrt function b.new(d,e)assert(tonumber(d)
-or(d==nil),'Vector2 coordinates can only be numbers')assert(tonumber(d)or(d==nil
-),'Vector2 coordinates can only be numbers')local f={}setmetatable(f,b)f.x=d or
-0 f.y=e or 0 f.Type='Vector2'return f end function b.__index(d,e)if e==
-'magnitude'then local f,g=rawget(d,'x'),rawget(d,'y')return c(f*f+g*g)elseif e==
-'unit'then local f,g=rawget(d,'x'),rawget(d,'y')local h=c(f*f+g*g)if h==0 then
-return d end return b.new(f/h,g/h)end return rawget(b,e)end function b.
-__tostring(d)return d.x..', '..d.y end function b.__eq(d,e)assert(e.Type==
-'Vector2','Cannot compare Vector2 with '..tostring(e))if d.x==e.x and d.y==e.y
-then return true end return false end function b.__add(d,e)if type(e)=='number'
-then return b.new(d.x+e,d.y+e)end return b.new(d.x+e.x,d.y+e.y)end function b.
-__mul(d,e)if type(e)=='number'then return b.new(d.x*e,d.y*e)end return b.new(d.x
-*e.x,d.y*e.y)end function b.__div(d,e)if type(e)=='number'then return b.new(d.x/
-e,d.y/e)end return b.new(d.x/e.x,d.y/e.y)end function b.__sub(d,e)if type(e)==
-'number'then return b.new(d.x-e,d.y-e)end return b.new(d.x-e.x,d.y-e.y)end
-return b end function a.f()local b={}do local function constructor(c:number,d:
-number,e:number)assert('number'==type(c),`Color3.new: red must be a number, got {
-type(c)}`)assert('number'==type(d),`Color3.new: green must be a number, got {
-type(d)}`)assert('number'==type(e),`Color3.new: blue must be a number, got {
-type(e)}`)return setmetatable({c,d,e},{__index=b.__index,__tostring=b.__tostring
-})end function b.toHSV(c)local d,e,f=c[1]/255,c[2]/255,c[3]/255 local g,h=math.
-max(d,e,f),math.min(d,e,f)local i,j,k k=g local l=g-h if g~=0 then j=l/g else j=
-0 i=0 return i,j,k end if d==g then i=(e-f)/l elseif e==g then i=2+(f-d)/l else
-i=4+(d-e)/l end i=i*60 if i<0 then i=i+360 end return i,j,k end function b.toHex
-(c)local d=string.format('%02X',math.floor(c[1]))local e=string.format('%02X',
-math.floor(c[2]))local f=string.format('%02X',math.floor(c[3]))return`{d}{e}{f}`
-end function b.fromRGB(c:number,d:number,e:number):Color3 assert('number'==type(
-c),`Color3.fromRGB: red must be a number, got {type(c)}`)assert('number'==type(d
-),`Color3.fromRGB: green must be a number, got {type(d)}`)assert('number'==type(
-e),`Color3.fromRGB: blue must be a number, got {type(e)}`)return constructor(c,d
-,e)end do local c=b.fromRGB function b.fromHex(d:string)assert('string'==type(d)
-,`Color3.fromHex: data must be a string, got {type(d)}`)local e=tonumber(d:sub(1
-,2),16)local f=tonumber(d:sub(3,4),16)local g=tonumber(d:sub(5,6),16)return c(e,
-f,g)end function b.fromHSV(d,e,f)assert(type(d)=='number'and type(e)=='number'
-and type(f)=='number','HSV values must be numbers')d=math.clamp(d,0,360)e=math.
-clamp(e,0,1)f=math.clamp(f,0,1)local g=f*e local h=g*(1-math.abs((d/60)%2-1))
-local i=f-g local j,k,l if d<60 then j,k,l=g,h,0 elseif d<120 then j,k,l=h,g,0
-elseif d<180 then j,k,l=0,g,h elseif d<240 then j,k,l=0,h,g elseif d<300 then j,
-k,l=h,0,g else j,k,l=g,0,h end return c(math.floor((j+i)*255),math.floor((k+i)*
-255),math.floor((l+i)*255))end end function b.buffer(c:buffer|typeof(b))assert(
-'buffer'==type(c)or'table'==type(c),`Color3.buffer: value must be a buffer or Color3, got {
-type(c)}`)if'buffer'==type(c)then local d=buffer.readi8(c,0)local e=buffer.
-readi8(c,1)local f=buffer.readi16(c,2)return b.fromRGB(d,e,f)else local d=buffer
-.create(8)buffer.writei8(d,0,c[1])buffer.writei8(d,1,c[2])buffer.writei16(d,2,c[
-3])return d end end function b.dword(c:number|typeof(b))assert('number'==type(c)
-or'table'==type(c),`Color3.dword: value must be a number or Color3, got {type(c)
-}`)if'number'==type(c)then return b.fromRGB(bit32.band(c,0xff),bit32.band(bit32.
+function a.b()local b={}do local function constructor(c:number,d:number,e:number
+)assert('number'==type(c),`Color3.new: red must be a number, got {type(c)}`)
+assert('number'==type(d),`Color3.new: green must be a number, got {type(d)}`)
+assert('number'==type(e),`Color3.new: blue must be a number, got {type(e)}`)
+return setmetatable({c,d,e},{__index=b.__index,__tostring=b.__tostring})end
+function b.toHSV(c)local d,e,f=c[1]/255,c[2]/255,c[3]/255 local g,h=math.max(d,e
+,f),math.min(d,e,f)local i,j,k k=g local l=g-h if g~=0 then j=l/g else j=0 i=0
+return i,j,k end if d==g then i=(e-f)/l elseif e==g then i=2+(f-d)/l else i=4+(d
+-e)/l end i=i*60 if i<0 then i=i+360 end return i,j,k end function b.toHex(c)
+local d=string.format('%02X',math.floor(c[1]))local e=string.format('%02X',math.
+floor(c[2]))local f=string.format('%02X',math.floor(c[3]))return`{d}{e}{f}`end
+function b.fromRGB(c:number,d:number,e:number):Color3 assert('number'==type(c),`Color3.fromRGB: red must be a number, got {
+type(c)}`)assert('number'==type(d),`Color3.fromRGB: green must be a number, got {
+type(d)}`)assert('number'==type(e),`Color3.fromRGB: blue must be a number, got {
+type(e)}`)return constructor(c,d,e)end do local c=b.fromRGB function b.fromHex(d
+:string)assert('string'==type(d),`Color3.fromHex: data must be a string, got {
+type(d)}`)local e=tonumber(d:sub(1,2),16)local f=tonumber(d:sub(3,4),16)local g=
+tonumber(d:sub(5,6),16)return c(e,f,g)end function b.fromHSV(d,e,f)assert(type(d
+)=='number'and type(e)=='number'and type(f)=='number',
+'HSV values must be numbers')d=math.clamp(d,0,360)e=math.clamp(e,0,1)f=math.
+clamp(f,0,1)local g=f*e local h=g*(1-math.abs((d/60)%2-1))local i=f-g local j,k,
+l if d<60 then j,k,l=g,h,0 elseif d<120 then j,k,l=h,g,0 elseif d<180 then j,k,l
+=0,g,h elseif d<240 then j,k,l=0,h,g elseif d<300 then j,k,l=h,0,g else j,k,l=g,
+0,h end return c(math.floor((j+i)*255),math.floor((k+i)*255),math.floor((l+i)*
+255))end end function b.buffer(c:buffer|typeof(b))assert('buffer'==type(c)or
+'table'==type(c),`Color3.buffer: value must be a buffer or Color3, got {type(c)}`
+)if'buffer'==type(c)then local d=buffer.readi8(c,0)local e=buffer.readi8(c,1)
+local f=buffer.readi16(c,2)return b.fromRGB(d,e,f)else local d=buffer.create(8)
+buffer.writei8(d,0,c[1])buffer.writei8(d,1,c[2])buffer.writei16(d,2,c[3])return
+d end end function b.dword(c:number|typeof(b))assert('number'==type(c)or'table'
+==type(c),`Color3.dword: value must be a number or Color3, got {type(c)}`)if
+'number'==type(c)then return b.fromRGB(bit32.band(c,0xff),bit32.band(bit32.
 rshift(c,8),0xff),bit32.band(bit32.rshift(c,16),0xff))else return bit32.bor(c[1]
 ,bit32.lshift(c[2],8),bit32.lshift(c[3],16))end end function b.__index(c,d:
 string)if d:lower()=='r'then return c[1]elseif d:lower()=='g'then return c[2]
@@ -256,13 +206,92 @@ if not f[1]or not f[2]or not f[3]then error(`can't initialize BrickColor, invali
 )end local h,i=(math.huge)for j,k in c.Palette do local l=k.Color:distance(f)if
 h>l then i=k h=l end end return c.new(i.Name)end return g end function c.random(
 )return c.new(e[math.random(1,#e)])end function c.__tostring(f)return f.Name end
-c.__index=c end _G.BrickColor=c return b end function a.g()return function(b,c):
-any if not b then return c end if not c then return b end for d,e in c do b[d]=e
-end return b end end function a.h()local b=a.load'g'local c={}do local d={global
-={}}local function constructor(e:any)e='userdata'==type(e)and e or'table'==type(
-e)and rawget(e,'Data')assert('userdata'==type(e),`Instance.new: userdata must be a userdata, got {
-type(e)}`)return setmetatable({ClassName=getclassname(e),Data=e},{__index=c.
-__index,__newindex=c.__newindex})end c.new=constructor function c.declare<T>(e:
+c.__index=c end _G.BrickColor=c return b end function a.c()local b=a.load'b'
+local c=function(c:any,d:number,e:string)if'color'==e and'userdata'==type(c)then
+local f=getmemoryvalue(c,d,'dword')return f and b.dword(f)end if'buffer'==e then
+local f=getmemoryvalue(c,d,'qword')return f and buffer.fromstring(string.pack(
+'<I8',f))end if'vector'==e then local f=getmemoryvalue(c,d,'float')local g=
+getmemoryvalue(c,d+4,'float')local h=getmemoryvalue(c,d+8,'float')return vector.
+create(f,g,h)end return getmemoryvalue(c,d,e::any)end local d=function(d:any,e:
+number,f:string,g:any)if'color'==f and'table'==type(g)and g.dword then return
+setmemoryvalue(d,e,g:dword(),'string')end if'buffer'==f and'buffer'==type(g)then
+return setmemoryvalue(d,e,g,'qword')end if'vector'==f and'vector'==type(g)then
+local h=g.X or g[1]local i=g.Y or g[2]local j=g.Z or g[3]setmemoryvalue(d,e,h,
+'float')setmemoryvalue(d,e+4,i,'float')setmemoryvalue(d,e+8,j,'float')return
+true end return setmemoryvalue(d,e,g,f::any)end local e={}do function e.read(f:
+number|any,g:number|string,h:string?)if'table'==type(f)and rawget(f,'Data')then
+f=f.Data end if'userdata'==type(f)then assert('number'==type(g),`memory.read: offset must be a number, got {
+type(g)}`)assert('string'==type(h)or not h,`memory.read: data_type must be a string or nil, got {
+type(h)}`)return c(f,g,h::any)end if'number'==type(f)then if'string'==type(g)
+then return c(pointer_to_user_data(f),0,g::any)else assert('number'==type(g),`memory.read: offset must be a number or a string, got {
+type(g)}`)assert('string'==type(h)or not h,`memory.read: data_type must be a string or nil, got {
+type(h)}`)return c(pointer_to_user_data(f),g,h::any)end end return nil end
+function e.write(f:number|any,g:number|string,h:any,i:string?)if'table'==type(f)
+and rawget(f,'Data')then f=f.Data end if'userdata'==type(f)then assert('number'
+==type(g),`memory.write: offset must be a number, got {type(g)}`)assert('string'
+==type(i)or not i,`memory.write: data_type must be a string or nil, got {type(i)
+}`)return d(f,g,i::any,h)end if'number'==type(f)then if'string'==type(g)then
+return d(pointer_to_user_data(f),0,g::any,h)else assert('number'==type(g),`memory.write: offset must be a number or a string, got {
+type(g)}`)assert('string'==type(i)or not i,`memory.write: data_type must be a string or nil, got {
+type(i)}`)return d(pointer_to_user_data(f),g,i::any,h)end end return nil end end
+return e end function a.d()local b={}do local function constructor()return
+setmetatable({_map={}},{__index=b})end b.new=constructor function b.emit<T...>(c
+,...:T...)for d=#c,1,-1 do local e=c[d]if e then if'function'==type(e)then
+coroutine.wrap(e)(...)elseif'thread'==type(e)then coroutine.resume(e,...)end end
+end return c end function b.bind<T...>(c,d:(T...)->()):
+connection__DARKLUA_TYPE_a table.insert(c,d)return{unbind=function()local e=
+table.find(c,d)if e then table.remove(c,e)end end}end function b.once<T...>(c,d:
+(T...)->()):connection__DARKLUA_TYPE_a local e do e=c:bind(function(...)d(...)e:
+unbind()end)end return e end function b.wait<T...>(c):T...local d=coroutine.
+running()c:once(function(...)coroutine.resume(d,...)end)return coroutine.yield()
+end setmetatable(b,{__call=constructor})end return b end function a.e()return
+function(b,c)assert('table'==type(b),`map(t, callback): expected a table, got {
+type(b)}`)assert('function'==type(c),`map(t, callback): expected a function, got {
+type(c)}`)local d={}do for e,f in b do d[e]=c(f,e,b)end end return d end end
+function a.f()local b={}local c={__index=b}function c.__add(d,e)return b.new(d.x
++e.x,d.y+e.y,d.z+e.z)end function c.__sub(d,e)return b.new(d.x-e.x,d.y-e.y,d.z-e
+.z)end function c.__unm(d)return b.new(-d.x,-d.y,-d.z)end function c.__eq(d,e)if
+d.x==e.x and d.y==e.y and d.z==e.z then return true else return false end end
+function c.__tostring(d)return'('..d.x..', '..d.y..', '..d.z..')'end function c.
+__concat(d,e)return tostring(d)..tostring(e)end function c.__mul(d,e)if type(e)
+=='number'then return b.new(d.x*e,d.y*e,d.z*e)end return b.new(d.x*e.x,d.y*e.y,d
+.z*e.z)end function c.__div(d,e)if type(e)=='number'then if e==0 then print
+'Attempted to divide by zero. Returning nil'return nil end return b.new(d.x/e,d.
+y/e,d.z/e)end if e.x==0 or e.y==0 or e.z==0 then print
+'Attempted to divide by zero. Returning nil.'return nil end return b.new(d.x/e.x
+,d.y/e.y,d.z/e.z)end function b.new(d,e,f)return setmetatable({x=d or 0,y=e or 0
+,z=f or 0},c)end function b.lerp(d,e,f)return b.new(d.x+(e.x-d.x)*f,d.y+(e.y-d.y
+)*f,d.z+(e.z-d.z)*f)end function b.distance(d,e)return math.sqrt((d.x-e.x)^2+(d.
+y-e.y)^2+(d.z-e.z)^2)end function b.magnitude(d)return math.sqrt(d.x^2+d.y^2+d.z
+^2)end function b.normalized(d)local e=d:magnitude()if e==0 then return b.new()
+end return b.new(d.x/e,d.y/e,d.z/e)end function b.dot(d,e)return((d.x*e.x)+(d.y*
+e.y)+(d.z*e.z))end function b.cross(d,e)local f=b.new((d.y*e.z)-(d.z*e.y),(d.z*e
+.x)-(d.x*e.z),(d.x*e.y)-(d.y*e.x))if f.x==0 then f.x=0 end if f.y==0 then f.y=0
+end if f.z==0 then f.z=0 end return f end function b.tostring(d)return tostring(
+d)end b.zero=b.new(0,0,0)b.up=b.new(0,1,0)b.down=b.new(0,-1,0)b.left=b.new(-1,0,
+0)b.right=b.new(1,0,0)b.forward=b.new(0,0,1)b.back=b.new(0,0,-1)return b end
+function a.g()local b={}local c=math.sqrt function b.new(d,e)assert(tonumber(d)
+or(d==nil),'Vector2 coordinates can only be numbers')assert(tonumber(d)or(d==nil
+),'Vector2 coordinates can only be numbers')local f={}setmetatable(f,b)f.x=d or
+0 f.y=e or 0 f.Type='Vector2'return f end function b.__index(d,e)if e==
+'magnitude'then local f,g=rawget(d,'x'),rawget(d,'y')return c(f*f+g*g)elseif e==
+'unit'then local f,g=rawget(d,'x'),rawget(d,'y')local h=c(f*f+g*g)if h==0 then
+return d end return b.new(f/h,g/h)end return rawget(b,e)end function b.
+__tostring(d)return d.x..', '..d.y end function b.__eq(d,e)assert(e.Type==
+'Vector2','Cannot compare Vector2 with '..tostring(e))if d.x==e.x and d.y==e.y
+then return true end return false end function b.__add(d,e)if type(e)=='number'
+then return b.new(d.x+e,d.y+e)end return b.new(d.x+e.x,d.y+e.y)end function b.
+__mul(d,e)if type(e)=='number'then return b.new(d.x*e,d.y*e)end return b.new(d.x
+*e.x,d.y*e.y)end function b.__div(d,e)if type(e)=='number'then return b.new(d.x/
+e,d.y/e)end return b.new(d.x/e.x,d.y/e.y)end function b.__sub(d,e)if type(e)==
+'number'then return b.new(d.x-e,d.y-e)end return b.new(d.x-e.x,d.y-e.y)end
+return b end function a.h()return function(b,c):any if not b then return c end
+if not c then return b end for d,e in c do b[d]=e end return b end end function
+a.i()local b=a.load'h'local c={}do local d={global={}}local function constructor
+(e:any)e='userdata'==type(e)and e or'table'==type(e)and rawget(e,'Data')assert(
+'userdata'==type(e),`Instance.new: userdata must be a userdata, got {type(e)}`)
+return setmetatable({ClassName=getclassname(e),Data=e},{__index=c.__index,
+__newindex=c.__newindex})end c.new=constructor function c.declare<T>(e:
 'property'|'method',f:string|{string},g:string,h:T|((self:typeof(c))->any))
 assert('string'==type(g),`Instance.declare: name must be a string, got {type(g)}`
 )assert('property'==e or'method'==e,`Instance.declare: value must be "property" or "method", got {
@@ -272,125 +301,126 @@ d[j]=b(d[j],{[g]={[e]=h}})end end end function c.__index(e,f:string)assert(
 'string'==type(f),`Instance:__index: key must be a string, got {type(f)}`)do
 local g=e.ClassName local h=d.global[f]or(d[g]and d[g][f])if h then local i=h.
 property local j=h.method if i and i.getter then return i.getter(e)elseif j then
-return j end end end return rawget(e,f)or rawget(e,'Data')and constructor(
-findfirstchild(e.Data,f))or c[f]end function c.__newindex(e,f:string,g:any)
-assert('string'==type(f),`Instance:__newindex: key must be a string, got {type(f
-)}`)do local h=e.ClassName local i=d.global[f]or(d[h]and d[h][f])if i and i.
-property and i.property.setter then return i.property.setter(e,g)end end return
-rawset(e,f,g)end end return c end function a.i()local b=a.load'c'do _G.Vector3=a
-.load'd'_G.Vector2=a.load'e'_G.Color3=a.load'f'end local c=a.load'h'do local d=c
-.new do c.declare('property','global','Name',{getter=function(e)return getname(e
-.Data)end})c.declare('property','global','Parent',{getter=function(e)local f:any
-=getparent(e.Data)return f and d(f)end})c.declare('method','global',
-'GetChildren',function(e)return b(getchildren(e.Data),d)end)c.declare('method',
-'global','GetDescendants',function(e)return b(getdescendants(e.Data),d)end)do
-local e=function(e)return function(f,...)local g:any=e(f.Data,...)return g and
-d(g)end end c.declare('method','global','FindFirstChild',e(findfirstchild))c.
-declare('method','global','FindFirstAncestor',e(findfirstancestor))c.declare(
-'method','global','FindFirstChildOfClass',e(findfirstchildofclass))c.declare(
-'method','global','FindFirstAncestorOfClass',e(findfirstancestorofclass))c.
-declare('method','global','WaitForChild',e(waitforchild))end do local e=function
-(e)return function(f,...)return e(f.Data,...)end end c.declare('method','global'
-,'SetMemoryValue',e(setmemoryvalue))c.declare('method','global','GetMemoryValue'
-,e(getmemoryvalue))c.declare('method','global','Read',e(getmemoryvalue))c.
-declare('method','global','Write',e(setmemoryvalue))end c.declare('method',
-'global','IsA',function(e,f:string)assert('string'==type(f),`Instance:IsA: class must be a string, got {
-type(f)}`)return e.ClassName==f end)c.declare('method','global','IsAncestorOf',
-function(e,f)assert('userdata'==type(f)or type(f)=='table'and f.Data,`Instance:IsAncestorOf: other must be a userdata or an Instance, got {
-type(f)}`)return isancestorof(e.Data,type(f)=='userdata'and f or f.Data)end)c.
-declare('method','global','IsDescendantOf',function(e,f)assert('userdata'==type(
-f)or type(f)=='table'and f.Data,`Instance:IsDescendantOf: other must be a userdata or an Instance, got {
-type(f)}`)return isdescendantof(e.Data,type(f)=='userdata'and f or f.Data)end)c.
-declare('method','global','Destroy',function(e)return destroy(e.Data)end)end do
-c.declare('property','DataModel','PlaceId',{getter=function(e)return getplaceid(
-)end})c.declare('property','DataModel','GameId',{getter=function(e)return
-getgameid()end})c.declare('method','DataModel','GetService',function(e,f:string)
-for g,h in getchildren(e.Data)do if getclassname(h)==f then return d(h)end end
-return nil end)c.declare('method','DataModel','FindService',function(e,f:string)
-local g:any=findservice(e.Data,f)return g and d(g)end)c.declare('method',
-'DataModel','HttpGet',function(e,f:string)assert('string'==type(f),`DataModel:HttpGet: url must be a string, got {
-type(f)}`)return httpget(f)end)c.declare('method','DataModel','HttpPost',
-function(e,f:string,g:string,...)assert('string'==type(f),`DataModel:HttpPost: url must be a string, got {
-type(f)}`)assert('string'==type(g),`DataModel:HttpPost: data must be a string, got {
-type(g)}`)return httppost(f,g,...)end)end do c.declare('method','HttpService',
-'JSONEncode',function(e,f:any)assert('table'==type(f),`HttpService:JSONEncode: value must be a table, got {
-type(f)}`)return JSONEncode(f)end)c.declare('method','HttpService','JSONDecode',
-function(e,f:string)assert('string'==type(f),`HttpService:JSONDecode: value must be a string, got {
-type(f)}`)return JSONDecode(f)end)end do c.declare('property',{'BoolValue',
+return j end end end return rawget(e,f)or rawget(e,'Data')and e:FindFirstChild(f
+)or c[f]end function c.__newindex(e,f:string,g:any)assert('string'==type(f),`Instance:__newindex: key must be a string, got {
+type(f)}`)do local h=e.ClassName local i=d.global[f]or(d[h]and d[h][f])if i and
+i.property and i.property.setter then return i.property.setter(e,g)end end
+return rawset(e,f,g)end end return c end function a.j()local b=a.load'e'local c=
+a.load'c'do _G.Vector3=a.load'f'_G.Vector2=a.load'g'_G.Color3=a.load'b'end local
+d=a.load'i'do local e=d.new do d.declare('property','global','Name',{getter=
+function(f)return getname(f.Data)end})d.declare('property','global','Parent',{
+getter=function(f)local g:any=getparent(f.Data)return g and e(g)end})d.declare(
+'method','global','GetChildren',function(f)return b(getchildren(f.Data),e)end)d.
+declare('method','global','GetDescendants',function(f)return b(getdescendants(f.
+Data),e)end)do local f=function(f)return function(g,...)local h:any=f(g.Data,...
+)return h and e(h)end end d.declare('method','global','FindFirstChild',f(
+findfirstchild))d.declare('method','global','FindFirstAncestor',f(
+findfirstancestor))d.declare('method','global','FindFirstChildOfClass',f(
+findfirstchildofclass))d.declare('method','global','FindFirstAncestorOfClass',f(
+findfirstancestorofclass))d.declare('method','global','WaitForChild',f(
+waitforchild))end do local f=function(f)return function(g,...)return f(g.Data,
+...)end end d.declare('method','global','SetMemoryValue',f(c.write))d.declare(
+'method','global','GetMemoryValue',f(c.read))d.declare('method','global','Read',
+f(c.read))d.declare('method','global','Write',f(c.write))end d.declare('method',
+'global','IsA',function(f,g:string)assert('string'==type(g),`Instance:IsA: class must be a string, got {
+type(g)}`)return f.ClassName==g end)d.declare('method','global','IsAncestorOf',
+function(f,g)assert('userdata'==type(g)or type(g)=='table'and g.Data,`Instance:IsAncestorOf: other must be a userdata or an Instance, got {
+type(g)}`)return isancestorof(f.Data,type(g)=='userdata'and g or g.Data)end)d.
+declare('method','global','IsDescendantOf',function(f,g)assert('userdata'==type(
+g)or type(g)=='table'and g.Data,`Instance:IsDescendantOf: other must be a userdata or an Instance, got {
+type(g)}`)return isdescendantof(f.Data,type(g)=='userdata'and g or g.Data)end)d.
+declare('method','global','Destroy',function(f)return destroy(f.Data)end)end do
+d.declare('property','DataModel','PlaceId',{getter=function(f)return getplaceid(
+)end})d.declare('property','DataModel','GameId',{getter=function(f)return
+getgameid()end})d.declare('method','DataModel','GetService',function(f,g:string)
+for h,i in getchildren(f.Data)do if getclassname(i)==g then return e(i)end end
+return nil end)d.declare('method','DataModel','FindService',function(f,g:string)
+local h:any=findservice(f.Data,g)return h and e(h)end)d.declare('method',
+'DataModel','HttpGet',function(f,g:string)assert('string'==type(g),`DataModel:HttpGet: url must be a string, got {
+type(g)}`)return httpget(g)end)d.declare('method','DataModel','HttpPost',
+function(f,g:string,h:string,...)assert('string'==type(g),`DataModel:HttpPost: url must be a string, got {
+type(g)}`)assert('string'==type(h),`DataModel:HttpPost: data must be a string, got {
+type(h)}`)return httppost(g,h,...)end)end do d.declare('method','HttpService',
+'JSONEncode',function(f,g:any)assert('table'==type(g),`HttpService:JSONEncode: value must be a table, got {
+type(g)}`)return JSONEncode(g)end)d.declare('method','HttpService','JSONDecode',
+function(f,g:string)assert('string'==type(g),`HttpService:JSONDecode: value must be a string, got {
+type(g)}`)return JSONDecode(g)end)end do d.declare('property',{'BoolValue',
 'IntValue','FloatValue','ObjectValue','StringValue','Vector3Value','ValueBase',
 'BrickColorValue','Color3Value','CFrameValue','DoubleConstrainedValue',
-'IntConstrainedValue'},'Value',{getter=function(e)return getvalue(e.Data)end,
-setter=function(e,f:any)setvalue(e.Data,f)end})end do c.declare('property',{
-'UnionOperation','MeshPart','TrussPart','Part'},'Size',{getter=function(e)local
-f=getsize(e.Data)return vector.create(f.x,f.y,f.z)end})c.declare('property',{
+'IntConstrainedValue'},'Value',{getter=function(f)return getvalue(f.Data)end,
+setter=function(f,g:any)setvalue(f.Data,g)end})end do d.declare('property',{
+'UnionOperation','MeshPart','TrussPart','Part'},'Size',{getter=function(f)local
+g=getsize(f.Data)return vector.create(g.x,g.y,g.z)end})d.declare('property',{
 'UnionOperation','MeshPart','TrussPart','Part','Camera'},'Position',{getter=
-function(e)local f=getposition(e.Data)return vector.create(f.x,f.y,f.z)end,
-setter=function(e,f:vector|{x:number,y:number,z:number})assert('table'==type(f)
-and f.x and f.y and f.z,`Instance:Position: value must be a Vector3, got {type(f
-)}`)setposition(e.Data,f)end})c.declare('property',{'UnionOperation','MeshPart',
-'TrussPart','Part','Camera'},'CFrame',{getter=function(e)local f=getposition(e.
-Data)local g=getupvector(e.Data)local h=getrightvector(e.Data)local i=
-getlookvector(e.Data)return{Position=vector.create(f.x,f.y,f.z),UpVector=vector.
-create(g.x,g.y,g.z),RightVector=vector.create(h.x,h.y,h.z),LookVector=vector.
-create(i.x,i.y,i.z)}end,setter=function(e,f:any)setcframe(e.Data,f)end})c.
+function(f)local g=getposition(f.Data)return vector.create(g.x,g.y,g.z)end,
+setter=function(f,g:vector|{x:number,y:number,z:number})assert('table'==type(g)
+and g.x and g.y and g.z,`Instance:Position: value must be a Vector3, got {type(g
+)}`)setposition(f.Data,g)end})d.declare('property',{'UnionOperation','MeshPart',
+'TrussPart','Part','Camera'},'CFrame',{getter=function(f)local g=getposition(f.
+Data)local h=getupvector(f.Data)local i=getrightvector(f.Data)local j=
+getlookvector(f.Data)return{Position=vector.create(g.x,g.y,g.z),UpVector=vector.
+create(h.x,h.y,h.z),RightVector=vector.create(i.x,i.y,i.z),LookVector=vector.
+create(j.x,j.y,j.z)}end,setter=function(f,g:any)setcframe(f.Data,g)end})d.
 declare('property',{'UnionOperation','MeshPart','TrussPart','Part'},
-'Transparency',{getter=function(e)return gettransparency(e.Data)end,setter=
-function(e,f:number)settransparency(e.Data,f)end})end do c.declare('property',
-'Player','Character',{getter=function(e)return d(getcharacter(e.Data))end})c.
-declare('property','Player','Team',{getter=function(e)return d(getteam(e.Data))
-end})c.declare('property','Player','DisplayName',{getter=function(e)return
-getdisplayname(e.Data)end})c.declare('property','Player','UserId',{getter=
-function(e)return getuserid(e.Data)end})end do c.declare('property','Workspace',
-'CurrentCamera',{getter=function(e)return d(findfirstchildofclass(e.Data,
-'Camera'))end})end do c.declare('property','Camera','FieldOfView',{getter=
-function(e)return getcamerafov(e.Data)end})c.declare('method','Camera',
-'SetCameraSubject',function(e,f)assert(type(f)=='table'and f.Data,`Camera:SetCameraSubject: subject must be an Instance, got {
-type(f)}`)return setcamerasubject(f.Data)end)end do c.declare('property',{
-'UnionOperation','MeshPart','TrussPart','Part'},'CanCollide',{getter=function(e)
-return getcancollide(e.Data)end,setter=function(e,f:boolean)assert(type(f)==
-'boolean',`Instance:CanCollide: value must be a boolean, got {type(f)}`)
-setcancollide(e.Data,f)end})c.declare('property',{'UnionOperation','MeshPart',
-'TrussPart','Part'},'Velocity',{getter=function(e)local f=getvelocity(e.Data)
-return vector.create(f.x,f.y,f.z)end,setter=function(e,f:vector|{x:number,y:
-number,z:number})assert('table'==type(f)and f.x and f.y and f.z,`Instance:Velocity: value must be a Vector3, got {
-type(f)}`)setvelocity(e.Data,f)end})end do c.declare('property','MeshPart',
-'TextureID',{getter=function(e)return gettextureid(e.Data)end})c.declare(
-'property','MeshPart','MeshID',{getter=function(e)return getmeshid(e.Data)end})
-end do c.declare('property','Humanoid','Health',{getter=function(e)return
-gethealth(e.Data)end})c.declare('property','Humanoid','MaxHealth',{getter=
-function(e)return getmaxhealth(e.Data)end})end do c.declare('property','Model',
-'PrimaryPart',{getter=function(e)return d(getprimarypart(e.Data))end})end do c.
-declare('property','BillboardGui','Adornee',{getter=function(e)return d(
-getadornee(e.Data))end})end do c.declare('property','Players','LocalPlayer',{
-getter=function(e)return d(getlocalplayer())end})end do c.declare('method',
-'MouseService','GetMousePosition',function(e)local f=getmouseposition()return
-vector.create(f.x,f.y)end)c.declare('method','MouseService','GetMouseLocation',
-function(e)local f=getmouselocation(e.Data)return vector.create(f.x,f.y)end)c.
-declare('method','MouseService','GetMouseBehavior',function(e)return
-getmousebehavior(e.Data)end)c.declare('method','MouseService',
-'GetMouseDeltaSensitivity',function(e)return getmousedeltasensitivity(e.Data)end
-)c.declare('method','MouseService','IsMouseIconEnabled',function(e)return
-ismouseiconenabled(e.Data)end)c.declare('method','MouseService',
-'SetMouseLocation',function(e,f,g)assert('number'==type(f),`MouseService:SetMouseLocation: x must be a number, got {
-type(f)}`)assert('number'==type(g),`MouseService:SetMouseLocation: y must be a number, got {
-type(g)}`)setmouselocation(e.Data,f,g)end)c.declare('method','MouseService',
-'SetMouseIconEnabled',function(e,f)assert('boolean'==type(f),`MouseService:SetMouseIconEnabled: enabled must be a boolean, got {
-type(f)}`)setmouseiconenabled(e.Data,f)end)c.declare('method','MouseService',
-'SetMouseBehavior',function(e,f)assert('number'==type(f),`MouseService:SetMouseBehavior: behavior must be a number, got {
-type(f)}`)setmousebehaviour(e.Data,f)end)c.declare('method','MouseService',
-'SetMouseDeltaSensitivity',function(e,f)assert('number'==type(f),`MouseService:SetMouseDeltaSensitivity: sensitivity must be a number, got {
-type(f)}`)setmousedeltasensitivity(e.Data,f)end)c.declare('method',
-'MouseService','SmoothMouseExponential',function(e,f,g,h)assert('table'==type(f)
-and#f>=2,`MouseService:SmoothMouseExponential: origin must be a table with at least 2 numbers, got {
-type(f)}`)assert('table'==type(g)and#g>=2,`MouseService:SmoothMouseExponential: point must be a table with at least 2 numbers, got {
-type(g)}`)assert('number'==type(h),`MouseService:SmoothMouseExponential: speed must be a number, got {
-type(h)}`)local i=smoothmouse_exponential(f,g,h)return vector.create(i.x,i.y)end
-)c.declare('method','MouseService','SmoothMouseLinear',function(e,f,g,h,i)
-assert('table'==type(f)and#f>=2,`MouseService:SmoothMouseLinear: origin must be a table with at least 2 numbers, got {
-type(f)}`)assert('table'==type(g)and#g>=2,`MouseService:SmoothMouseLinear: point must be a table with at least 2 numbers, got {
-type(g)}`)assert('number'==type(h),`MouseService:SmoothMouseLinear: sensitivity must be a number, got {
-type(h)}`)assert('number'==type(i),`MouseService:SmoothMouseLinear: smoothness must be a number, got {
-type(i)}`)local j=smoothmouse_linear(f,g,h,i)return vector.create(j.x,j.y)end)
-end end _G.Instance=c _G.workspace=c.new(Workspace)_G.game=c.new(Game)return{
-Instance=c,workspace=_G.workspace,game=_G.game}end end _G.websocket=a.load'a'_G.
-signal=a.load'b'a.load'i'
+'Transparency',{getter=function(f)return gettransparency(f.Data)end,setter=
+function(f,g:number)settransparency(f.Data,g)end})end do d.declare('property',
+'Player','Character',{getter=function(f)return e(getcharacter(f.Data))end})d.
+declare('property','Player','Team',{getter=function(f)return e(getteam(f.Data))
+end})d.declare('property','Player','DisplayName',{getter=function(f)return
+getdisplayname(f.Data)end})d.declare('property','Player','UserId',{getter=
+function(f)return getuserid(f.Data)end})end do d.declare('property','Workspace',
+'CurrentCamera',{getter=function(f)local g:any=findfirstchildofclass(f.Data,
+'Camera')return g and e(g)end})end do d.declare('property','Camera',
+'FieldOfView',{getter=function(f)return getcamerafov(f.Data)end})d.declare(
+'method','Camera','SetCameraSubject',function(f,g)assert(type(g)=='table'and g.
+Data,`Camera:SetCameraSubject: subject must be an Instance, got {type(g)}`)
+return setcamerasubject(g.Data)end)end do d.declare('property',{'UnionOperation'
+,'MeshPart','TrussPart','Part'},'CanCollide',{getter=function(f)return
+getcancollide(f.Data)end,setter=function(f,g:boolean)assert(type(g)=='boolean',`Instance:CanCollide: value must be a boolean, got {
+type(g)}`)setcancollide(f.Data,g)end})d.declare('property',{'UnionOperation',
+'MeshPart','TrussPart','Part'},'Velocity',{getter=function(f)local g=
+getvelocity(f.Data)return vector.create(g.x,g.y,g.z)end,setter=function(f,g:
+vector|{x:number,y:number,z:number})assert('table'==type(g)and g.x and g.y and g
+.z,`Instance:Velocity: value must be a Vector3, got {type(g)}`)setvelocity(f.
+Data,g)end})end do d.declare('property','MeshPart','TextureID',{getter=function(
+f)return gettextureid(f.Data)end})d.declare('property','MeshPart','MeshID',{
+getter=function(f)return getmeshid(f.Data)end})end do d.declare('property',
+'Humanoid','Health',{getter=function(f)return gethealth(f.Data)end})d.declare(
+'property','Humanoid','MaxHealth',{getter=function(f)return getmaxhealth(f.Data)
+end})end do d.declare('property','Model','PrimaryPart',{getter=function(f)local
+g:any=getprimarypart(f.Data)return g and e(g)end})end do d.declare('property',
+'BillboardGui','Adornee',{getter=function(f)local g:any=getadornee(f.Data)return
+g and e(g)end})end do d.declare('property','Players','LocalPlayer',{getter=
+function(f)local g:any=getlocalplayer()return g and e(g)end})end do d.declare(
+'method','MouseService','GetMousePosition',function(f)local g=getmouseposition()
+return vector.create(g.x,g.y)end)d.declare('method','MouseService',
+'GetMouseLocation',function(f)local g=getmouselocation(f.Data)return vector.
+create(g.x,g.y)end)d.declare('method','MouseService','GetMouseBehavior',function
+(f)return getmousebehavior(f.Data)end)d.declare('method','MouseService',
+'GetMouseDeltaSensitivity',function(f)return getmousedeltasensitivity(f.Data)end
+)d.declare('method','MouseService','IsMouseIconEnabled',function(f)return
+ismouseiconenabled(f.Data)end)d.declare('method','MouseService',
+'SetMouseLocation',function(f,g,h)assert('number'==type(g),`MouseService:SetMouseLocation: x must be a number, got {
+type(g)}`)assert('number'==type(h),`MouseService:SetMouseLocation: y must be a number, got {
+type(h)}`)setmouselocation(f.Data,g,h)end)d.declare('method','MouseService',
+'SetMouseIconEnabled',function(f,g)assert('boolean'==type(g),`MouseService:SetMouseIconEnabled: enabled must be a boolean, got {
+type(g)}`)setmouseiconenabled(f.Data,g)end)d.declare('method','MouseService',
+'SetMouseBehavior',function(f,g)assert('number'==type(g),`MouseService:SetMouseBehavior: behavior must be a number, got {
+type(g)}`)setmousebehaviour(f.Data,g)end)d.declare('method','MouseService',
+'SetMouseDeltaSensitivity',function(f,g)assert('number'==type(g),`MouseService:SetMouseDeltaSensitivity: sensitivity must be a number, got {
+type(g)}`)setmousedeltasensitivity(f.Data,g)end)d.declare('method',
+'MouseService','SmoothMouseExponential',function(f,g,h,i)assert('table'==type(g)
+and#g>=2,`MouseService:SmoothMouseExponential: origin must be a table with at least 2 numbers, got {
+type(g)}`)assert('table'==type(h)and#h>=2,`MouseService:SmoothMouseExponential: point must be a table with at least 2 numbers, got {
+type(h)}`)assert('number'==type(i),`MouseService:SmoothMouseExponential: speed must be a number, got {
+type(i)}`)local j=smoothmouse_exponential(g,h,i)return vector.create(j.x,j.y)end
+)d.declare('method','MouseService','SmoothMouseLinear',function(f,g,h,i,j)
+assert('table'==type(g)and#g>=2,`MouseService:SmoothMouseLinear: origin must be a table with at least 2 numbers, got {
+type(g)}`)assert('table'==type(h)and#h>=2,`MouseService:SmoothMouseLinear: point must be a table with at least 2 numbers, got {
+type(h)}`)assert('number'==type(i),`MouseService:SmoothMouseLinear: sensitivity must be a number, got {
+type(i)}`)assert('number'==type(j),`MouseService:SmoothMouseLinear: smoothness must be a number, got {
+type(j)}`)local k=smoothmouse_linear(g,h,i,j)return vector.create(k.x,k.y)end)
+end end _G.Instance=d _G.workspace=d.new(Workspace)_G.game=d.new(Game)return{
+Instance=d,workspace=_G.workspace,game=_G.game}end end if not _G.websocket then
+_G.websocket=a.load'a'end if not _G.memory then _G.memory=a.load'c'end _G.signal
+=a.load'd'a.load'j'

@@ -1,6 +1,7 @@
 ---- environment ---
 
-local map = require("@external/functions/map")
+local map    = require("@external/functions/map")
+local memory = require("@external/modules/memory")
 
 ---- declarations ----
 
@@ -61,10 +62,10 @@ local Instance = require("@roblox/classes/instance"); do
                 end
             end
 
-            Instance.declare("method", "global", "SetMemoryValue", generate(setmemoryvalue))
-            Instance.declare("method", "global", "GetMemoryValue", generate(getmemoryvalue))
-            Instance.declare("method", "global", "Read", generate(getmemoryvalue))
-            Instance.declare("method", "global", "Write", generate(setmemoryvalue))
+            Instance.declare("method", "global", "SetMemoryValue", generate(memory.write))
+            Instance.declare("method", "global", "GetMemoryValue", generate(memory.read))
+            Instance.declare("method", "global", "Read", generate(memory.read))
+            Instance.declare("method", "global", "Write", generate(memory.write))
         end
 
         Instance.declare("method", "global", "IsA", function(self, class: string)
@@ -255,7 +256,8 @@ local Instance = require("@roblox/classes/instance"); do
 
         Instance.declare("property", "Workspace", "CurrentCamera", {
             getter = function(self)
-                return constructor(findfirstchildofclass(self.Data, "Camera"))
+                local userdata: any = findfirstchildofclass(self.Data, "Camera")
+                return userdata and constructor(userdata)
             end
         })
     end
@@ -343,7 +345,8 @@ local Instance = require("@roblox/classes/instance"); do
 
         Instance.declare("property", "Model", "PrimaryPart", {
             getter = function(self)
-                return constructor(getprimarypart(self.Data))
+                local userdata: any = getprimarypart(self.Data)
+                return userdata and constructor(userdata)
             end
         })
     end
@@ -353,7 +356,8 @@ local Instance = require("@roblox/classes/instance"); do
 
         Instance.declare("property", "BillboardGui", "Adornee", {
             getter = function(self)
-                return constructor(getadornee(self.Data))
+                local userdata: any = getadornee(self.Data)
+                return userdata and constructor(userdata)
             end
         })
     end
@@ -363,7 +367,8 @@ local Instance = require("@roblox/classes/instance"); do
 
         Instance.declare("property", "Players", "LocalPlayer", {
             getter = function(self)
-                return constructor(getlocalplayer())
+                local userdata: any = getlocalplayer()
+                return userdata and constructor(userdata)
             end
         })
     end

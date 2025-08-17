@@ -78,7 +78,7 @@ local Instance = {}; do
         end
 
         return rawget(self, key) or rawget(self, "Data") and
-            constructor(findfirstchild(self.Data, key)) or
+            self:FindFirstChild(key) or
             Instance[key]
     end
 
