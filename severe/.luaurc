@@ -1,0 +1,6 @@
+{
+	"aliases": {
+		"external": "src/external",
+		"roblox": "src/roblox"
+	}
+}

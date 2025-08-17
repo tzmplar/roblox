@@ -1,0 +1,80 @@
+---- environment ---
+
+local merge = require("@external/functions/merge")
+
+---- module ----
+
+local Instance = {}; do
+    --- constants ---
+
+    local declarations = { global = {} }
+
+    --- constructor ---
+
+    local function constructor(userdata: any)
+        userdata = "userdata" == type(userdata) and userdata or "table" == type(userdata) and rawget(userdata, "Data")
+        assert("userdata" == type(userdata), `Instance.new: userdata must be a userdata, got {type(userdata)}`)
+
+        return setmetatable( { ClassName = getclassname(userdata), Data = userdata }, { __index = Instance.__index } )
+    end
+
+    --- functions ---
+
+    Instance.new = constructor
+
+    function Instance.declare<T>(value: "property" | "method", class: string | { string }, name: string, definition: T | (self: typeof(Instance)) -> any)
+        -- assertions --
+
+        assert("string" == type(name), `Instance.declare: name must be a string, got {type(name)}`)
+        assert("property" == value or "method" == value, `Instance.declare: value must be "property" or "method", got {value}`)
+        assert("table" == type(class) or "string" == type(class), `Instance.declare: class must be a string or a table of strings, got {type(class)}`)
+
+        -- declaration --
+
+        if "string" == type(class) then
+            declarations[class] = merge(declarations[class], {
+                [name] = {
+                    [value] = definition
+                }
+            })
+        else
+            for index, class in class do
+                declarations[class] = merge(declarations[class], {
+                    [name] = {
+                        [value] = definition
+                    }
+                })
+            end
+        end
+    end
+
+    --- metatables ---
+
+    function Instance:__index(key: string)
+        assert("string" == type(key), `Instance:__index: key must be a string, got {type(key)}`)
+        
+        do
+            local class = self.ClassName
+            local declaration = declarations.global[key] or (declarations[class] and declarations[class][key])
+
+            if declaration then
+                local property = declaration.property
+                local method = declaration.method
+
+                if property and property.getter then
+                    return property.getter(self)
+                elseif method then
+                    return method
+                end
+            end
+        end
+
+        return rawget(self, key) or rawget(self, "Data") and
+            constructor(findfirstchild(self.Data, key)) or
+            Instance[key]
+    end
+end
+
+---- exports ----
+
+return Instance
