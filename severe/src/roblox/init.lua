@@ -7,7 +7,6 @@ local map = require("@external/functions/map")
 do
     _G.Vector3 = require("@roblox/classes/vector3");
     _G.Vector2 = require("@roblox/classes/vector2");
-    _G.Signal = require("@external/classes/signal");
     _G.Color3 = require("@roblox/classes/color");
 end
 
@@ -446,3 +445,11 @@ _G.Instance = Instance
 
 _G.workspace = Instance.new(Workspace)
 _G.game = Instance.new(Game)
+
+---- exports ----
+
+return {
+    Instance  = Instance,
+    workspace = _G.workspace,
+    game      = _G.game
+}

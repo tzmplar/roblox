@@ -1,9 +1,28 @@
 type connection__DARKLUA_TYPE_a={unbind:()->()}local a a={cache={},load=function
 (b)if not a.cache[b]then a.cache[b]={c=a[b]()}end return a.cache[b].c end}do
-function a.a()return function(b,c)assert('table'==type(b),`map(t, callback): expected a table, got {
+function a.a()local b={}do function b.connect(c:string)local d=
+websocket_connect(c)local e={}do local f={}function e.send(g,h:string)assert(
+'string'==type(h),`websocket:send: message must be a string, got {type(h)}`)
+websocket_send(d,h)end function e.on(g,h:string,i)assert('string'==type(h),`websocket:on: event must be a string, got {
+type(h)}`)assert('function'==type(i),`websocket:on: callback must be a function, got {
+type(i)}`)f[h]=f[h]or{}table.insert(f[h],i)return{disconnect=function()assert(
+'function'==type(i),`connection:disconnect: callback must be a function, got {
+type(i)}`)local j=table.find(f[h],i)if j then table.remove(f[h],j)end end}end
+function e.close(g)websocket_close(d)end end return e end end return b end
+function a.b()local b={}do local function constructor()return setmetatable({_map
+={}},{__index=b})end b.new=constructor function b.emit<T...>(c,...:T...)for d=#c
+,1,-1 do local e=c[d]if e then if'function'==type(e)then coroutine.wrap(e)(...)
+elseif'thread'==type(e)then coroutine.resume(e,...)end end end return c end
+function b.bind<T...>(c,d:(T...)->()):connection__DARKLUA_TYPE_a table.insert(c,
+d)return{unbind=function()local e=table.find(c,d)if e then table.remove(c,e)end
+end}end function b.once<T...>(c,d:(T...)->()):connection__DARKLUA_TYPE_a local e
+do e=c:bind(function(...)d(...)e:unbind()end)end return e end function b.wait<T
+...>(c):T...local d=coroutine.running()c:once(function(...)coroutine.resume(d,
+...)end)return coroutine.yield()end setmetatable(b,{__call=constructor})end
+return b end function a.c()return function(b,c)assert('table'==type(b),`map(t, callback): expected a table, got {
 type(b)}`)assert('function'==type(c),`map(t, callback): expected a function, got {
 type(c)}`)local d={}do for e,f in b do d[e]=c(f,e,b)end end return d end end
-function a.b()local b={}local c={__index=b}function c.__add(d,e)return b.new(d.x
+function a.d()local b={}local c={__index=b}function c.__add(d,e)return b.new(d.x
 +e.x,d.y+e.y,d.z+e.z)end function c.__sub(d,e)return b.new(d.x-e.x,d.y-e.y,d.z-e
 .z)end function c.__unm(d)return b.new(-d.x,-d.y,-d.z)end function c.__eq(d,e)if
 d.x==e.x and d.y==e.y and d.z==e.z then return true else return false end end
@@ -25,7 +44,7 @@ e.y)+(d.z*e.z))end function b.cross(d,e)local f=b.new((d.y*e.z)-(d.z*e.y),(d.z*e
 end if f.z==0 then f.z=0 end return f end function b.tostring(d)return tostring(
 d)end b.zero=b.new(0,0,0)b.up=b.new(0,1,0)b.down=b.new(0,-1,0)b.left=b.new(-1,0,
 0)b.right=b.new(1,0,0)b.forward=b.new(0,0,1)b.back=b.new(0,0,-1)return b end
-function a.c()local b={}local c=math.sqrt function b.new(d,e)assert(tonumber(d)
+function a.e()local b={}local c=math.sqrt function b.new(d,e)assert(tonumber(d)
 or(d==nil),'Vector2 coordinates can only be numbers')assert(tonumber(d)or(d==nil
 ),'Vector2 coordinates can only be numbers')local f={}setmetatable(f,b)f.x=d or
 0 f.y=e or 0 f.Type='Vector2'return f end function b.__index(d,e)if e==
@@ -40,19 +59,9 @@ __mul(d,e)if type(e)=='number'then return b.new(d.x*e,d.y*e)end return b.new(d.x
 *e.x,d.y*e.y)end function b.__div(d,e)if type(e)=='number'then return b.new(d.x/
 e,d.y/e)end return b.new(d.x/e.x,d.y/e.y)end function b.__sub(d,e)if type(e)==
 'number'then return b.new(d.x-e,d.y-e)end return b.new(d.x-e.x,d.y-e.y)end
-return b end function a.d()local b={}do local function constructor()return
-setmetatable({_map={}},{__index=b})end b.new=constructor function b.emit<T...>(c
-,...:T...)for d=#c,1,-1 do local e=c[d]if e then if'function'==type(e)then
-coroutine.wrap(e)(...)elseif'thread'==type(e)then coroutine.resume(e,...)end end
-end return c end function b.bind<T...>(c,d:(T...)->()):
-connection__DARKLUA_TYPE_a table.insert(c,d)return{unbind=function()local e=
-table.find(c,d)if e then table.remove(c,e)end end}end function b.once<T...>(c,d:
-(T...)->()):connection__DARKLUA_TYPE_a local e do e=c:bind(function(...)d(...)e:
-unbind()end)end return e end function b.wait<T...>(c):T...local d=coroutine.
-running()c:once(function(...)coroutine.resume(d,...)end)return coroutine.yield()
-end setmetatable(b,{__call=constructor})end return b end function a.e()local b={
-}do local function constructor(c:number,d:number,e:number)assert('number'==type(
-c),`Color3.new: red must be a number, got {type(c)}`)assert('number'==type(d),`Color3.new: green must be a number, got {
+return b end function a.f()local b={}do local function constructor(c:number,d:
+number,e:number)assert('number'==type(c),`Color3.new: red must be a number, got {
+type(c)}`)assert('number'==type(d),`Color3.new: green must be a number, got {
 type(d)}`)assert('number'==type(e),`Color3.new: blue must be a number, got {
 type(e)}`)return setmetatable({c,d,e},{__index=b.__index,__tostring=b.__tostring
 })end function b.toHSV(c)local d,e,f=c[1]/255,c[2]/255,c[3]/255 local g,h=math.
@@ -60,7 +69,7 @@ max(d,e,f),math.min(d,e,f)local i,j,k k=g local l=g-h if g~=0 then j=l/g else j=
 0 i=0 return i,j,k end if d==g then i=(e-f)/l elseif e==g then i=2+(f-d)/l else
 i=4+(d-e)/l end i=i*60 if i<0 then i=i+360 end return i,j,k end function b.toHex
 (c)local d=string.format('%02X',math.floor(c[1]))local e=string.format('%02X',
-math.floor(c[2]))local f=string.format('%02X',math.floor(c[3]))return d..e..f
+math.floor(c[2]))local f=string.format('%02X',math.floor(c[3]))return`{d}{e}{f}`
 end function b.fromRGB(c:number,d:number,e:number):Color3 assert('number'==type(
 c),`Color3.fromRGB: red must be a number, got {type(c)}`)assert('number'==type(d
 ),`Color3.fromRGB: green must be a number, got {type(d)}`)assert('number'==type(
@@ -247,9 +256,9 @@ if not f[1]or not f[2]or not f[3]then error(`can't initialize BrickColor, invali
 )end local h,i=(math.huge)for j,k in c.Palette do local l=k.Color:distance(f)if
 h>l then i=k h=l end end return c.new(i.Name)end return g end function c.random(
 )return c.new(e[math.random(1,#e)])end function c.__tostring(f)return f.Name end
-c.__index=c end _G.BrickColor=c return b end function a.f()return function(b,c):
+c.__index=c end _G.BrickColor=c return b end function a.g()return function(b,c):
 any if not b then return c end if not c then return b end for d,e in c do b[d]=e
-end return b end end function a.g()local b=a.load'f'local c={}do local d={global
+end return b end end function a.h()local b=a.load'g'local c={}do local d={global
 ={}}local function constructor(e:any)e='userdata'==type(e)and e or'table'==type(
 e)and rawget(e,'Data')assert('userdata'==type(e),`Instance.new: userdata must be a userdata, got {
 type(e)}`)return setmetatable({ClassName=getclassname(e),Data=e},{__index=c.
@@ -268,11 +277,11 @@ findfirstchild(e.Data,f))or c[f]end function c.__newindex(e,f:string,g:any)
 assert('string'==type(f),`Instance:__newindex: key must be a string, got {type(f
 )}`)do local h=e.ClassName local i=d.global[f]or(d[h]and d[h][f])if i and i.
 property and i.property.setter then return i.property.setter(e,g)end end return
-rawset(e,f,g)end end return c end end local b=a.load'a'do _G.Vector3=a.load'b'_G
-.Vector2=a.load'c'_G.Signal=a.load'd'_G.Color3=a.load'e'end local c=a.load'g'do
-local d=c.new do c.declare('property','global','Name',{getter=function(e)return
-getname(e.Data)end})c.declare('property','global','Parent',{getter=function(e)
-local f:any=getparent(e.Data)return f and d(f)end})c.declare('method','global',
+rawset(e,f,g)end end return c end function a.i()local b=a.load'c'do _G.Vector3=a
+.load'd'_G.Vector2=a.load'e'_G.Color3=a.load'f'end local c=a.load'h'do local d=c
+.new do c.declare('property','global','Name',{getter=function(e)return getname(e
+.Data)end})c.declare('property','global','Parent',{getter=function(e)local f:any
+=getparent(e.Data)return f and d(f)end})c.declare('method','global',
 'GetChildren',function(e)return b(getchildren(e.Data),d)end)c.declare('method',
 'global','GetDescendants',function(e)return b(getdescendants(e.Data),d)end)do
 local e=function(e)return function(f,...)local g:any=e(f.Data,...)return g and
@@ -382,4 +391,6 @@ type(f)}`)assert('table'==type(g)and#g>=2,`MouseService:SmoothMouseLinear: point
 type(g)}`)assert('number'==type(h),`MouseService:SmoothMouseLinear: sensitivity must be a number, got {
 type(h)}`)assert('number'==type(i),`MouseService:SmoothMouseLinear: smoothness must be a number, got {
 type(i)}`)local j=smoothmouse_linear(f,g,h,i)return vector.create(j.x,j.y)end)
-end end _G.Instance=c _G.workspace=c.new(Workspace)_G.game=c.new(Game)
+end end _G.Instance=c _G.workspace=c.new(Workspace)_G.game=c.new(Game)return{
+Instance=c,workspace=_G.workspace,game=_G.game}end end _G.websocket=a.load'a'_G.
+signal=a.load'b'a.load'i'

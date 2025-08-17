@@ -1,1 +1,1 @@
-darklua process src/init.lua ../i84q.lua --config out/.darklua.json
+darklua process src/run.lua ../i84q.lua --config out/.darklua.json
