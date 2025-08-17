@@ -226,14 +226,14 @@ type(h)}`)return c(f,g,h::any)end if'number'==type(f)then if'string'==type(g)
 then return c(pointer_to_user_data(f),0,g::any)else assert('number'==type(g),`memory.read: offset must be a number or a string, got {
 type(g)}`)assert('string'==type(h)or not h,`memory.read: data_type must be a string or nil, got {
 type(h)}`)return c(pointer_to_user_data(f),g,h::any)end end return nil end
-function e.write(f:number|any,g:number|string,h:any,i:string?)if'table'==type(f)
+function e.write(f:number|any,g:number|string,h:string?,i:any)if'table'==type(f)
 and rawget(f,'Data')then f=f.Data end if'userdata'==type(f)then assert('number'
 ==type(g),`memory.write: offset must be a number, got {type(g)}`)assert('string'
-==type(i)or not i,`memory.write: data_type must be a string or nil, got {type(i)
-}`)return d(f,g,i::any,h)end if'number'==type(f)then if'string'==type(g)then
-return d(pointer_to_user_data(f),0,g::any,h)else assert('number'==type(g),`memory.write: offset must be a number or a string, got {
-type(g)}`)assert('string'==type(i)or not i,`memory.write: data_type must be a string or nil, got {
-type(i)}`)return d(pointer_to_user_data(f),g,i::any,h)end end return nil end end
+==type(h)or not h,`memory.write: data_type must be a string or nil, got {type(h)
+}`)return d(f,g,h::any,i)end if'number'==type(f)then if'string'==type(g)then
+return d(pointer_to_user_data(f),0,g::any,i)else assert('number'==type(g),`memory.write: offset must be a number or a string, got {
+type(g)}`)assert('string'==type(h)or not h,`memory.write: data_type must be a string or nil, got {
+type(h)}`)return d(pointer_to_user_data(f),g,h::any,i)end end return nil end end
 return e end function a.d()local b={}do local function constructor()return
 setmetatable({_map={}},{__index=b})end b.new=constructor function b.emit<T...>(c
 ,...:T...)for d=#c,1,-1 do local e=c[d]if e then if'function'==type(e)then

@@ -80,7 +80,7 @@ local memory = {}; do
         return nil
     end
 
-    function memory.write(pointer: number | any, offset: number | string, value: any, data_type: string?)
+    function memory.write(pointer: number | any, offset: number | string, data_type: string?, value: any)
         if "table" == type(pointer) and rawget(pointer, "Data") then
             pointer = pointer.Data
         end
