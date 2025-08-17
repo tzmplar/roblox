@@ -125,7 +125,6 @@ do
     do
         local generate = function(f)
             return function(self, ...)
-                print(self, ...)
                 return constructor(f(self.Data, ...))
             end
         end

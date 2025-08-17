@@ -26,9 +26,9 @@ function(self)return constructor(getparent(self.Data))end})Instance.declare(
 'method','global','GetChildren',function(self)return map(getchildren(self.Data),
 constructor)end)Instance.declare('method','global','GetDescendants',function(
 self)return map(getdescendants(self.Data),constructor)end)do local generate=
-function(f)return function(self,...)print(self,...)return constructor(f(self.
-Data,...))end end Instance.declare('method','global','FindFirstChild',generate(
-findfirstchild))Instance.declare('method','global','FindFirstAncestor',generate(
+function(f)return function(self,...)return constructor(f(self.Data,...))end end
+Instance.declare('method','global','FindFirstChild',generate(findfirstchild))
+Instance.declare('method','global','FindFirstAncestor',generate(
 findfirstancestor))Instance.declare('method','global','FindFirstChildOfClass',
 generate(findfirstchildofclass))Instance.declare('method','global',
 'FindFirstAncestorOfClass',generate(findfirstancestorofclass))Instance.declare(
