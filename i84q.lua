@@ -46,10 +46,10 @@ rshift(c,8),0xff),bit32.band(bit32.rshift(c,16),0xff))else return bit32.bor(c[1]
 string)if d:lower()=='r'then return c[1]elseif d:lower()=='g'then return c[2]
 elseif d:lower()=='b'then return c[3]end return rawget(c,d)or b[d]end function b
 .__eq(c,d)return c[1]==d[1]and c[2]==d[2]and c[3]==d[3]end function b.__tostring
-(c)return`Color.new({c[1]}, {c[2]}, {c[3]})`end end local c={Palette={[1032]={
-Name='Hot pink',Color=b.fromRGB(255,0,191)},[1031]={Name='Royal purple',Color=b.
-fromRGB(98,37,209)},[1030]={Name='Pastel brown',Color=b.fromRGB(255,204,153)},[
-1029]={Name='Pastel yellow',Color=b.fromRGB(255,255,204)},[1028]={Name=
+(c)return`Color3.fromRGB({c[1]}, {c[2]}, {c[3]})`end end local c={Palette={[1032
+]={Name='Hot pink',Color=b.fromRGB(255,0,191)},[1031]={Name='Royal purple',Color
+=b.fromRGB(98,37,209)},[1030]={Name='Pastel brown',Color=b.fromRGB(255,204,153)}
+,[1029]={Name='Pastel yellow',Color=b.fromRGB(255,255,204)},[1028]={Name=
 'Pastel green',Color=b.fromRGB(204,255,204)},[1027]={Name='Pastel blue-green',
 Color=b.fromRGB(159,243,233)},[1026]={Name='Pastel violet',Color=b.fromRGB(177,
 167,255)},[1025]={Name='Pastel orange',Color=b.fromRGB(255,201,201)},[1024]={

@@ -187,7 +187,7 @@ local Color3 = {} do
     end
 
     function Color3:__eq(other) return self[1] == other[1] and self[2] == other[2] and self[3] == other[3] end
-    function Color3:__tostring() return `Color.new({self[1]}, {self[2]}, {self[3]})` end
+    function Color3:__tostring() return `Color3.fromRGB({self[1]}, {self[2]}, {self[3]})` end
 end
 
 local BrickColor = {
