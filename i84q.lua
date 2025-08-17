@@ -206,20 +206,23 @@ if not f[1]or not f[2]or not f[3]then error(`can't initialize BrickColor, invali
 h>l then i=k h=l end end return c.new(i.Name)end return g end function c.random(
 )return c.new(e[math.random(1,#e)])end function c.__tostring(f)return f.Name end
 c.__index=c end _G.BrickColor=c return b end function a.c()local b=a.load'b'
-local c=function(c:any,d:number,e:string)if'color'==e and'userdata'==type(c)then
-local f=getmemoryvalue(c,d,'dword')return f and b.dword(f)end if'buffer'==e then
-local f=getmemoryvalue(c,d,'qword')return f and buffer.fromstring(string.pack(
-'<I8',f))end if'vector'==e then local f=getmemoryvalue(c,d,'float')local g=
-getmemoryvalue(c,d+4,'float')local h=getmemoryvalue(c,d+8,'float')return vector.
-create(f,g,h)end return getmemoryvalue(c,d,e::any)end local d=function(d:any,e:
-number,f:string,g:any)if'color'==f and'table'==type(g)and g.dword then return
-setmemoryvalue(d,e,'dword',g:dword())end if'buffer'==f and'buffer'==type(g)then
-return setmemoryvalue(d,e,g,'qword')end if'vector'==f and'vector'==type(g)then
-local h=g.X or g[1]local i=g.Y or g[2]local j=g.Z or g[3]setmemoryvalue(d,e,h,
-'float')setmemoryvalue(d,e+4,i,'float')setmemoryvalue(d,e+8,j,'float')return
-true end return setmemoryvalue(d,e,g,f::any)end local e={}do function e.read(f:
-number|any,g:number|string,h:string?)if'table'==type(f)and rawget(f,'Data')then
-f=f.Data end if'userdata'==type(f)then assert('number'==type(g),`memory.read: offset must be a number, got {
+local c=function(c:any,d:number,e:string)if'color'==e then local f=
+getmemoryvalue(c,d,'dword')return f and b.dword(f)end if'userdata'==e then local
+f=getmemoryvalue(c,d,'qword')return f and pointer_to_user_data(f)end if'buffer'
+==e then local f=getmemoryvalue(c,d,'qword')return f and buffer.fromstring(
+string.pack('<I8',f))end if'vector'==e then local f=getmemoryvalue(c,d,'float')
+local g=getmemoryvalue(c,d+4,'float')local h=getmemoryvalue(c,d+8,'float')return
+vector.create(f,g,h)end return getmemoryvalue(c,d,e::any)end local d=function(d:
+any,e:number,f:string,g:any)if'color'==f and'table'==type(g)and g.dword then
+return setmemoryvalue(d,e,'dword',g:dword())end if'userdata'==f then g=tostring(
+g)if'string'==type(g)and g:match'^0x'then g=tonumber(g:sub(3),16)end return
+setmemoryvalue(d,e,'qword',g)end if'buffer'==f and'buffer'==type(g)then return
+setmemoryvalue(d,e,g,'qword')end if'vector'==f and'vector'==type(g)then local h=
+g.X or g[1]local i=g.Y or g[2]local j=g.Z or g[3]setmemoryvalue(d,e,h,'float')
+setmemoryvalue(d,e+4,i,'float')setmemoryvalue(d,e+8,j,'float')return true end
+return setmemoryvalue(d,e,g,f::any)end local e={}do function e.read(f:number|any
+,g:number|string,h:string?)if'table'==type(f)and rawget(f,'Data')then f=f.Data
+end if'userdata'==type(f)then assert('number'==type(g),`memory.read: offset must be a number, got {
 type(g)}`)assert('string'==type(h)or not h,`memory.read: data_type must be a string or nil, got {
 type(h)}`)return c(f,g,h::any)end if'number'==type(f)then if'string'==type(g)
 then return c(pointer_to_user_data(f),0,g::any)else assert('number'==type(g),`memory.read: offset must be a number or a string, got {
