@@ -63,41 +63,45 @@ type(data)}`)return httppost(url,data,...)end)end do Instance.declare('method',
 type(value)}`)return JSONEncode(value)end)Instance.declare('method',
 'HttpService','JSONDecode',function(self,value:string)assert('string'==type(
 value),`HttpService:JSONDecode: value must be a string, got {type(value)}`)
-return JSONDecode(value)end)end do Instance.declare('property',{'UnionOperation'
-,'MeshPart','TrussPart','Part'},'Size',{getter=function(self)local size=getsize(
-self.Data)return vector.create(size.x,size.y,size.z)end})Instance.declare(
-'property',{'UnionOperation','MeshPart','TrussPart','Part','Camera'},'Position',
-{getter=function(self)local position=getposition(self.Data)return vector.create(
-position.x,position.y,position.z)end,setter=function(self,value:vector|{x:number
-,y:number,z:number})assert('table'==type(value)and value.x and value.y and value
-.z,`Instance:Position: value must be a Vector3, got {type(value)}`)setposition(
-self.Data,value)end})Instance.declare('property',{'UnionOperation','MeshPart',
-'TrussPart','Part','Camera'},'CFrame',{getter=function(self)local position=
-getposition(self.Data)local up_vector=getupvector(self.Data)local right_vector=
-getrightvector(self.Data)local look_vector=getlookvector(self.Data)return{
-Position=vector.create(position.x,position.y,position.z),UpVector=vector.create(
-up_vector.x,up_vector.y,up_vector.z),RightVector=vector.create(right_vector.x,
-right_vector.y,right_vector.z),LookVector=vector.create(look_vector.x,
-look_vector.y,look_vector.z)}end,setter=function(self,value:any)setcframe(self.
-Data,value)end})Instance.declare('property',{'UnionOperation','MeshPart',
-'TrussPart','Part'},'Transparency',{getter=function(self)return gettransparency(
-self.Data)end,setter=function(self,value:number)settransparency(self.Data,value)
-end})end do Instance.declare('property','Player','Character',{getter=function(
-self)return constructor(getcharacter(self.Data))end})Instance.declare('property'
-,'Player','Team',{getter=function(self)return constructor(getteam(self.Data))end
-})Instance.declare('property','Player','DisplayName',{getter=function(self)
-return getdisplayname(self.Data)end})Instance.declare('property','Player',
-'UserId',{getter=function(self)return getuserid(self.Data)end})end do Instance.
-declare('property','Workspace','CurrentCamera',{getter=function(self)return
-constructor(findfirstchildofclass(self.Data,'Camera'))end})end do Instance.
-declare('property','Camera','FieldOfView',{getter=function(self)return
-getcamerafov(self.Data)end})Instance.declare('method','Camera',
-'SetCameraSubject',function(self,subject)assert(type(subject)=='table'and
-subject.Data,`Camera:SetCameraSubject: subject must be an Instance, got {type(
-subject)}`)return setcamerasubject(subject.Data)end)end do Instance.declare(
-'property',{'UnionOperation','MeshPart','TrussPart','Part'},'CanCollide',{getter
-=function(self)return getcancollide(self.Data)end,setter=function(self,value:
-boolean)assert(type(value)=='boolean',`Instance:CanCollide: value must be a boolean, got {
+return JSONDecode(value)end)end do Instance.declare('property',{'BoolValue',
+'IntValue','FloatValue','ObjectValue','StringValue','Vector3Value','ValueBase',
+'BrickColorValue','Color3Value','CFrameValue','DoubleConstrainedValue',
+'IntConstrainedValue'},'Value',{getter=function(self)return getvalue(self.Data)
+end,setter=function(self,value:any)setvalue(self.Data,value)end})end do Instance
+.declare('property',{'UnionOperation','MeshPart','TrussPart','Part'},'Size',{
+getter=function(self)local size=getsize(self.Data)return vector.create(size.x,
+size.y,size.z)end})Instance.declare('property',{'UnionOperation','MeshPart',
+'TrussPart','Part','Camera'},'Position',{getter=function(self)local position=
+getposition(self.Data)return vector.create(position.x,position.y,position.z)end,
+setter=function(self,value:vector|{x:number,y:number,z:number})assert('table'==
+type(value)and value.x and value.y and value.z,`Instance:Position: value must be a Vector3, got {
+type(value)}`)setposition(self.Data,value)end})Instance.declare('property',{
+'UnionOperation','MeshPart','TrussPart','Part','Camera'},'CFrame',{getter=
+function(self)local position=getposition(self.Data)local up_vector=getupvector(
+self.Data)local right_vector=getrightvector(self.Data)local look_vector=
+getlookvector(self.Data)return{Position=vector.create(position.x,position.y,
+position.z),UpVector=vector.create(up_vector.x,up_vector.y,up_vector.z),
+RightVector=vector.create(right_vector.x,right_vector.y,right_vector.z),
+LookVector=vector.create(look_vector.x,look_vector.y,look_vector.z)}end,setter=
+function(self,value:any)setcframe(self.Data,value)end})Instance.declare(
+'property',{'UnionOperation','MeshPart','TrussPart','Part'},'Transparency',{
+getter=function(self)return gettransparency(self.Data)end,setter=function(self,
+value:number)settransparency(self.Data,value)end})end do Instance.declare(
+'property','Player','Character',{getter=function(self)return constructor(
+getcharacter(self.Data))end})Instance.declare('property','Player','Team',{getter
+=function(self)return constructor(getteam(self.Data))end})Instance.declare(
+'property','Player','DisplayName',{getter=function(self)return getdisplayname(
+self.Data)end})Instance.declare('property','Player','UserId',{getter=function(
+self)return getuserid(self.Data)end})end do Instance.declare('property',
+'Workspace','CurrentCamera',{getter=function(self)return constructor(
+findfirstchildofclass(self.Data,'Camera'))end})end do Instance.declare(
+'property','Camera','FieldOfView',{getter=function(self)return getcamerafov(self
+.Data)end})Instance.declare('method','Camera','SetCameraSubject',function(self,
+subject)assert(type(subject)=='table'and subject.Data,`Camera:SetCameraSubject: subject must be an Instance, got {
+type(subject)}`)return setcamerasubject(subject.Data)end)end do Instance.
+declare('property',{'UnionOperation','MeshPart','TrussPart','Part'},'CanCollide'
+,{getter=function(self)return getcancollide(self.Data)end,setter=function(self,
+value:boolean)assert(type(value)=='boolean',`Instance:CanCollide: value must be a boolean, got {
 type(value)}`)setcancollide(self.Data,value)end})Instance.declare('property',{
 'UnionOperation','MeshPart','TrussPart','Part'},'Velocity',{getter=function(self
 )local velocity=getvelocity(self.Data)return vector.create(velocity.x,velocity.y
