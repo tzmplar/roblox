@@ -5,9 +5,21 @@ local color = require("@roblox/classes/color")
 ---- functions ----
 
 local get = function(pointer: any, offset: number, spec: string)
-    if "color" == spec and "userdata" == type(pointer) then
+    if "color" == spec then
         local dword = getmemoryvalue(pointer, offset, "dword")
         return dword and color.dword(dword)
+    end
+
+    if "userdata" == spec then
+        local q = getmemoryvalue(pointer, offset, "qword")
+
+        return q and pointer_to_user_data(q)
+    end
+
+    if "object" == spec then
+        local q = getmemoryvalue(pointer, offset, "qword")
+
+        return q and Instance and Instance.new(pointer_to_user_data(q))
     end
 
     if "buffer" == spec then
@@ -29,7 +41,27 @@ end
 
 local set = function(pointer: any, offset: number, spec: string, value: any)
     if "color" == spec and "table" == type(value) and value.dword then
-        return setmemoryvalue(pointer, offset, value:dword(), "string")
+        return setmemoryvalue(pointer, offset, "dword", value:dword())
+    end
+
+    if "userdata" == spec then
+        value = tostring(value)
+        
+        if "string" == type(value) and value:match("^0x") then
+            value = tonumber(value:sub(3), 16)
+        end
+
+        return setmemoryvalue(pointer, offset, "qword", value)
+    end
+
+    if "object" == spec and type(value) == "table" then
+        value = tostring(value.Data)
+        
+        if "string" == type(value) and value:match("^0x") then
+            value = tonumber(value:sub(3), 16)
+        end
+
+        return setmemoryvalue(pointer, offset, "qword", value)
     end
 
     if "buffer" == spec and "buffer" == type(value) then

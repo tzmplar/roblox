@@ -3,44 +3,43 @@ type connection__DARKLUA_TYPE_a={unbind:()->()}local a a={cache={},load=function
 function a.a()local b={}do function b.connect(c:string)local d=
 websocket_connect(c)local e={}do local f={}function e.send(g,h:string)assert(
 'string'==type(h),`websocket:send: message must be a string, got {type(h)}`)
-websocket_send(d,h)end function e.on(g,h:string,i)assert('string'==type(h),`websocket:on: event must be a string, got {
-type(h)}`)assert('function'==type(i),`websocket:on: callback must be a function, got {
-type(i)}`)f[h]=f[h]or{}table.insert(f[h],i)return{disconnect=function()assert(
-'function'==type(i),`connection:disconnect: callback must be a function, got {
-type(i)}`)local j=table.find(f[h],i)if j then table.remove(f[h],j)end end}end
-function e.close(g)websocket_close(d)end end return e end end return b end
-function a.b()local b={}do local function constructor(c:number,d:number,e:number
-)assert('number'==type(c),`Color3.new: red must be a number, got {type(c)}`)
-assert('number'==type(d),`Color3.new: green must be a number, got {type(d)}`)
-assert('number'==type(e),`Color3.new: blue must be a number, got {type(e)}`)
-return setmetatable({c,d,e},{__index=b.__index,__tostring=b.__tostring})end
-function b.toHSV(c)local d,e,f=c[1]/255,c[2]/255,c[3]/255 local g,h=math.max(d,e
-,f),math.min(d,e,f)local i,j,k k=g local l=g-h if g~=0 then j=l/g else j=0 i=0
-return i,j,k end if d==g then i=(e-f)/l elseif e==g then i=2+(f-d)/l else i=4+(d
--e)/l end i=i*60 if i<0 then i=i+360 end return i,j,k end function b.toHex(c)
-local d=string.format('%02X',math.floor(c[1]))local e=string.format('%02X',math.
-floor(c[2]))local f=string.format('%02X',math.floor(c[3]))return`{d}{e}{f}`end
-function b.fromRGB(c:number,d:number,e:number):Color3 assert('number'==type(c),`Color3.fromRGB: red must be a number, got {
-type(c)}`)assert('number'==type(d),`Color3.fromRGB: green must be a number, got {
-type(d)}`)assert('number'==type(e),`Color3.fromRGB: blue must be a number, got {
-type(e)}`)return constructor(c,d,e)end do local c=b.fromRGB function b.fromHex(d
-:string)assert('string'==type(d),`Color3.fromHex: data must be a string, got {
-type(d)}`)local e=tonumber(d:sub(1,2),16)local f=tonumber(d:sub(3,4),16)local g=
-tonumber(d:sub(5,6),16)return c(e,f,g)end function b.fromHSV(d,e,f)assert(type(d
-)=='number'and type(e)=='number'and type(f)=='number',
-'HSV values must be numbers')d=math.clamp(d,0,360)e=math.clamp(e,0,1)f=math.
-clamp(f,0,1)local g=f*e local h=g*(1-math.abs((d/60)%2-1))local i=f-g local j,k,
-l if d<60 then j,k,l=g,h,0 elseif d<120 then j,k,l=h,g,0 elseif d<180 then j,k,l
-=0,g,h elseif d<240 then j,k,l=0,h,g elseif d<300 then j,k,l=h,0,g else j,k,l=g,
-0,h end return c(math.floor((j+i)*255),math.floor((k+i)*255),math.floor((l+i)*
-255))end end function b.buffer(c:buffer|typeof(b))assert('buffer'==type(c)or
-'table'==type(c),`Color3.buffer: value must be a buffer or Color3, got {type(c)}`
-)if'buffer'==type(c)then local d=buffer.readi8(c,0)local e=buffer.readi8(c,1)
-local f=buffer.readi16(c,2)return b.fromRGB(d,e,f)else local d=buffer.create(8)
-buffer.writei8(d,0,c[1])buffer.writei8(d,1,c[2])buffer.writei16(d,2,c[3])return
-d end end function b.dword(c:number|typeof(b))assert('number'==type(c)or'table'
-==type(c),`Color3.dword: value must be a number or Color3, got {type(c)}`)if
-'number'==type(c)then return b.fromRGB(bit32.band(c,0xff),bit32.band(bit32.
+websocket_send(d,h)end function e.on(g,h)assert('function'==type(h),`websocket:on: callback must be a function, got {
+type(h)}`)table.insert(f,h)return{disconnect=function()assert('function'==type(h
+),`connection:disconnect: callback must be a function, got {type(h)}`)local i=
+table.find(f,h)if i then table.remove(f,i)end end}end function e.close(g)
+websocket_close(d)end websocket_onmessage(d,function(...)for g,h in f do h(...)
+end end)end return e end end return b end function a.b()local b={}do
+local function constructor(c:number,d:number,e:number)assert('number'==type(c),`Color3.new: red must be a number, got {
+type(c)}`)assert('number'==type(d),`Color3.new: green must be a number, got {
+type(d)}`)assert('number'==type(e),`Color3.new: blue must be a number, got {
+type(e)}`)return setmetatable({c,d,e},{__index=b.__index,__tostring=b.__tostring
+})end function b.toHSV(c)local d,e,f=c[1]/255,c[2]/255,c[3]/255 local g,h=math.
+max(d,e,f),math.min(d,e,f)local i,j,k k=g local l=g-h if g~=0 then j=l/g else j=
+0 i=0 return i,j,k end if d==g then i=(e-f)/l elseif e==g then i=2+(f-d)/l else
+i=4+(d-e)/l end i=i*60 if i<0 then i=i+360 end return i,j,k end function b.toHex
+(c)local d=string.format('%02X',math.floor(c[1]))local e=string.format('%02X',
+math.floor(c[2]))local f=string.format('%02X',math.floor(c[3]))return`{d}{e}{f}`
+end function b.fromRGB(c:number,d:number,e:number):Color3 assert('number'==type(
+c),`Color3.fromRGB: red must be a number, got {type(c)}`)assert('number'==type(d
+),`Color3.fromRGB: green must be a number, got {type(d)}`)assert('number'==type(
+e),`Color3.fromRGB: blue must be a number, got {type(e)}`)return constructor(c,d
+,e)end do local c=b.fromRGB function b.fromHex(d:string)assert('string'==type(d)
+,`Color3.fromHex: data must be a string, got {type(d)}`)local e=tonumber(d:sub(1
+,2),16)local f=tonumber(d:sub(3,4),16)local g=tonumber(d:sub(5,6),16)return c(e,
+f,g)end function b.fromHSV(d,e,f)assert(type(d)=='number'and type(e)=='number'
+and type(f)=='number','HSV values must be numbers')d=math.clamp(d,0,360)e=math.
+clamp(e,0,1)f=math.clamp(f,0,1)local g=f*e local h=g*(1-math.abs((d/60)%2-1))
+local i=f-g local j,k,l if d<60 then j,k,l=g,h,0 elseif d<120 then j,k,l=h,g,0
+elseif d<180 then j,k,l=0,g,h elseif d<240 then j,k,l=0,h,g elseif d<300 then j,
+k,l=h,0,g else j,k,l=g,0,h end return c(math.floor((j+i)*255),math.floor((k+i)*
+255),math.floor((l+i)*255))end end function b.buffer(c:buffer|typeof(b))assert(
+'buffer'==type(c)or'table'==type(c),`Color3.buffer: value must be a buffer or Color3, got {
+type(c)}`)if'buffer'==type(c)then local d=buffer.readi8(c,0)local e=buffer.
+readi8(c,1)local f=buffer.readi16(c,2)return b.fromRGB(d,e,f)else local d=buffer
+.create(8)buffer.writei8(d,0,c[1])buffer.writei8(d,1,c[2])buffer.writei16(d,2,c[
+3])return d end end function b.dword(c:number|typeof(b))assert('number'==type(c)
+or'table'==type(c),`Color3.dword: value must be a number or Color3, got {type(c)
+}`)if'number'==type(c)then return b.fromRGB(bit32.band(c,0xff),bit32.band(bit32.
 rshift(c,8),0xff),bit32.band(bit32.rshift(c,16),0xff))else return bit32.bor(c[1]
 ,bit32.lshift(c[2],8),bit32.lshift(c[3],16))end end function b.__index(c,d:
 string)if d:lower()=='r'then return c[1]elseif d:lower()=='g'then return c[2]
@@ -207,20 +206,23 @@ if not f[1]or not f[2]or not f[3]then error(`can't initialize BrickColor, invali
 h>l then i=k h=l end end return c.new(i.Name)end return g end function c.random(
 )return c.new(e[math.random(1,#e)])end function c.__tostring(f)return f.Name end
 c.__index=c end _G.BrickColor=c return b end function a.c()local b=a.load'b'
-local c=function(c:any,d:number,e:string)if'color'==e and'userdata'==type(c)then
-local f=getmemoryvalue(c,d,'dword')return f and b.dword(f)end if'buffer'==e then
-local f=getmemoryvalue(c,d,'qword')return f and buffer.fromstring(string.pack(
-'<I8',f))end if'vector'==e then local f=getmemoryvalue(c,d,'float')local g=
-getmemoryvalue(c,d+4,'float')local h=getmemoryvalue(c,d+8,'float')return vector.
-create(f,g,h)end return getmemoryvalue(c,d,e::any)end local d=function(d:any,e:
-number,f:string,g:any)if'color'==f and'table'==type(g)and g.dword then return
-setmemoryvalue(d,e,g:dword(),'string')end if'buffer'==f and'buffer'==type(g)then
-return setmemoryvalue(d,e,g,'qword')end if'vector'==f and'vector'==type(g)then
-local h=g.X or g[1]local i=g.Y or g[2]local j=g.Z or g[3]setmemoryvalue(d,e,h,
-'float')setmemoryvalue(d,e+4,i,'float')setmemoryvalue(d,e+8,j,'float')return
-true end return setmemoryvalue(d,e,g,f::any)end local e={}do function e.read(f:
-number|any,g:number|string,h:string?)if'table'==type(f)and rawget(f,'Data')then
-f=f.Data end if'userdata'==type(f)then assert('number'==type(g),`memory.read: offset must be a number, got {
+local c=function(c:any,d:number,e:string)if'color'==e then local f=
+getmemoryvalue(c,d,'dword')return f and b.dword(f)end if'userdata'==e then local
+f=getmemoryvalue(c,d,'qword')return f and pointer_to_user_data(f)end if'buffer'
+==e then local f=getmemoryvalue(c,d,'qword')return f and buffer.fromstring(
+string.pack('<I8',f))end if'vector'==e then local f=getmemoryvalue(c,d,'float')
+local g=getmemoryvalue(c,d+4,'float')local h=getmemoryvalue(c,d+8,'float')return
+vector.create(f,g,h)end return getmemoryvalue(c,d,e::any)end local d=function(d:
+any,e:number,f:string,g:any)if'color'==f and'table'==type(g)and g.dword then
+return setmemoryvalue(d,e,'dword',g:dword())end if'userdata'==f then g=tostring(
+g)if'string'==type(g)and g:match'^0x'then g=tonumber(g:sub(3),16)end return
+setmemoryvalue(d,e,'qword',g)end if'buffer'==f and'buffer'==type(g)then return
+setmemoryvalue(d,e,g,'qword')end if'vector'==f and'vector'==type(g)then local h=
+g.X or g[1]local i=g.Y or g[2]local j=g.Z or g[3]setmemoryvalue(d,e,h,'float')
+setmemoryvalue(d,e+4,i,'float')setmemoryvalue(d,e+8,j,'float')return true end
+return setmemoryvalue(d,e,g,f::any)end local e={}do function e.read(f:number|any
+,g:number|string,h:string?)if'table'==type(f)and rawget(f,'Data')then f=f.Data
+end if'userdata'==type(f)then assert('number'==type(g),`memory.read: offset must be a number, got {
 type(g)}`)assert('string'==type(h)or not h,`memory.read: data_type must be a string or nil, got {
 type(h)}`)return c(f,g,h::any)end if'number'==type(f)then if'string'==type(g)
 then return c(pointer_to_user_data(f),0,g::any)else assert('number'==type(g),`memory.read: offset must be a number or a string, got {
@@ -421,6 +423,5 @@ type(h)}`)assert('number'==type(i),`MouseService:SmoothMouseLinear: sensitivity 
 type(i)}`)assert('number'==type(j),`MouseService:SmoothMouseLinear: smoothness must be a number, got {
 type(j)}`)local k=smoothmouse_linear(g,h,i,j)return vector.create(k.x,k.y)end)
 end end _G.Instance=d _G.workspace=d.new(Workspace)_G.game=d.new(Game)return{
-Instance=d,workspace=_G.workspace,game=_G.game}end end if not _G.websocket then
-_G.websocket=a.load'a'end if not _G.memory then _G.memory=a.load'c'end _G.signal
-=a.load'd'a.load'j'
+Instance=d,workspace=_G.workspace,game=_G.game}end end _G.websocket=a.load'a'_G.
+memory=a.load'c'_G.signal=a.load'd'a.load'j'
