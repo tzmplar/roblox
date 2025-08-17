@@ -16,16 +16,14 @@ local websocket = {}; do
                 websocket_send(data, message)
             end
 
-            function connection:on(event: string, callback)
+            function connection:on(callback)
                 -- assertions --
 
-                assert("string" == type(event), `websocket:on: event must be a string, got {type(event)}`)
                 assert("function" == type(callback), `websocket:on: callback must be a function, got {type(callback)}`)
 
                 -- exports --
 
-                callbacks[event] = callbacks[event] or {}
-                table.insert(callbacks[event], callback)
+                table.insert(callbacks, callback)
 
                 return {
                     disconnect = function()
@@ -35,9 +33,9 @@ local websocket = {}; do
 
                         -- exports --
 
-                        local index = table.find(callbacks[event], callback)
+                        local index = table.find(callbacks, callback)
                         if index then
-                            table.remove(callbacks[event], index)
+                            table.remove(callbacks, index)
                         end
                     end
                 }
@@ -46,6 +44,12 @@ local websocket = {}; do
             function connection:close()
                 websocket_close(data)
             end
+
+            websocket_onmessage(data, function(...)
+                for _, callback in callbacks do
+                    callback(...)
+                end
+            end)
         end
 
         return connection
