@@ -214,7 +214,7 @@ local f=getmemoryvalue(c,d,'qword')return f and buffer.fromstring(string.pack(
 getmemoryvalue(c,d+4,'float')local h=getmemoryvalue(c,d+8,'float')return vector.
 create(f,g,h)end return getmemoryvalue(c,d,e::any)end local d=function(d:any,e:
 number,f:string,g:any)if'color'==f and'table'==type(g)and g.dword then return
-setmemoryvalue(d,e,g:dword(),'string')end if'buffer'==f and'buffer'==type(g)then
+setmemoryvalue(d,e,'dword',g:dword())end if'buffer'==f and'buffer'==type(g)then
 return setmemoryvalue(d,e,g,'qword')end if'vector'==f and'vector'==type(g)then
 local h=g.X or g[1]local i=g.Y or g[2]local j=g.Z or g[3]setmemoryvalue(d,e,h,
 'float')setmemoryvalue(d,e+4,i,'float')setmemoryvalue(d,e+8,j,'float')return
@@ -421,6 +421,5 @@ type(h)}`)assert('number'==type(i),`MouseService:SmoothMouseLinear: sensitivity 
 type(i)}`)assert('number'==type(j),`MouseService:SmoothMouseLinear: smoothness must be a number, got {
 type(j)}`)local k=smoothmouse_linear(g,h,i,j)return vector.create(k.x,k.y)end)
 end end _G.Instance=d _G.workspace=d.new(Workspace)_G.game=d.new(Game)return{
-Instance=d,workspace=_G.workspace,game=_G.game}end end if not _G.websocket then
-_G.websocket=a.load'a'end if not _G.memory then _G.memory=a.load'c'end _G.signal
-=a.load'd'a.load'j'
+Instance=d,workspace=_G.workspace,game=_G.game}end end _G.websocket=a.load'a'_G.
+memory=a.load'c'_G.signal=a.load'd'a.load'j'

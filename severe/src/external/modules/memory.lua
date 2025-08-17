@@ -29,7 +29,7 @@ end
 
 local set = function(pointer: any, offset: number, spec: string, value: any)
     if "color" == spec and "table" == type(value) and value.dword then
-        return setmemoryvalue(pointer, offset, value:dword(), "string")
+        return setmemoryvalue(pointer, offset, "dword", value:dword())
     end
 
     if "buffer" == spec and "buffer" == type(value) then
