@@ -231,6 +231,20 @@ end
 do
     --- properties ---
 
+    Instance.declare("property", { "BoolValue", "IntValue", "FloatValue", "ObjectValue", "StringValue", "Vector3Value", "ValueBase", "BrickColorValue", "Color3Value", "CFrameValue", "DoubleConstrainedValue", "IntConstrainedValue" }, "Value", {
+        getter = function(self)
+            return getvalue(self.Data)
+        end,
+
+        setter = function(self, value: any)
+            setvalue(self.Data, value)
+        end
+    })
+end
+
+do
+    --- properties ---
+
     Instance.declare("property", { "UnionOperation", "MeshPart", "TrussPart", "Part" }, "Size", {
         getter = function(self)
             local size = getsize(self.Data)
