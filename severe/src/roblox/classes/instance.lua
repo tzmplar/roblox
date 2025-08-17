@@ -15,7 +15,7 @@ local Instance = {}; do
         userdata = "userdata" == type(userdata) and userdata or "table" == type(userdata) and rawget(userdata, "Data")
         assert("userdata" == type(userdata), `Instance.new: userdata must be a userdata, got {type(userdata)}`)
 
-        return setmetatable( { ClassName = getclassname(userdata), Data = userdata }, { __index = Instance.__index } )
+        return setmetatable( { ClassName = getclassname(userdata), Data = userdata }, { __index = Instance.__index, __newindex = Instance.__newindex } )
     end
 
     --- functions ---
@@ -72,6 +72,21 @@ local Instance = {}; do
         return rawget(self, key) or rawget(self, "Data") and
             constructor(findfirstchild(self.Data, key)) or
             Instance[key]
+    end
+
+    function Instance:__newindex(key: string, value: any)
+        assert("string" == type(key), `Instance:__newindex: key must be a string, got {type(key)}`)
+
+        do
+            local class = self.ClassName
+            local declaration = declarations.global[key] or (declarations[class] and declarations[class][key])
+
+            if declaration and declaration.property and declaration.property.setter then
+                return declaration.property.setter(self, value)
+            end
+        end
+
+        return rawset(self, key, value)
     end
 end
 

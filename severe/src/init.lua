@@ -24,7 +24,8 @@ local Instance = require("@roblox/classes/instance"); do
 
         Instance.declare("property", "global", "Parent", {
             getter = function(self)
-                return constructor(getparent(self.Data))
+                local userdata: any = getparent(self.Data)
+                return userdata and constructor(userdata)
             end
         })
 

@@ -253,9 +253,10 @@ end return b end end function a.g()local b=a.load'f'local c={}do local d={global
 ={}}local function constructor(e:any)e='userdata'==type(e)and e or'table'==type(
 e)and rawget(e,'Data')assert('userdata'==type(e),`Instance.new: userdata must be a userdata, got {
 type(e)}`)return setmetatable({ClassName=getclassname(e),Data=e},{__index=c.
-__index})end c.new=constructor function c.declare<T>(e:'property'|'method',f:
-string|{string},g:string,h:T|((self:typeof(c))->any))assert('string'==type(g),`Instance.declare: name must be a string, got {
-type(g)}`)assert('property'==e or'method'==e,`Instance.declare: value must be "property" or "method", got {
+__index,__newindex=c.__newindex})end c.new=constructor function c.declare<T>(e:
+'property'|'method',f:string|{string},g:string,h:T|((self:typeof(c))->any))
+assert('string'==type(g),`Instance.declare: name must be a string, got {type(g)}`
+)assert('property'==e or'method'==e,`Instance.declare: value must be "property" or "method", got {
 e}`)assert('table'==type(f)or'string'==type(f),`Instance.declare: class must be a string or a table of strings, got {
 type(f)}`)if'string'==type(f)then d[f]=b(d[f],{[g]={[e]=h}})else for i,j in f do
 d[j]=b(d[j],{[g]={[e]=h}})end end end function c.__index(e,f:string)assert(
@@ -263,16 +264,20 @@ d[j]=b(d[j],{[g]={[e]=h}})end end end function c.__index(e,f:string)assert(
 local g=e.ClassName local h=d.global[f]or(d[g]and d[g][f])if h then local i=h.
 property local j=h.method if i and i.getter then return i.getter(e)elseif j then
 return j end end end return rawget(e,f)or rawget(e,'Data')and constructor(
-findfirstchild(e.Data,f))or c[f]end end return c end end local b=a.load'a'do _G.
-Vector3=a.load'b'_G.Vector2=a.load'c'_G.Signal=a.load'd'_G.Color3=a.load'e'end
-local c=a.load'g'do local d=c.new do c.declare('property','global','Name',{
-getter=function(e)return getname(e.Data)end})c.declare('property','global',
-'Parent',{getter=function(e)return d(getparent(e.Data))end})c.declare('method',
-'global','GetChildren',function(e)return b(getchildren(e.Data),d)end)c.declare(
-'method','global','GetDescendants',function(e)return b(getdescendants(e.Data),d)
-end)do local e=function(e)return function(f,...)local g:any=e(f.Data,...)return
-g and d(g)end end c.declare('method','global','FindFirstChild',e(findfirstchild)
-)c.declare('method','global','FindFirstAncestor',e(findfirstancestor))c.declare(
+findfirstchild(e.Data,f))or c[f]end function c.__newindex(e,f:string,g:any)
+assert('string'==type(f),`Instance:__newindex: key must be a string, got {type(f
+)}`)do local h=e.ClassName local i=d.global[f]or(d[h]and d[h][f])if i and i.
+property and i.property.setter then return i.property.setter(e,g)end end return
+rawset(e,f,g)end end return c end end local b=a.load'a'do _G.Vector3=a.load'b'_G
+.Vector2=a.load'c'_G.Signal=a.load'd'_G.Color3=a.load'e'end local c=a.load'g'do
+local d=c.new do c.declare('property','global','Name',{getter=function(e)return
+getname(e.Data)end})c.declare('property','global','Parent',{getter=function(e)
+local f:any=getparent(e.Data)return f and d(f)end})c.declare('method','global',
+'GetChildren',function(e)return b(getchildren(e.Data),d)end)c.declare('method',
+'global','GetDescendants',function(e)return b(getdescendants(e.Data),d)end)do
+local e=function(e)return function(f,...)local g:any=e(f.Data,...)return g and
+d(g)end end c.declare('method','global','FindFirstChild',e(findfirstchild))c.
+declare('method','global','FindFirstAncestor',e(findfirstancestor))c.declare(
 'method','global','FindFirstChildOfClass',e(findfirstchildofclass))c.declare(
 'method','global','FindFirstAncestorOfClass',e(findfirstancestorofclass))c.
 declare('method','global','WaitForChild',e(waitforchild))end do local e=function
