@@ -14,11 +14,15 @@ local Color3 = {} do
     --- methods ---
 
     function Color3:toHSV()
+        -- constants --
+
         local r, g, b = self[1] / 255, self[2] / 255, self[3] / 255
         local max, min = math.max(r, g, b), math.min(r, g, b)
         local h, s, v
         
         v = max
+
+        -- conversion --
         
         local delta = max - min
         if max ~= 0 then
@@ -28,6 +32,8 @@ local Color3 = {} do
             h = 0
             return h, s, v
         end
+
+        -- hue --
         
         if r == max then
             h = (g - b) / delta
@@ -41,16 +47,22 @@ local Color3 = {} do
         if h < 0 then
             h = h + 360
         end
+
+        -- exports --
         
         return h, s, v
     end
 
     function Color3:toHex()
+        -- constants --
+
         local r = string.format("%02X", math.floor(self[1]))
         local g = string.format("%02X", math.floor(self[2]))
         local b = string.format("%02X", math.floor(self[3]))
+
+        -- exports --
         
-        return r .. g .. b
+        return `{r}{g}{b}`
     end
 
     --- functions ---
@@ -121,7 +133,11 @@ local Color3 = {} do
     end
 
     function Color3.buffer(value: buffer | typeof(Color3))
+        -- assertions --
+
         assert("buffer" == type(value) or "table" == type(value), `Color3.buffer: value must be a buffer or Color3, got {type(value)}`)
+
+        -- exports --
 
         if "buffer" == type(value) then
             local red   = buffer.readi8(value, 0)
@@ -141,7 +157,11 @@ local Color3 = {} do
     end
 
     function Color3.dword(value: number | typeof(Color3))
+        -- assertions --
+
         assert("number" == type(value) or "table" == type(value), `Color3.dword: value must be a number or Color3, got {type(value)}`)
+
+        -- exports --
 
         if "number" == type(value) then
             return Color3.fromRGB(bit32.band(value, 0xFF), bit32.band(bit32.rshift(value, 8), 0xFF), bit32.band(bit32.rshift(value, 16), 0xFF))
@@ -160,6 +180,8 @@ local Color3 = {} do
         elseif key:lower() == "b" then
             return self[3]
         end
+
+        -- exports --
 
         return rawget(self, key) or Color3[key]
     end

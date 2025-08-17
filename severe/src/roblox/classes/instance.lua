@@ -12,8 +12,12 @@ local Instance = {}; do
     --- constructor ---
 
     local function constructor(userdata: any)
+        -- assertions --
+
         userdata = "userdata" == type(userdata) and userdata or "table" == type(userdata) and rawget(userdata, "Data")
         assert("userdata" == type(userdata), `Instance.new: userdata must be a userdata, got {type(userdata)}`)
+
+        -- exports --
 
         return setmetatable( { ClassName = getclassname(userdata), Data = userdata }, { __index = Instance.__index, __newindex = Instance.__newindex } )
     end
@@ -51,7 +55,11 @@ local Instance = {}; do
     --- metatables ---
 
     function Instance:__index(key: string)
+        -- assertions --
+
         assert("string" == type(key), `Instance:__index: key must be a string, got {type(key)}`)
+
+        -- exports --
         
         do
             local class = self.ClassName
@@ -75,7 +83,11 @@ local Instance = {}; do
     end
 
     function Instance:__newindex(key: string, value: any)
+        -- assertions --
+
         assert("string" == type(key), `Instance:__newindex: key must be a string, got {type(key)}`)
+
+        -- exports --
 
         do
             local class = self.ClassName
