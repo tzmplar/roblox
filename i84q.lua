@@ -1,473 +1,426 @@
-local function merge(a,b)if not a then return b elseif not b then return a end
-for k,v in pairs(b)do a[k]=v end return a end local function map(t,f)local
-result={}for k,v in t do result[k]=f(v,k)end return result end local Instance={}
-do local declarations={global={}}local function constructor(userdata:any)
-userdata='userdata'==type(userdata)and userdata or'table'==type(userdata)and
-rawget(userdata,'Data')assert('userdata'==type(userdata),`Instance.new: userdata must be a userdata, got {
-type(userdata)}`)return setmetatable({ClassName=getclassname(userdata),Data=
-userdata},{__index=Instance.__index})end Instance.new=constructor function
-Instance.declare<T>(value:'property'|'method',class:string|{string},name:string,
-definition:T|((self:typeof(Instance))->any))assert('string'==type(name),`Instance.declare: name must be a string, got {
-type(name)}`)assert('property'==value or'method'==value,`Instance.declare: value must be "property" or "method", got {
-value}`)assert('table'==type(class)or'string'==type(class),`Instance.declare: class must be a string or a table of strings, got {
-type(class)}`)if'string'==type(class)then declarations[class]=merge(declarations
-[class],{[name]={[value]=definition}})else for index,class in class do
-declarations[class]=merge(declarations[class],{[name]={[value]=definition}})end
-end end function Instance:__index(key:string)assert('string'==type(key),`Instance:__index: key must be a string, got {
-type(key)}`)do local class=self.ClassName local declaration=declarations.global[
-key]or(declarations[class]and declarations[class][key])if declaration then local
-property=declaration.property local method=declaration.method if property and
-property.getter then return property.getter(self)elseif method then return
-method end end end return rawget(self,key)or rawget(self,'Data')and constructor(
-findfirstchild(self.Data,key))or Instance[key]end end local constructor=Instance
-.new do Instance.declare('property','global','Name',{getter=function(self)return
-getname(self.Data)end})Instance.declare('property','global','Parent',{getter=
-function(self)return constructor(getparent(self.Data))end})Instance.declare(
-'method','global','GetChildren',function(self)return map(getchildren(self.Data),
-constructor)end)Instance.declare('method','global','GetDescendants',function(
-self)return map(getdescendants(self.Data),constructor)end)do local generate=
-function(f)return function(self,...)return constructor(f(self.Data,...))end end
-Instance.declare('method','global','FindFirstChild',generate(findfirstchild))
-Instance.declare('method','global','FindFirstAncestor',generate(
-findfirstancestor))Instance.declare('method','global','FindFirstChildOfClass',
-generate(findfirstchildofclass))Instance.declare('method','global',
-'FindFirstAncestorOfClass',generate(findfirstancestorofclass))Instance.declare(
-'method','global','WaitForChild',generate(waitforchild))end do local generate=
-function(f)return function(self,...)return f(self.Data,...)end end Instance.
-declare('method','global','SetMemoryValue',generate(setmemoryvalue))Instance.
-declare('method','global','GetMemoryValue',generate(getmemoryvalue))Instance.
-declare('method','global','Read',generate(getmemoryvalue))Instance.declare(
-'method','global','Write',generate(setmemoryvalue))end Instance.declare('method'
-,'global','IsA',function(self,class:string)assert('string'==type(class),`Instance:IsA: class must be a string, got {
-type(class)}`)return self.ClassName==class end)Instance.declare('method',
-'global','IsAncestorOf',function(self,other)assert('userdata'==type(other)or
-type(other)=='table'and other.Data,`Instance:IsAncestorOf: other must be a userdata or an Instance, got {
-type(other)}`)return isancestorof(self.Data,type(other)=='userdata'and other or
-other.Data)end)Instance.declare('method','global','IsDescendantOf',function(self
-,other)assert('userdata'==type(other)or type(other)=='table'and other.Data,`Instance:IsDescendantOf: other must be a userdata or an Instance, got {
-type(other)}`)return isdescendantof(self.Data,type(other)=='userdata'and other
-or other.Data)end)Instance.declare('method','global','Destroy',function(self)
-return destroy(self.Data)end)end do Instance.declare('property','DataModel',
-'PlaceId',{getter=function(self)return getplaceid()end})Instance.declare(
-'property','DataModel','GameId',{getter=function(self)return getgameid()end})
-Instance.declare('method','DataModel','GetService',function(self,name:string)
-return constructor(findservice(self.Data,name))end)Instance.declare('method',
-'DataModel','FindService',function(self,name:string)return constructor(
-findservice(self.Data,name))end)Instance.declare('method','DataModel','HttpGet',
-function(self,url:string)assert('string'==type(url),`DataModel:HttpGet: url must be a string, got {
-type(url)}`)return httpget(url)end)Instance.declare('method','DataModel',
-'HttpPost',function(self,url:string,data:string,...)assert('string'==type(url),`DataModel:HttpPost: url must be a string, got {
-type(url)}`)assert('string'==type(data),`DataModel:HttpPost: data must be a string, got {
-type(data)}`)return httppost(url,data,...)end)end do Instance.declare('method',
-'HttpService','JSONEncode',function(self,value:any)assert('table'==type(value),`HttpService:JSONEncode: value must be a table, got {
-type(value)}`)return JSONEncode(value)end)Instance.declare('method',
-'HttpService','JSONDecode',function(self,value:string)assert('string'==type(
-value),`HttpService:JSONDecode: value must be a string, got {type(value)}`)
-return JSONDecode(value)end)end do Instance.declare('property',{'BoolValue',
+type connection__DARKLUA_TYPE_a={unbind:()->()}local a a={cache={},load=function
+(b)if not a.cache[b]then a.cache[b]={c=a[b]()}end return a.cache[b].c end}do
+function a.a()local b={}do function b.connect(c:string)local d=
+websocket_connect(c)local e={}do local f={}function e.send(g,h:string)assert(
+'string'==type(h),`websocket:send: message must be a string, got {type(h)}`)
+websocket_send(d,h)end function e.on(g,h:string,i)assert('string'==type(h),`websocket:on: event must be a string, got {
+type(h)}`)assert('function'==type(i),`websocket:on: callback must be a function, got {
+type(i)}`)f[h]=f[h]or{}table.insert(f[h],i)return{disconnect=function()assert(
+'function'==type(i),`connection:disconnect: callback must be a function, got {
+type(i)}`)local j=table.find(f[h],i)if j then table.remove(f[h],j)end end}end
+function e.close(g)websocket_close(d)end end return e end end return b end
+function a.b()local b={}do local function constructor(c:number,d:number,e:number
+)assert('number'==type(c),`Color3.new: red must be a number, got {type(c)}`)
+assert('number'==type(d),`Color3.new: green must be a number, got {type(d)}`)
+assert('number'==type(e),`Color3.new: blue must be a number, got {type(e)}`)
+return setmetatable({c,d,e},{__index=b.__index,__tostring=b.__tostring})end
+function b.toHSV(c)local d,e,f=c[1]/255,c[2]/255,c[3]/255 local g,h=math.max(d,e
+,f),math.min(d,e,f)local i,j,k k=g local l=g-h if g~=0 then j=l/g else j=0 i=0
+return i,j,k end if d==g then i=(e-f)/l elseif e==g then i=2+(f-d)/l else i=4+(d
+-e)/l end i=i*60 if i<0 then i=i+360 end return i,j,k end function b.toHex(c)
+local d=string.format('%02X',math.floor(c[1]))local e=string.format('%02X',math.
+floor(c[2]))local f=string.format('%02X',math.floor(c[3]))return`{d}{e}{f}`end
+function b.fromRGB(c:number,d:number,e:number):Color3 assert('number'==type(c),`Color3.fromRGB: red must be a number, got {
+type(c)}`)assert('number'==type(d),`Color3.fromRGB: green must be a number, got {
+type(d)}`)assert('number'==type(e),`Color3.fromRGB: blue must be a number, got {
+type(e)}`)return constructor(c,d,e)end do local c=b.fromRGB function b.fromHex(d
+:string)assert('string'==type(d),`Color3.fromHex: data must be a string, got {
+type(d)}`)local e=tonumber(d:sub(1,2),16)local f=tonumber(d:sub(3,4),16)local g=
+tonumber(d:sub(5,6),16)return c(e,f,g)end function b.fromHSV(d,e,f)assert(type(d
+)=='number'and type(e)=='number'and type(f)=='number',
+'HSV values must be numbers')d=math.clamp(d,0,360)e=math.clamp(e,0,1)f=math.
+clamp(f,0,1)local g=f*e local h=g*(1-math.abs((d/60)%2-1))local i=f-g local j,k,
+l if d<60 then j,k,l=g,h,0 elseif d<120 then j,k,l=h,g,0 elseif d<180 then j,k,l
+=0,g,h elseif d<240 then j,k,l=0,h,g elseif d<300 then j,k,l=h,0,g else j,k,l=g,
+0,h end return c(math.floor((j+i)*255),math.floor((k+i)*255),math.floor((l+i)*
+255))end end function b.buffer(c:buffer|typeof(b))assert('buffer'==type(c)or
+'table'==type(c),`Color3.buffer: value must be a buffer or Color3, got {type(c)}`
+)if'buffer'==type(c)then local d=buffer.readi8(c,0)local e=buffer.readi8(c,1)
+local f=buffer.readi16(c,2)return b.fromRGB(d,e,f)else local d=buffer.create(8)
+buffer.writei8(d,0,c[1])buffer.writei8(d,1,c[2])buffer.writei16(d,2,c[3])return
+d end end function b.dword(c:number|typeof(b))assert('number'==type(c)or'table'
+==type(c),`Color3.dword: value must be a number or Color3, got {type(c)}`)if
+'number'==type(c)then return b.fromRGB(bit32.band(c,0xff),bit32.band(bit32.
+rshift(c,8),0xff),bit32.band(bit32.rshift(c,16),0xff))else return bit32.bor(c[1]
+,bit32.lshift(c[2],8),bit32.lshift(c[3],16))end end function b.__index(c,d:
+string)if d:lower()=='r'then return c[1]elseif d:lower()=='g'then return c[2]
+elseif d:lower()=='b'then return c[3]end return rawget(c,d)or b[d]end function b
+.__eq(c,d)return c[1]==d[1]and c[2]==d[2]and c[3]==d[3]end function b.__tostring
+(c)return`Color3.fromRGB({c[1]}, {c[2]}, {c[3]})`end end local c={Palette={[1032
+]={Name='Hot pink',Color=b.fromRGB(255,0,191)},[1031]={Name='Royal purple',Color
+=b.fromRGB(98,37,209)},[1030]={Name='Pastel brown',Color=b.fromRGB(255,204,153)}
+,[1029]={Name='Pastel yellow',Color=b.fromRGB(255,255,204)},[1028]={Name=
+'Pastel green',Color=b.fromRGB(204,255,204)},[1027]={Name='Pastel blue-green',
+Color=b.fromRGB(159,243,233)},[1026]={Name='Pastel violet',Color=b.fromRGB(177,
+167,255)},[1025]={Name='Pastel orange',Color=b.fromRGB(255,201,201)},[1024]={
+Name='Pastel light blue',Color=b.fromRGB(175,221,255)},[1023]={Name='Lavender',
+Color=b.fromRGB(140,91,159)},[1022]={Name='Grime',Color=b.fromRGB(127,142,100)},
+[1021]={Name='Camo',Color=b.fromRGB(58,125,21)},[1020]={Name='Lime green',Color=
+b.fromRGB(0,255,0)},[1019]={Name='Toothpaste',Color=b.fromRGB(0,255,255)},[1018]
+={Name='Teal',Color=b.fromRGB(18,238,212)},[1017]={Name='Deep orange',Color=b.
+fromRGB(255,175,0)},[1016]={Name='Pink',Color=b.fromRGB(255,102,204)},[1015]={
+Name='Magenta',Color=b.fromRGB(170,0,170)},[1014]={Name='CGA brown',Color=b.
+fromRGB(170,85,0)},[1013]={Name='Cyan',Color=b.fromRGB(4,175,236)},[1012]={Name=
+'Deep blue',Color=b.fromRGB(33,84,185)},[1011]={Name='Navy blue',Color=b.
+fromRGB(0,32,96)},[1010]={Name='Really blue',Color=b.fromRGB(0,0,255)},[1009]={
+Name='New Yeller',Color=b.fromRGB(255,255,0)},[1008]={Name='Olive',Color=b.
+fromRGB(193,190,66)},[1007]={Name='Dusty Rose',Color=b.fromRGB(163,75,75)},[1006
+]={Name='Alder',Color=b.fromRGB(180,128,255)},[1005]={Name='Deep orange',Color=b
+.fromRGB(255,176,0)},[1004]={Name='Really red',Color=b.fromRGB(255,0,0)},[1003]=
+{Name='Really black',Color=b.fromRGB(17,17,17)},[1002]={Name='Mid gray',Color=b.
+fromRGB(205,205,205)},[1001]={Name='Institutional white',Color=b.fromRGB(248,248
+,248)},[365]={Name='Burnt Sienna',Color=b.fromRGB(106,57,9)},[364]={Name=
+'Dark taupe',Color=b.fromRGB(90,76,66)},[363]={Name='Flint',Color=b.fromRGB(105,
+102,92)},[362]={Name='Bronze',Color=b.fromRGB(126,104,63)},[361]={Name=
+'Medium brown',Color=b.fromRGB(86,66,54)},[360]={Name='Copper',Color=b.fromRGB(
+150,103,102)},[359]={Name='Linen',Color=b.fromRGB(175,148,131)},[358]={Name=
+'Cloudy grey',Color=b.fromRGB(171,168,158)},[357]={Name='Hurricane grey',Color=b
+.fromRGB(149,137,136)},[356]={Name='Fawn brown',Color=b.fromRGB(160,132,79)},[
+355]={Name='Pine Cone',Color=b.fromRGB(108,88,75)},[354]={Name='Oyster',Color=b.
+fromRGB(187,179,178)},[353]={Name='Beige',Color=b.fromRGB(202,191,163)},[352]={
+Name='Burlap',Color=b.fromRGB(199,172,120)},[351]={Name='Cork',Color=b.fromRGB(
+188,155,93)},[350]={Name='Burgundy',Color=b.fromRGB(136,62,62)},[349]={Name=
+'Seashell',Color=b.fromRGB(233,218,218)},[348]={Name='Lily white',Color=b.
+fromRGB(237,234,234)},[347]={Name='Khaki',Color=b.fromRGB(226,220,188)},[346]={
+Name='Cashmere',Color=b.fromRGB(211,190,150)},[345]={Name='Rust',Color=b.
+fromRGB(143,76,42)},[344]={Name='Tawny',Color=b.fromRGB(150,85,85)},[343]={Name=
+'Sunrise',Color=b.fromRGB(212,144,189)},[342]={Name='Mauve',Color=b.fromRGB(224,
+178,208)},[341]={Name='Buttermilk',Color=b.fromRGB(254,243,187)},[340]={Name=
+'Wheat',Color=b.fromRGB(241,231,199)},[339]={Name='Cocoa',Color=b.fromRGB(86,36,
+36)},[338]={Name='Terra Cotta',Color=b.fromRGB(190,104,98)},[337]={Name='Salmon'
+,Color=b.fromRGB(255,148,148)},[336]={Name='Fog',Color=b.fromRGB(199,212,228)},[
+335]={Name='Pearl',Color=b.fromRGB(231,231,236)},[334]={Name='Daisy orange',
+Color=b.fromRGB(248,217,109)},[333]={Name='Gold',Color=b.fromRGB(239,184,56)},[
+332]={Name='Maroon',Color=b.fromRGB(117,0,0)},[331]={Name='Persimmon',Color=b.
+fromRGB(255,89,89)},[330]={Name='Carnation pink',Color=b.fromRGB(255,152,220)},[
+329]={Name='Baby blue',Color=b.fromRGB(152,194,219)},[328]={Name='Mint',Color=b.
+fromRGB(177,229,166)},[327]={Name='Crimson',Color=b.fromRGB(151,0,0)},[325]={
+Name='Quill grey',Color=b.fromRGB(223,223,222)},[324]={Name='Laurel green',Color
+=b.fromRGB(168,189,153)},[323]={Name='Olivine',Color=b.fromRGB(148,190,129)},[
+322]={Name='Plum',Color=b.fromRGB(123,47,123)},[321]={Name='Lilac',Color=b.
+fromRGB(167,94,155)},[320]={Name='Ghost grey',Color=b.fromRGB(202,203,209)},[319
+]={Name='Sage green',Color=b.fromRGB(185,196,177)},[318]={Name='Artichoke',Color
+=b.fromRGB(138,171,133)},[317]={Name='Moss',Color=b.fromRGB(124,156,107)},[316]=
+{Name='Eggplant',Color=b.fromRGB(123,0,123)},[315]={Name='Electric blue',Color=b
+.fromRGB(9,137,207)},[314]={Name='Cadet blue',Color=b.fromRGB(159,173,192)},[313
+]={Name='Forest green',Color=b.fromRGB(31,128,29)},[312]={Name='Mulberry',Color=
+b.fromRGB(89,34,89)},[311]={Name='Fossil',Color=b.fromRGB(159,161,172)},[310]={
+Name='Shamrock',Color=b.fromRGB(91,154,76)},[309]={Name='Sea green',Color=b.
+fromRGB(52,142,64)},[308]={Name='Dark indigo',Color=b.fromRGB(61,21,133)},[307]=
+{Name='Lapis',Color=b.fromRGB(16,42,220)},[306]={Name='Storm blue',Color=b.
+fromRGB(51,88,130)},[305]={Name='Steel blue',Color=b.fromRGB(82,124,174)},[304]=
+{Name='Parsley green',Color=b.fromRGB(44,101,29)},[303]={Name='Dark blue',Color=
+b.fromRGB(0,16,176)},[302]={Name='Smoky grey',Color=b.fromRGB(91,93,105)},[301]=
+{Name='Slime green',Color=b.fromRGB(80,109,84)},[268]={Name='Medium lilac',Color
+=b.fromRGB(52,43,117)},[232]={Name='Dove blue',Color=b.fromRGB(125,187,221)},[
+226]={Name='Cool yellow',Color=b.fromRGB(253,234,141)},[225]={Name=
+'Warm yellowish orange',Color=b.fromRGB(235,184,127)},[224]={Name=
+'Light brick yellow',Color=b.fromRGB(240,213,160)},[223]={Name='Light pink',
+Color=b.fromRGB(220,144,149)},[222]={Name='Light purple',Color=b.fromRGB(228,173
+,200)},[221]={Name='Bright purple',Color=b.fromRGB(205,98,152)},[220]={Name=
+'Light lilac',Color=b.fromRGB(167,169,206)},[219]={Name='Lilac',Color=b.fromRGB(
+107,98,155)},[218]={Name='Reddish lilac',Color=b.fromRGB(150,112,159)},[217]={
+Name='Brown',Color=b.fromRGB(124,92,70)},[216]={Name='Rust',Color=b.fromRGB(144,
+76,42)},[213]={Name='Medium Royal blue',Color=b.fromRGB(108,129,183)},[212]={
+Name='Light Royal blue',Color=b.fromRGB(159,195,233)},[211]={Name='Turquoise',
+Color=b.fromRGB(121,181,181)},[210]={Name='Faded green',Color=b.fromRGB(112,149,
+120)},[209]={Name='Dark Curry',Color=b.fromRGB(176,142,68)},[208]={Name=
+'Light stone grey',Color=b.fromRGB(229,228,223)},[200]={Name='Lemon metalic',
+Color=b.fromRGB(130,138,93)},[199]={Name='Dark stone grey',Color=b.fromRGB(99,95
+,98)},[198]={Name='Bright reddish lilac',Color=b.fromRGB(142,66,133)},[196]={
+Name='Dark Royal blue',Color=b.fromRGB(35,71,139)},[195]={Name='Royal blue',
+Color=b.fromRGB(70,103,164)},[193]={Name='Flame reddish orange',Color=b.fromRGB(
+207,96,36)},[192]={Name='Reddish brown',Color=b.fromRGB(105,64,40)},[191]={Name=
+'Flame yellowish orange',Color=b.fromRGB(232,171,45)},[190]={Name='Fire Yellow',
+Color=b.fromRGB(249,214,46)},[180]={Name='Curry',Color=b.fromRGB(215,169,75)},[
+179]={Name='Silver flip/flop',Color=b.fromRGB(137,135,136)},[178]={Name=
+'Yellow flip/flop',Color=b.fromRGB(180,132,85)},[176]={Name='Red flip/flop',
+Color=b.fromRGB(151,105,91)},[168]={Name='Gun metallic',Color=b.fromRGB(117,108,
+98)},[158]={Name='Tr. Flu. Red',Color=b.fromRGB(225,164,194)},[157]={Name=
+'Tr. Flu. Yellow',Color=b.fromRGB(255,246,123)},[154]={Name='Dark red',Color=b.
+fromRGB(123,46,47)},[153]={Name='Sand red',Color=b.fromRGB(149,121,119)},[151]={
+Name='Sand green',Color=b.fromRGB(120,144,130)},[150]={Name=
+'Light grey metallic',Color=b.fromRGB(171,173,172)},[149]={Name='Black metallic'
+,Color=b.fromRGB(22,29,50)},[148]={Name='Dark grey metallic',Color=b.fromRGB(87,
+88,87)},[147]={Name='Sand yellow metallic',Color=b.fromRGB(147,135,103)},[146]={
+Name='Sand violet metallic',Color=b.fromRGB(149,142,163)},[145]={Name=
+'Sand blue metallic',Color=b.fromRGB(121,136,161)},[143]={Name='Tr. Flu. Blue',
+Color=b.fromRGB(207,226,247)},[141]={Name='Earth green',Color=b.fromRGB(39,70,45
+)},[140]={Name='Earth blue',Color=b.fromRGB(32,58,86)},[138]={Name='Sand yellow'
+,Color=b.fromRGB(149,138,115)},[137]={Name='Medium orange',Color=b.fromRGB(224,
+152,100)},[136]={Name='Sand violet',Color=b.fromRGB(135,124,144)},[135]={Name=
+'Sand blue',Color=b.fromRGB(116,134,157)},[134]={Name='Neon green',Color=b.
+fromRGB(216,221,86)},[133]={Name='Neon orange',Color=b.fromRGB(213,115,61)},[131
+]={Name='Silver',Color=b.fromRGB(156,163,168)},[128]={Name='Dark nougat',Color=b
+.fromRGB(174,122,89)},[127]={Name='Gold',Color=b.fromRGB(220,188,129)},[126]={
+Name='Tr. Bright bluish violet',Color=b.fromRGB(165,165,203)},[125]={Name=
+'Light orange',Color=b.fromRGB(234,184,146)},[124]={Name='Bright reddish violet'
+,Color=b.fromRGB(146,57,120)},[123]={Name='Br. reddish orange',Color=b.fromRGB(
+211,111,76)},[121]={Name='Med. yellowish orange',Color=b.fromRGB(231,172,88)},[
+120]={Name='Lig. yellowish green',Color=b.fromRGB(217,228,167)},[119]={Name=
+'Br. yellowish green',Color=b.fromRGB(164,189,71)},[118]={Name=
+'Light bluish green',Color=b.fromRGB(183,215,213)},[116]={Name=
+'Med. bluish green',Color=b.fromRGB(85,165,175)},[115]={Name=
+'Med. yellowish green',Color=b.fromRGB(199,210,60)},[113]={Name=
+'Tr. Medi. reddish violet',Color=b.fromRGB(229,173,200)},[112]={Name=
+'Medium bluish violet',Color=b.fromRGB(104,116,172)},[111]={Name='Tr. Brown',
+Color=b.fromRGB(191,183,177)},[110]={Name='Bright bluish violet',Color=b.
+fromRGB(67,84,147)},[108]={Name='Earth yellow',Color=b.fromRGB(104,92,67)},[107]
+={Name='Bright bluish green',Color=b.fromRGB(0,143,156)},[106]={Name=
+'Bright orange',Color=b.fromRGB(218,133,65)},[105]={Name='Br. yellowish orange',
+Color=b.fromRGB(226,155,64)},[104]={Name='Bright violet',Color=b.fromRGB(107,50,
+124)},[103]={Name='Light grey',Color=b.fromRGB(199,193,183)},[102]={Name=
+'Medium blue',Color=b.fromRGB(110,153,202)},[101]={Name='Medium red',Color=b.
+fromRGB(218,134,122)},[100]={Name='Light red',Color=b.fromRGB(238,196,182)},[50]
+={Name='Phosph. White',Color=b.fromRGB(236,232,222)},[49]={Name='Tr. Flu. Green'
+,Color=b.fromRGB(248,241,132)},[48]={Name='Tr. Green',Color=b.fromRGB(132,182,
+141)},[47]={Name='Tr. Flu. Reddish orange',Color=b.fromRGB(217,133,108)},[45]={
+Name='Light blue',Color=b.fromRGB(180,210,228)},[44]={Name='Tr. Yellow',Color=b.
+fromRGB(247,241,141)},[43]={Name='Tr. Blue',Color=b.fromRGB(123,182,232)},[42]={
+Name='Tr. Lg blue',Color=b.fromRGB(193,223,240)},[41]={Name='Tr. Red',Color=b.
+fromRGB(205,84,75)},[40]={Name='Transparent',Color=b.fromRGB(236,236,236)},[39]=
+{Name='Light bluish violet',Color=b.fromRGB(193,202,222)},[38]={Name=
+'Dark orange',Color=b.fromRGB(160,95,53)},[37]={Name='Bright green',Color=b.
+fromRGB(75,151,75)},[36]={Name='Lig. Yellowich orange',Color=b.fromRGB(243,207,
+155)},[29]={Name='Medium green',Color=b.fromRGB(161,196,140)},[28]={Name=
+'Dark green',Color=b.fromRGB(40,127,71)},[27]={Name='Dark grey',Color=b.fromRGB(
+109,110,108)},[26]={Name='Black',Color=b.fromRGB(27,42,53)},[25]={Name=
+'Earth orange',Color=b.fromRGB(98,71,50)},[24]={Name='Bright yellow',Color=b.
+fromRGB(245,205,48)},[23]={Name='Bright blue',Color=b.fromRGB(13,105,172)},[22]=
+{Name='Med. reddish violet',Color=b.fromRGB(196,112,160)},[21]={Name=
+'Bright red',Color=b.fromRGB(196,40,28)},[18]={Name='Nougat',Color=b.fromRGB(204
+,142,105)},[12]={Name='Light orange brown',Color=b.fromRGB(203,132,66)},[11]={
+Name='Pastel Blue',Color=b.fromRGB(128,187,219)},[9]={Name=
+'Light reddish violet',Color=b.fromRGB(232,186,200)},[6]={Name=
+'Light green (Mint)',Color=b.fromRGB(194,218,184)},[5]={Name='Brick yellow',
+Color=b.fromRGB(215,197,154)},[4]={Name='Medium stone grey',Color=b.fromRGB(163,
+162,165)},[3]={Name='Light yellow',Color=b.fromRGB(249,233,153)},[2]={Name=
+'Grey',Color=b.fromRGB(161,165,162)},[1]={Name='White',Color=b.fromRGB(242,243,
+243)}}}do local d={}do for e,f in pairs(c.Palette)do d[f.Name:lower()]=e end end
+local e={}do for f in c.Palette do table.insert(e,f)end end function c.new(f)
+local g=setmetatable({},c)if type(f)=='number'then local h=c.Palette[f]or c.
+Palette[4]g.Name=h.Name g.Color=h.Color g.Index=f elseif type(f)=='string'then
+local h=d[f:lower()]if h then local i=c.Palette[h]g.Index=h g.Color=i.Color g.
+Name=i.Name else error(`invalid BrickColor: {f}`)end elseif type(f)=='table'then
+if not f[1]or not f[2]or not f[3]then error(`can't initialize BrickColor, invalid Color`
+)end local h,i=(math.huge)for j,k in c.Palette do local l=k.Color:distance(f)if
+h>l then i=k h=l end end return c.new(i.Name)end return g end function c.random(
+)return c.new(e[math.random(1,#e)])end function c.__tostring(f)return f.Name end
+c.__index=c end _G.BrickColor=c return b end function a.c()local b=a.load'b'
+local c=function(c:any,d:number,e:string)if'color'==e and'userdata'==type(c)then
+local f=getmemoryvalue(c,d,'dword')return f and b.dword(f)end if'buffer'==e then
+local f=getmemoryvalue(c,d,'qword')return f and buffer.fromstring(string.pack(
+'<I8',f))end if'vector'==e then local f=getmemoryvalue(c,d,'float')local g=
+getmemoryvalue(c,d+4,'float')local h=getmemoryvalue(c,d+8,'float')return vector.
+create(f,g,h)end return getmemoryvalue(c,d,e::any)end local d=function(d:any,e:
+number,f:string,g:any)if'color'==f and'table'==type(g)and g.dword then return
+setmemoryvalue(d,e,g:dword(),'string')end if'buffer'==f and'buffer'==type(g)then
+return setmemoryvalue(d,e,g,'qword')end if'vector'==f and'vector'==type(g)then
+local h=g.X or g[1]local i=g.Y or g[2]local j=g.Z or g[3]setmemoryvalue(d,e,h,
+'float')setmemoryvalue(d,e+4,i,'float')setmemoryvalue(d,e+8,j,'float')return
+true end return setmemoryvalue(d,e,g,f::any)end local e={}do function e.read(f:
+number|any,g:number|string,h:string?)if'table'==type(f)and rawget(f,'Data')then
+f=f.Data end if'userdata'==type(f)then assert('number'==type(g),`memory.read: offset must be a number, got {
+type(g)}`)assert('string'==type(h)or not h,`memory.read: data_type must be a string or nil, got {
+type(h)}`)return c(f,g,h::any)end if'number'==type(f)then if'string'==type(g)
+then return c(pointer_to_user_data(f),0,g::any)else assert('number'==type(g),`memory.read: offset must be a number or a string, got {
+type(g)}`)assert('string'==type(h)or not h,`memory.read: data_type must be a string or nil, got {
+type(h)}`)return c(pointer_to_user_data(f),g,h::any)end end return nil end
+function e.write(f:number|any,g:number|string,h:string?,i:any)if'table'==type(f)
+and rawget(f,'Data')then f=f.Data end if'userdata'==type(f)then assert('number'
+==type(g),`memory.write: offset must be a number, got {type(g)}`)assert('string'
+==type(h)or not h,`memory.write: data_type must be a string or nil, got {type(h)
+}`)return d(f,g,h::any,i)end if'number'==type(f)then if'string'==type(g)then
+return d(pointer_to_user_data(f),0,g::any,i)else assert('number'==type(g),`memory.write: offset must be a number or a string, got {
+type(g)}`)assert('string'==type(h)or not h,`memory.write: data_type must be a string or nil, got {
+type(h)}`)return d(pointer_to_user_data(f),g,h::any,i)end end return nil end end
+return e end function a.d()local b={}do local function constructor()return
+setmetatable({_map={}},{__index=b})end b.new=constructor function b.emit<T...>(c
+,...:T...)for d=#c,1,-1 do local e=c[d]if e then if'function'==type(e)then
+coroutine.wrap(e)(...)elseif'thread'==type(e)then coroutine.resume(e,...)end end
+end return c end function b.bind<T...>(c,d:(T...)->()):
+connection__DARKLUA_TYPE_a table.insert(c,d)return{unbind=function()local e=
+table.find(c,d)if e then table.remove(c,e)end end}end function b.once<T...>(c,d:
+(T...)->()):connection__DARKLUA_TYPE_a local e do e=c:bind(function(...)d(...)e:
+unbind()end)end return e end function b.wait<T...>(c):T...local d=coroutine.
+running()c:once(function(...)coroutine.resume(d,...)end)return coroutine.yield()
+end setmetatable(b,{__call=constructor})end return b end function a.e()return
+function(b,c)assert('table'==type(b),`map(t, callback): expected a table, got {
+type(b)}`)assert('function'==type(c),`map(t, callback): expected a function, got {
+type(c)}`)local d={}do for e,f in b do d[e]=c(f,e,b)end end return d end end
+function a.f()local b={}local c={__index=b}function c.__add(d,e)return b.new(d.x
++e.x,d.y+e.y,d.z+e.z)end function c.__sub(d,e)return b.new(d.x-e.x,d.y-e.y,d.z-e
+.z)end function c.__unm(d)return b.new(-d.x,-d.y,-d.z)end function c.__eq(d,e)if
+d.x==e.x and d.y==e.y and d.z==e.z then return true else return false end end
+function c.__tostring(d)return'('..d.x..', '..d.y..', '..d.z..')'end function c.
+__concat(d,e)return tostring(d)..tostring(e)end function c.__mul(d,e)if type(e)
+=='number'then return b.new(d.x*e,d.y*e,d.z*e)end return b.new(d.x*e.x,d.y*e.y,d
+.z*e.z)end function c.__div(d,e)if type(e)=='number'then if e==0 then print
+'Attempted to divide by zero. Returning nil'return nil end return b.new(d.x/e,d.
+y/e,d.z/e)end if e.x==0 or e.y==0 or e.z==0 then print
+'Attempted to divide by zero. Returning nil.'return nil end return b.new(d.x/e.x
+,d.y/e.y,d.z/e.z)end function b.new(d,e,f)return setmetatable({x=d or 0,y=e or 0
+,z=f or 0},c)end function b.lerp(d,e,f)return b.new(d.x+(e.x-d.x)*f,d.y+(e.y-d.y
+)*f,d.z+(e.z-d.z)*f)end function b.distance(d,e)return math.sqrt((d.x-e.x)^2+(d.
+y-e.y)^2+(d.z-e.z)^2)end function b.magnitude(d)return math.sqrt(d.x^2+d.y^2+d.z
+^2)end function b.normalized(d)local e=d:magnitude()if e==0 then return b.new()
+end return b.new(d.x/e,d.y/e,d.z/e)end function b.dot(d,e)return((d.x*e.x)+(d.y*
+e.y)+(d.z*e.z))end function b.cross(d,e)local f=b.new((d.y*e.z)-(d.z*e.y),(d.z*e
+.x)-(d.x*e.z),(d.x*e.y)-(d.y*e.x))if f.x==0 then f.x=0 end if f.y==0 then f.y=0
+end if f.z==0 then f.z=0 end return f end function b.tostring(d)return tostring(
+d)end b.zero=b.new(0,0,0)b.up=b.new(0,1,0)b.down=b.new(0,-1,0)b.left=b.new(-1,0,
+0)b.right=b.new(1,0,0)b.forward=b.new(0,0,1)b.back=b.new(0,0,-1)return b end
+function a.g()local b={}local c=math.sqrt function b.new(d,e)assert(tonumber(d)
+or(d==nil),'Vector2 coordinates can only be numbers')assert(tonumber(d)or(d==nil
+),'Vector2 coordinates can only be numbers')local f={}setmetatable(f,b)f.x=d or
+0 f.y=e or 0 f.Type='Vector2'return f end function b.__index(d,e)if e==
+'magnitude'then local f,g=rawget(d,'x'),rawget(d,'y')return c(f*f+g*g)elseif e==
+'unit'then local f,g=rawget(d,'x'),rawget(d,'y')local h=c(f*f+g*g)if h==0 then
+return d end return b.new(f/h,g/h)end return rawget(b,e)end function b.
+__tostring(d)return d.x..', '..d.y end function b.__eq(d,e)assert(e.Type==
+'Vector2','Cannot compare Vector2 with '..tostring(e))if d.x==e.x and d.y==e.y
+then return true end return false end function b.__add(d,e)if type(e)=='number'
+then return b.new(d.x+e,d.y+e)end return b.new(d.x+e.x,d.y+e.y)end function b.
+__mul(d,e)if type(e)=='number'then return b.new(d.x*e,d.y*e)end return b.new(d.x
+*e.x,d.y*e.y)end function b.__div(d,e)if type(e)=='number'then return b.new(d.x/
+e,d.y/e)end return b.new(d.x/e.x,d.y/e.y)end function b.__sub(d,e)if type(e)==
+'number'then return b.new(d.x-e,d.y-e)end return b.new(d.x-e.x,d.y-e.y)end
+return b end function a.h()return function(b,c):any if not b then return c end
+if not c then return b end for d,e in c do b[d]=e end return b end end function
+a.i()local b=a.load'h'local c={}do local d={global={}}local function constructor
+(e:any)e='userdata'==type(e)and e or'table'==type(e)and rawget(e,'Data')assert(
+'userdata'==type(e),`Instance.new: userdata must be a userdata, got {type(e)}`)
+return setmetatable({ClassName=getclassname(e),Data=e},{__index=c.__index,
+__newindex=c.__newindex})end c.new=constructor function c.declare<T>(e:
+'property'|'method',f:string|{string},g:string,h:T|((self:typeof(c))->any))
+assert('string'==type(g),`Instance.declare: name must be a string, got {type(g)}`
+)assert('property'==e or'method'==e,`Instance.declare: value must be "property" or "method", got {
+e}`)assert('table'==type(f)or'string'==type(f),`Instance.declare: class must be a string or a table of strings, got {
+type(f)}`)if'string'==type(f)then d[f]=b(d[f],{[g]={[e]=h}})else for i,j in f do
+d[j]=b(d[j],{[g]={[e]=h}})end end end function c.__index(e,f:string)assert(
+'string'==type(f),`Instance:__index: key must be a string, got {type(f)}`)do
+local g=e.ClassName local h=d.global[f]or(d[g]and d[g][f])if h then local i=h.
+property local j=h.method if i and i.getter then return i.getter(e)elseif j then
+return j end end end return rawget(e,f)or rawget(e,'Data')and e:FindFirstChild(f
+)or c[f]end function c.__newindex(e,f:string,g:any)assert('string'==type(f),`Instance:__newindex: key must be a string, got {
+type(f)}`)do local h=e.ClassName local i=d.global[f]or(d[h]and d[h][f])if i and
+i.property and i.property.setter then return i.property.setter(e,g)end end
+return rawset(e,f,g)end end return c end function a.j()local b=a.load'e'local c=
+a.load'c'do _G.Vector3=a.load'f'_G.Vector2=a.load'g'_G.Color3=a.load'b'end local
+d=a.load'i'do local e=d.new do d.declare('property','global','Name',{getter=
+function(f)return getname(f.Data)end})d.declare('property','global','Parent',{
+getter=function(f)local g:any=getparent(f.Data)return g and e(g)end})d.declare(
+'method','global','GetChildren',function(f)return b(getchildren(f.Data),e)end)d.
+declare('method','global','GetDescendants',function(f)return b(getdescendants(f.
+Data),e)end)do local f=function(f)return function(g,...)local h:any=f(g.Data,...
+)return h and e(h)end end d.declare('method','global','FindFirstChild',f(
+findfirstchild))d.declare('method','global','FindFirstAncestor',f(
+findfirstancestor))d.declare('method','global','FindFirstChildOfClass',f(
+findfirstchildofclass))d.declare('method','global','FindFirstAncestorOfClass',f(
+findfirstancestorofclass))d.declare('method','global','WaitForChild',f(
+waitforchild))end do local f=function(f)return function(g,...)return f(g.Data,
+...)end end d.declare('method','global','SetMemoryValue',f(c.write))d.declare(
+'method','global','GetMemoryValue',f(c.read))d.declare('method','global','Read',
+f(c.read))d.declare('method','global','Write',f(c.write))end d.declare('method',
+'global','IsA',function(f,g:string)assert('string'==type(g),`Instance:IsA: class must be a string, got {
+type(g)}`)return f.ClassName==g end)d.declare('method','global','IsAncestorOf',
+function(f,g)assert('userdata'==type(g)or type(g)=='table'and g.Data,`Instance:IsAncestorOf: other must be a userdata or an Instance, got {
+type(g)}`)return isancestorof(f.Data,type(g)=='userdata'and g or g.Data)end)d.
+declare('method','global','IsDescendantOf',function(f,g)assert('userdata'==type(
+g)or type(g)=='table'and g.Data,`Instance:IsDescendantOf: other must be a userdata or an Instance, got {
+type(g)}`)return isdescendantof(f.Data,type(g)=='userdata'and g or g.Data)end)d.
+declare('method','global','Destroy',function(f)return destroy(f.Data)end)end do
+d.declare('property','DataModel','PlaceId',{getter=function(f)return getplaceid(
+)end})d.declare('property','DataModel','GameId',{getter=function(f)return
+getgameid()end})d.declare('method','DataModel','GetService',function(f,g:string)
+for h,i in getchildren(f.Data)do if getclassname(i)==g then return e(i)end end
+return nil end)d.declare('method','DataModel','FindService',function(f,g:string)
+local h:any=findservice(f.Data,g)return h and e(h)end)d.declare('method',
+'DataModel','HttpGet',function(f,g:string)assert('string'==type(g),`DataModel:HttpGet: url must be a string, got {
+type(g)}`)return httpget(g)end)d.declare('method','DataModel','HttpPost',
+function(f,g:string,h:string,...)assert('string'==type(g),`DataModel:HttpPost: url must be a string, got {
+type(g)}`)assert('string'==type(h),`DataModel:HttpPost: data must be a string, got {
+type(h)}`)return httppost(g,h,...)end)end do d.declare('method','HttpService',
+'JSONEncode',function(f,g:any)assert('table'==type(g),`HttpService:JSONEncode: value must be a table, got {
+type(g)}`)return JSONEncode(g)end)d.declare('method','HttpService','JSONDecode',
+function(f,g:string)assert('string'==type(g),`HttpService:JSONDecode: value must be a string, got {
+type(g)}`)return JSONDecode(g)end)end do d.declare('property',{'BoolValue',
 'IntValue','FloatValue','ObjectValue','StringValue','Vector3Value','ValueBase',
 'BrickColorValue','Color3Value','CFrameValue','DoubleConstrainedValue',
-'IntConstrainedValue'},'Value',{getter=function(self)return getvalue(self.Data)
-end,setter=function(self,value:any)setvalue(self.Data,value)end})end do Instance
-.declare('property',{'UnionOperation','MeshPart','TrussPart','Part'},'Size',{
-getter=function(self)local size=getsize(self.Data)return vector.create(size.x,
-size.y,size.z)end})Instance.declare('property',{'UnionOperation','MeshPart',
-'TrussPart','Part','Camera'},'Position',{getter=function(self)local position=
-getposition(self.Data)return vector.create(position.x,position.y,position.z)end,
-setter=function(self,value:vector|{x:number,y:number,z:number})assert('table'==
-type(value)and value.x and value.y and value.z,`Instance:Position: value must be a Vector3, got {
-type(value)}`)setposition(self.Data,value)end})Instance.declare('property',{
-'UnionOperation','MeshPart','TrussPart','Part','Camera'},'CFrame',{getter=
-function(self)local position=getposition(self.Data)local up_vector=getupvector(
-self.Data)local right_vector=getrightvector(self.Data)local look_vector=
-getlookvector(self.Data)return{Position=vector.create(position.x,position.y,
-position.z),UpVector=vector.create(up_vector.x,up_vector.y,up_vector.z),
-RightVector=vector.create(right_vector.x,right_vector.y,right_vector.z),
-LookVector=vector.create(look_vector.x,look_vector.y,look_vector.z)}end,setter=
-function(self,value:any)setcframe(self.Data,value)end})Instance.declare(
-'property',{'UnionOperation','MeshPart','TrussPart','Part'},'Transparency',{
-getter=function(self)return gettransparency(self.Data)end,setter=function(self,
-value:number)settransparency(self.Data,value)end})end do Instance.declare(
-'property','Player','Character',{getter=function(self)return constructor(
-getcharacter(self.Data))end})Instance.declare('property','Player','Team',{getter
-=function(self)return constructor(getteam(self.Data))end})Instance.declare(
-'property','Player','DisplayName',{getter=function(self)return getdisplayname(
-self.Data)end})Instance.declare('property','Player','UserId',{getter=function(
-self)return getuserid(self.Data)end})end do Instance.declare('property',
-'Workspace','CurrentCamera',{getter=function(self)return constructor(
-findfirstchildofclass(self.Data,'Camera'))end})end do Instance.declare(
-'property','Camera','FieldOfView',{getter=function(self)return getcamerafov(self
-.Data)end})Instance.declare('method','Camera','SetCameraSubject',function(self,
-subject)assert(type(subject)=='table'and subject.Data,`Camera:SetCameraSubject: subject must be an Instance, got {
-type(subject)}`)return setcamerasubject(subject.Data)end)end do Instance.
-declare('property',{'UnionOperation','MeshPart','TrussPart','Part'},'CanCollide'
-,{getter=function(self)return getcancollide(self.Data)end,setter=function(self,
-value:boolean)assert(type(value)=='boolean',`Instance:CanCollide: value must be a boolean, got {
-type(value)}`)setcancollide(self.Data,value)end})Instance.declare('property',{
-'UnionOperation','MeshPart','TrussPart','Part'},'Velocity',{getter=function(self
-)local velocity=getvelocity(self.Data)return vector.create(velocity.x,velocity.y
-,velocity.z)end,setter=function(self,value:vector|{x:number,y:number,z:number})
-assert('table'==type(value)and value.x and value.y and value.z,`Instance:Velocity: value must be a Vector3, got {
-type(value)}`)setvelocity(self.Data,value)end})end do Instance.declare(
-'property','MeshPart','TextureID',{getter=function(self)return gettextureid(self
-.Data)end})Instance.declare('property','MeshPart','MeshID',{getter=function(self
-)return getmeshid(self.Data)end})end do Instance.declare('property','Humanoid',
-'Health',{getter=function(self)return gethealth(self.Data)end})Instance.declare(
-'property','Humanoid','MaxHealth',{getter=function(self)return getmaxhealth(self
-.Data)end})end do Instance.declare('property','Model','PrimaryPart',{getter=
-function(self)return constructor(getprimarypart(self.Data))end})end do Instance.
-declare('property','BillboardGui','Adornee',{getter=function(self)return
-constructor(getadornee(self.Data))end})end do Instance.declare('property',
-'Players','LocalPlayer',{getter=function(self)return constructor(getlocalplayer(
-))end})end do Instance.declare('method','MouseService','GetMousePosition',
-function(self)local position=getmouseposition()return vector.create(position.x,
-position.y)end)Instance.declare('method','MouseService','GetMouseLocation',
-function(self)local location=getmouselocation(self.Data)return vector.create(
-location.x,location.y)end)Instance.declare('method','MouseService',
-'GetMouseBehavior',function(self)return getmousebehavior(self.Data)end)Instance.
-declare('method','MouseService','GetMouseDeltaSensitivity',function(self)return
-getmousedeltasensitivity(self.Data)end)Instance.declare('method','MouseService',
-'IsMouseIconEnabled',function(self)return ismouseiconenabled(self.Data)end)
-Instance.declare('method','MouseService','SetMouseLocation',function(self,x,y)
-assert('number'==type(x),`MouseService:SetMouseLocation: x must be a number, got {
-type(x)}`)assert('number'==type(y),`MouseService:SetMouseLocation: y must be a number, got {
-type(y)}`)setmouselocation(self.Data,x,y)end)Instance.declare('method',
-'MouseService','SetMouseIconEnabled',function(self,enabled)assert('boolean'==
-type(enabled),`MouseService:SetMouseIconEnabled: enabled must be a boolean, got {
-type(enabled)}`)setmouseiconenabled(self.Data,enabled)end)Instance.declare(
-'method','MouseService','SetMouseBehavior',function(self,behavior)assert(
-'number'==type(behavior),`MouseService:SetMouseBehavior: behavior must be a number, got {
-type(behavior)}`)setmousebehaviour(self.Data,behavior)end)Instance.declare(
-'method','MouseService','SetMouseDeltaSensitivity',function(self,sensitivity)
-assert('number'==type(sensitivity),`MouseService:SetMouseDeltaSensitivity: sensitivity must be a number, got {
-type(sensitivity)}`)setmousedeltasensitivity(self.Data,sensitivity)end)Instance.
-declare('method','MouseService','SmoothMouseExponential',function(self,origin,
-point,speed)assert('table'==type(origin)and#origin>=2,`MouseService:SmoothMouseExponential: origin must be a table with at least 2 numbers, got {
-type(origin)}`)assert('table'==type(point)and#point>=2,`MouseService:SmoothMouseExponential: point must be a table with at least 2 numbers, got {
-type(point)}`)assert('number'==type(speed),`MouseService:SmoothMouseExponential: speed must be a number, got {
-type(speed)}`)local result=smoothmouse_exponential(origin,point,speed)return
-vector.create(result.x,result.y)end)Instance.declare('method','MouseService',
-'SmoothMouseLinear',function(self,origin,point,sensitivity,smoothness)assert(
-'table'==type(origin)and#origin>=2,`MouseService:SmoothMouseLinear: origin must be a table with at least 2 numbers, got {
-type(origin)}`)assert('table'==type(point)and#point>=2,`MouseService:SmoothMouseLinear: point must be a table with at least 2 numbers, got {
-type(point)}`)assert('number'==type(sensitivity),`MouseService:SmoothMouseLinear: sensitivity must be a number, got {
-type(sensitivity)}`)assert('number'==type(smoothness),`MouseService:SmoothMouseLinear: smoothness must be a number, got {
-type(smoothness)}`)local result=smoothmouse_linear(origin,point,sensitivity,
-smoothness)return vector.create(result.x,result.y)end)end _G.Instance=Instance
-_G.game=Instance.new(Game)_G.workspace=Instance.new(Workspace)function _G.
-pointer_to_table_data(n)assert('number'==type(n),`pointer_to_table_data: n must be a number, got {
-type(n)}`)local data=pointer_to_user_data(n)return data and Instance.new(data)or
-nil end do local Vector2={}Vector2.__index=Vector2 function Vector2.new(x,y)
-return setmetatable({X=x or 0,Y=y or 0},Vector2)end Vector2.zero=Vector2.new(0,0
-)Vector2.one=Vector2.new(1,1)Vector2.xAxis=Vector2.new(1,0)Vector2.yAxis=Vector2
-.new(0,1)function Vector2:Magnitude()return math.sqrt(self.X^2+self.Y^2)end
-function Vector2:Unit()local m=self:Magnitude()if m>0 then return Vector2.new(
-self.X/m,self.Y/m)end return Vector2.zero end function Vector2:Dot(v)return self
-.X*v.X+self.Y*v.Y end function Vector2:Cross(v)return self.X*v.Y-self.Y*v.X end
-function Vector2:Angle(v,isSigned)local dot=self:Dot(v)local magProduct=self:
-Magnitude()*v:Magnitude()local angle=math.acos(math.clamp(dot/magProduct,-1,1))
-if isSigned then return angle*(self:Cross(v)<0 and-1 or 1)end return angle end
-function Vector2:Lerp(v,alpha)return Vector2.new(self.X+(v.X-self.X)*alpha,self.
-Y+(v.Y-self.Y)*alpha)end function Vector2:Abs()return Vector2.new(math.abs(self.
-X),math.abs(self.Y))end function Vector2:Ceil()return Vector2.new(math.ceil(self
-.X),math.ceil(self.Y))end function Vector2:Floor()return Vector2.new(math.floor(
-self.X),math.floor(self.Y))end function Vector2:Sign()local sign=function(v)
-return v>0 and 1 or(v<0 and-1 or 0)end return Vector2.new(sign(self.X),sign(self
-.Y))end function Vector2:Max(...)local args={...}local maxX,maxY=self.X,self.Y
-for _,v in ipairs(args)do maxX=math.max(maxX,v.X)maxY=math.max(maxY,v.Y)end
-return Vector2.new(maxX,maxY)end function Vector2:Min(...)local args={...}local
-minX,minY=self.X,self.Y for _,v in ipairs(args)do minX=math.min(minX,v.X)minY=
-math.min(minY,v.Y)end return Vector2.new(minX,minY)end function Vector2:FuzzyEq(
-v,epsilon)epsilon=epsilon or 1e-5 return math.abs(self.X-v.X)<epsilon and math.
-abs(self.Y-v.Y)<epsilon end function Vector2:__add(v)return Vector2.new(self.X+v
-.X,self.Y+v.Y)end function Vector2:__sub(v)return Vector2.new(self.X-v.X,self.Y-
-v.Y)end function Vector2:__mul(v)if type(v)=='number'then return Vector2.new(
-self.X*v,self.Y*v)elseif getmetatable(v)==Vector2 then return Vector2.new(self.X
-*v.X,self.Y*v.Y)end end function Vector2:__div(v)if type(v)=='number'then return
-Vector2.new(self.X/v,self.Y/v)elseif getmetatable(v)==Vector2 then return
-Vector2.new(self.X/v.X,self.Y/v.Y)end end function Vector2:__floordiv(v)if type(
-v)=='number'then return Vector2.new(math.floor(self.X/v),math.floor(self.Y/v))
-elseif getmetatable(v)==Vector2 then return Vector2.new(math.floor(self.X/v.X),
-math.floor(self.Y/v.Y))end end function Vector2:__unm()return Vector2.new(-self.
-X,-self.Y)end function Vector2:__tostring()return string.format(
-'Vector2.new(%.3f, %.3f)',self.X,self.Y)end _G.Vector2=Vector2 local Vector3={}
-Vector3.__index=Vector3 local Enum={NormalId={Top='Top',Bottom='Bottom',Left=
-'Left',Right='Right',Front='Front',Back='Back'},Axis={X='X',Y='Y',Z='Z'}}
-function Vector3.new(x,y,z)return setmetatable({X=x or 0,Y=y or 0,Z=z or 0},
-Vector3)end function Vector3.FromNormalId(normal)local map={[Enum.NormalId.Top]=
-Vector3.new(0,1,0),[Enum.NormalId.Bottom]=Vector3.new(0,-1,0),[Enum.NormalId.
-Left]=Vector3.new(-1,0,0),[Enum.NormalId.Right]=Vector3.new(1,0,0),[Enum.
-NormalId.Front]=Vector3.new(0,0,-1),[Enum.NormalId.Back]=Vector3.new(0,0,1)}
-return map[normal]or Vector3.zero end function Vector3.FromAxis(axis)local map={
-[Enum.Axis.X]=Vector3.new(1,0,0),[Enum.Axis.Y]=Vector3.new(0,1,0),[Enum.Axis.Z]=
-Vector3.new(0,0,1)}return map[axis]or Vector3.zero end Vector3.zero=Vector3.new(
-0,0,0)Vector3.one=Vector3.new(1,1,1)Vector3.xAxis=Vector3.new(1,0,0)Vector3.
-yAxis=Vector3.new(0,1,0)Vector3.zAxis=Vector3.new(0,0,1)function Vector3:
-Magnitude()return math.sqrt(self.X^2+self.Y^2+self.Z^2)end function Vector3:Unit
-()local m=self:Magnitude()if m>0 then return Vector3.new(self.X/m,self.Y/m,self.
-Z/m)end return Vector3.zero end function Vector3:Abs()return Vector3.new(math.
-abs(self.X),math.abs(self.Y),math.abs(self.Z))end function Vector3:Ceil()return
-Vector3.new(math.ceil(self.X),math.ceil(self.Y),math.ceil(self.Z))end function
-Vector3:Floor()return Vector3.new(math.floor(self.X),math.floor(self.Y),math.
-floor(self.Z))end function Vector3:Sign()local sign=function(v)return v>0 and 1
-or(v<0 and-1 or 0)end return Vector3.new(sign(self.X),sign(self.Y),sign(self.Z))
-end function Vector3:Cross(v)return Vector3.new(self.Y*v.Z-self.Z*v.Y,self.Z*v.X
--self.X*v.Z,self.X*v.Y-self.Y*v.X)end function Vector3:Angle(v,axis)local dot=
-self:Dot(v)local magProduct=self:Magnitude()*v:Magnitude()local angle=math.acos(
-math.clamp(dot/magProduct,-1,1))if axis then return angle*(self:Cross(v):Dot(
-axis)<0 and-1 or 1)end return angle end function Vector3:Dot(v)return self.X*v.X
-+self.Y*v.Y+self.Z*v.Z end function Vector3:FuzzyEq(v,epsilon)epsilon=epsilon or
-1e-5 local diffSq=(self-v):Magnitude()^2 return diffSq<=epsilon^2*math.max(self:
-Magnitude()^2,v:Magnitude()^2,1)end function Vector3:Lerp(v,alpha)return Vector3
-.new(self.X+(v.X-self.X)*alpha,self.Y+(v.Y-self.Y)*alpha,self.Z+(v.Z-self.Z)*
-alpha)end function Vector3:Max(v)return Vector3.new(math.max(self.X,v.X),math.
-max(self.Y,v.Y),math.max(self.Z,v.Z))end function Vector3:Min(v)return Vector3.
-new(math.min(self.X,v.X),math.min(self.Y,v.Y),math.min(self.Z,v.Z))end function
-Vector3:__add(v)return Vector3.new(self.X+v.X,self.Y+v.Y,self.Z+v.Z)end function
-Vector3:__sub(v)return Vector3.new(self.X-v.X,self.Y-v.Y,self.Z-v.Z)end function
-Vector3:__mul(v)if type(v)=='number'then return Vector3.new(self.X*v,self.Y*v,
-self.Z*v)elseif getmetatable(v)==Vector3 then return Vector3.new(self.X*v.X,self
-.Y*v.Y,self.Z*v.Z)end end function Vector3:__div(v)if type(v)=='number'then
-return Vector3.new(self.X/v,self.Y/v,self.Z/v)elseif getmetatable(v)==Vector3
-then return Vector3.new(self.X/v.X,self.Y/v.Y,self.Z/v.Z)end end function
-Vector3:__mod(v)return Vector3.new(self.X%v.X,self.Y%v.Y,self.Z%v.Z)end function
-Vector3:__floordiv(v)if type(v)=='number'then return Vector3.new(math.floor(self
-.X/v),math.floor(self.Y/v),math.floor(self.Z/v))elseif getmetatable(v)==Vector3
-then return Vector3.new(math.floor(self.X/v.X),math.floor(self.Y/v.Y),math.
-floor(self.Z/v.Z))end end function Vector3:__unm()return Vector3.new(-self.X,-
-self.Y,-self.Z)end function Vector3:__tostring()return string.format(
-'Vector3.new(%.3f, %.3f, %.3f)',self.X,self.Y,self.Z)end _G.Vector3=Vector3 _G.
-Enum=Enum _G.print=function(...)local args,count={...},select('#',...)local
-output=''for i=1,count do local v=args[i]if type(v)=='table'then if v.Name and v
-.Data then output=output..v.Name..' | 'end elseif type(v)=='userdata'then output
-=output..getname(v)..' | 'end local str=tostring(v)if type(str)~='string'then
-error("'tostring' must return a string - print function")end output=output..str
-..' 'end return print(output)end _G.warn=function(...)local args,count={...},
-select('#',...)local output=''for i=1,count do local v=args[i]if type(v)==
-'table'then if v.Name and v.Data then output=output..v.Name..' | 'end elseif
-type(v)=='userdata'then output=output..getname(v)..' | 'end local str=tostring(v
-)if type(str)~='string'then error(
-"'tostring' must return a string - warn function")end output=output..str..' 'end
-return warn(output)end end local Color3={}do function Color3.fromRGB(R,G,B)
-assert(type(R)=='number'and type(G)=='number'and type(B)=='number',
-"can't construct color with non-numeric arguments")local This=setmetatable({math
-.clamp(math.floor(R),0,255),math.clamp(math.floor(G),0,255),math.clamp(math.
-floor(B),0,255)},Color3)do function This.unpack(This)return{This[1],This[2],This
-[3]}end function This.lerp(This,Target,T)return This+(Target-This)*T end
-function This.distance(This,Other)return math.sqrt((This[1]-Other[1])^2+(This[2]
--Other[2])^2+(This[3]-Other[3])^2)end function This.dword(This)return bit32.bor(
-This[1],bit32.lshift(This[2],8),bit32.lshift(This[3],16))end end return This end
-function Color3.fromHex(Hex)assert(type(Hex)=='string'and#Hex==6,
-'Hex color must be a 6-character string')local R=tonumber(Hex:sub(1,2),16)local
-G=tonumber(Hex:sub(3,4),16)local B=tonumber(Hex:sub(5,6),16)return Color3.
-fromRGB(R,G,B)end function Color3.fromHSV(H,S,V)assert(type(H)=='number'and
-type(S)=='number'and type(V)=='number','HSV values must be numbers')H=math.
-clamp(H,0,360)S=math.clamp(S,0,1)V=math.clamp(V,0,1)local C=V*S local X=C*(1-
-math.abs((H/60)%2-1))local m=V-C local r,g,b if H<60 then r,g,b=C,X,0 elseif H<
-120 then r,g,b=X,C,0 elseif H<180 then r,g,b=0,C,X elseif H<240 then r,g,b=0,X,C
-elseif H<300 then r,g,b=X,0,C else r,g,b=C,0,X end return Color3.fromRGB(math.
-floor((r+m)*255),math.floor((g+m)*255),math.floor((b+m)*255))end function Color3
-.new(R,G,B)assert(type(R)=='number'and type(G)=='number'and type(B)=='number',
-'Color3 constructor requires three numeric arguments')return Color3.fromRGB(R*
-255,G*255,B*255)end function Color3.dword(This,value)return Color3.fromRGB(bit32
-.band(value,0xff),bit32.band(bit32.rshift(value,8),0xff),bit32.band(bit32.
-rshift(value,16),0xff))end function Color3.__newindex(This,Key,Value)if Key=='R'
-or Key=='G'or Key=='B'then rawset(This,Key,math.clamp(math.floor(Value),0,255))
-else rawset(This,Key,Value)end end function Color3.__eq(This,Other)return This[1
-]==Other[1]and This[2]==Other[2]and This[3]==Other[3]end function Color3.
-__tostring(This)return`Color.new({This[1]}, {This[2]}, {This[3]})`end function
-Color3.__add(This,Other)if type(Other)=='table'and Other[1]and Other[2]and Other
-[3]then return Color3.fromRGB(This[1]+Other[1],This[2]+Other[2],This[3]+Other[3]
-)end return error(`can't add {type(Other)} to Color`)end function Color3.__sub(
-This,Other)if type(Other)=='table'and Other[1]and Other[2]and Other[3]then
-return Color3.fromRGB(This[1]-Other[1],This[2]-Other[2],This[3]-Other[3])end
-return error(`can't subtract {type(Other)} from Color`)end function Color3.__mul
-(This,Other)if type(Other)=='table'and Other[1]and Other[2]and Other[3]then
-return Color3.fromRGB(This[1]*Other[1],This[2]*Other[2],This[3]*Other[3])elseif
-type(Other)=='number'then return Color3.fromRGB(This[1]*Other,This[2]*Other,This
-[3]*Other)end return error(`can't multiply {type(Other)} with Color`)end
-function Color3.__div(This,Other)if type(Other)=='table'and Other[1]and Other[2]
-and Other[3]then return Color3.fromRGB(This[1]/Other[1],This[2]/Other[2],This[3]
-/Other[3])elseif type(Other)=='number'then return Color3.fromRGB(This[1]/Other,
-This[2]/Other,This[3]/Other)end return error(`can't divide {type(Other)} from Color`
-)end Color3.__index=Color3 end local BrickColor={Palette={[1032]={Name=
-'Hot pink',Color=Color3.fromRGB(255,0,191)},[1031]={Name='Royal purple',Color=
-Color3.fromRGB(98,37,209)},[1030]={Name='Pastel brown',Color=Color3.fromRGB(255,
-204,153)},[1029]={Name='Pastel yellow',Color=Color3.fromRGB(255,255,204)},[1028]
-={Name='Pastel green',Color=Color3.fromRGB(204,255,204)},[1027]={Name=
-'Pastel blue-green',Color=Color3.fromRGB(159,243,233)},[1026]={Name=
-'Pastel violet',Color=Color3.fromRGB(177,167,255)},[1025]={Name='Pastel orange',
-Color=Color3.fromRGB(255,201,201)},[1024]={Name='Pastel light blue',Color=Color3
-.fromRGB(175,221,255)},[1023]={Name='Lavender',Color=Color3.fromRGB(140,91,159)}
-,[1022]={Name='Grime',Color=Color3.fromRGB(127,142,100)},[1021]={Name='Camo',
-Color=Color3.fromRGB(58,125,21)},[1020]={Name='Lime green',Color=Color3.fromRGB(
-0,255,0)},[1019]={Name='Toothpaste',Color=Color3.fromRGB(0,255,255)},[1018]={
-Name='Teal',Color=Color3.fromRGB(18,238,212)},[1017]={Name='Deep orange',Color=
-Color3.fromRGB(255,175,0)},[1016]={Name='Pink',Color=Color3.fromRGB(255,102,204)
-},[1015]={Name='Magenta',Color=Color3.fromRGB(170,0,170)},[1014]={Name=
-'CGA brown',Color=Color3.fromRGB(170,85,0)},[1013]={Name='Cyan',Color=Color3.
-fromRGB(4,175,236)},[1012]={Name='Deep blue',Color=Color3.fromRGB(33,84,185)},[
-1011]={Name='Navy blue',Color=Color3.fromRGB(0,32,96)},[1010]={Name=
-'Really blue',Color=Color3.fromRGB(0,0,255)},[1009]={Name='New Yeller',Color=
-Color3.fromRGB(255,255,0)},[1008]={Name='Olive',Color=Color3.fromRGB(193,190,66)
-},[1007]={Name='Dusty Rose',Color=Color3.fromRGB(163,75,75)},[1006]={Name=
-'Alder',Color=Color3.fromRGB(180,128,255)},[1005]={Name='Deep orange',Color=
-Color3.fromRGB(255,176,0)},[1004]={Name='Really red',Color=Color3.fromRGB(255,0,
-0)},[1003]={Name='Really black',Color=Color3.fromRGB(17,17,17)},[1002]={Name=
-'Mid gray',Color=Color3.fromRGB(205,205,205)},[1001]={Name='Institutional white'
-,Color=Color3.fromRGB(248,248,248)},[365]={Name='Burnt Sienna',Color=Color3.
-fromRGB(106,57,9)},[364]={Name='Dark taupe',Color=Color3.fromRGB(90,76,66)},[363
-]={Name='Flint',Color=Color3.fromRGB(105,102,92)},[362]={Name='Bronze',Color=
-Color3.fromRGB(126,104,63)},[361]={Name='Medium brown',Color=Color3.fromRGB(86,
-66,54)},[360]={Name='Copper',Color=Color3.fromRGB(150,103,102)},[359]={Name=
-'Linen',Color=Color3.fromRGB(175,148,131)},[358]={Name='Cloudy grey',Color=
-Color3.fromRGB(171,168,158)},[357]={Name='Hurricane grey',Color=Color3.fromRGB(
-149,137,136)},[356]={Name='Fawn brown',Color=Color3.fromRGB(160,132,79)},[355]={
-Name='Pine Cone',Color=Color3.fromRGB(108,88,75)},[354]={Name='Oyster',Color=
-Color3.fromRGB(187,179,178)},[353]={Name='Beige',Color=Color3.fromRGB(202,191,
-163)},[352]={Name='Burlap',Color=Color3.fromRGB(199,172,120)},[351]={Name='Cork'
-,Color=Color3.fromRGB(188,155,93)},[350]={Name='Burgundy',Color=Color3.fromRGB(
-136,62,62)},[349]={Name='Seashell',Color=Color3.fromRGB(233,218,218)},[348]={
-Name='Lily white',Color=Color3.fromRGB(237,234,234)},[347]={Name='Khaki',Color=
-Color3.fromRGB(226,220,188)},[346]={Name='Cashmere',Color=Color3.fromRGB(211,190
-,150)},[345]={Name='Rust',Color=Color3.fromRGB(143,76,42)},[344]={Name='Tawny',
-Color=Color3.fromRGB(150,85,85)},[343]={Name='Sunrise',Color=Color3.fromRGB(212,
-144,189)},[342]={Name='Mauve',Color=Color3.fromRGB(224,178,208)},[341]={Name=
-'Buttermilk',Color=Color3.fromRGB(254,243,187)},[340]={Name='Wheat',Color=Color3
-.fromRGB(241,231,199)},[339]={Name='Cocoa',Color=Color3.fromRGB(86,36,36)},[338]
-={Name='Terra Cotta',Color=Color3.fromRGB(190,104,98)},[337]={Name='Salmon',
-Color=Color3.fromRGB(255,148,148)},[336]={Name='Fog',Color=Color3.fromRGB(199,
-212,228)},[335]={Name='Pearl',Color=Color3.fromRGB(231,231,236)},[334]={Name=
-'Daisy orange',Color=Color3.fromRGB(248,217,109)},[333]={Name='Gold',Color=
-Color3.fromRGB(239,184,56)},[332]={Name='Maroon',Color=Color3.fromRGB(117,0,0)},
-[331]={Name='Persimmon',Color=Color3.fromRGB(255,89,89)},[330]={Name=
-'Carnation pink',Color=Color3.fromRGB(255,152,220)},[329]={Name='Baby blue',
-Color=Color3.fromRGB(152,194,219)},[328]={Name='Mint',Color=Color3.fromRGB(177,
-229,166)},[327]={Name='Crimson',Color=Color3.fromRGB(151,0,0)},[325]={Name=
-'Quill grey',Color=Color3.fromRGB(223,223,222)},[324]={Name='Laurel green',Color
-=Color3.fromRGB(168,189,153)},[323]={Name='Olivine',Color=Color3.fromRGB(148,190
-,129)},[322]={Name='Plum',Color=Color3.fromRGB(123,47,123)},[321]={Name='Lilac',
-Color=Color3.fromRGB(167,94,155)},[320]={Name='Ghost grey',Color=Color3.fromRGB(
-202,203,209)},[319]={Name='Sage green',Color=Color3.fromRGB(185,196,177)},[318]=
-{Name='Artichoke',Color=Color3.fromRGB(138,171,133)},[317]={Name='Moss',Color=
-Color3.fromRGB(124,156,107)},[316]={Name='Eggplant',Color=Color3.fromRGB(123,0,
-123)},[315]={Name='Electric blue',Color=Color3.fromRGB(9,137,207)},[314]={Name=
-'Cadet blue',Color=Color3.fromRGB(159,173,192)},[313]={Name='Forest green',Color
-=Color3.fromRGB(31,128,29)},[312]={Name='Mulberry',Color=Color3.fromRGB(89,34,89
-)},[311]={Name='Fossil',Color=Color3.fromRGB(159,161,172)},[310]={Name=
-'Shamrock',Color=Color3.fromRGB(91,154,76)},[309]={Name='Sea green',Color=Color3
-.fromRGB(52,142,64)},[308]={Name='Dark indigo',Color=Color3.fromRGB(61,21,133)},
-[307]={Name='Lapis',Color=Color3.fromRGB(16,42,220)},[306]={Name='Storm blue',
-Color=Color3.fromRGB(51,88,130)},[305]={Name='Steel blue',Color=Color3.fromRGB(
-82,124,174)},[304]={Name='Parsley green',Color=Color3.fromRGB(44,101,29)},[303]=
-{Name='Dark blue',Color=Color3.fromRGB(0,16,176)},[302]={Name='Smoky grey',Color
-=Color3.fromRGB(91,93,105)},[301]={Name='Slime green',Color=Color3.fromRGB(80,
-109,84)},[268]={Name='Medium lilac',Color=Color3.fromRGB(52,43,117)},[232]={Name
-='Dove blue',Color=Color3.fromRGB(125,187,221)},[226]={Name='Cool yellow',Color=
-Color3.fromRGB(253,234,141)},[225]={Name='Warm yellowish orange',Color=Color3.
-fromRGB(235,184,127)},[224]={Name='Light brick yellow',Color=Color3.fromRGB(240,
-213,160)},[223]={Name='Light pink',Color=Color3.fromRGB(220,144,149)},[222]={
-Name='Light purple',Color=Color3.fromRGB(228,173,200)},[221]={Name=
-'Bright purple',Color=Color3.fromRGB(205,98,152)},[220]={Name='Light lilac',
-Color=Color3.fromRGB(167,169,206)},[219]={Name='Lilac',Color=Color3.fromRGB(107,
-98,155)},[218]={Name='Reddish lilac',Color=Color3.fromRGB(150,112,159)},[217]={
-Name='Brown',Color=Color3.fromRGB(124,92,70)},[216]={Name='Rust',Color=Color3.
-fromRGB(144,76,42)},[213]={Name='Medium Royal blue',Color=Color3.fromRGB(108,129
-,183)},[212]={Name='Light Royal blue',Color=Color3.fromRGB(159,195,233)},[211]={
-Name='Turquoise',Color=Color3.fromRGB(121,181,181)},[210]={Name='Faded green',
-Color=Color3.fromRGB(112,149,120)},[209]={Name='Dark Curry',Color=Color3.
-fromRGB(176,142,68)},[208]={Name='Light stone grey',Color=Color3.fromRGB(229,228
-,223)},[200]={Name='Lemon metalic',Color=Color3.fromRGB(130,138,93)},[199]={Name
-='Dark stone grey',Color=Color3.fromRGB(99,95,98)},[198]={Name=
-'Bright reddish lilac',Color=Color3.fromRGB(142,66,133)},[196]={Name=
-'Dark Royal blue',Color=Color3.fromRGB(35,71,139)},[195]={Name='Royal blue',
-Color=Color3.fromRGB(70,103,164)},[193]={Name='Flame reddish orange',Color=
-Color3.fromRGB(207,96,36)},[192]={Name='Reddish brown',Color=Color3.fromRGB(105,
-64,40)},[191]={Name='Flame yellowish orange',Color=Color3.fromRGB(232,171,45)},[
-190]={Name='Fire Yellow',Color=Color3.fromRGB(249,214,46)},[180]={Name='Curry',
-Color=Color3.fromRGB(215,169,75)},[179]={Name='Silver flip/flop',Color=Color3.
-fromRGB(137,135,136)},[178]={Name='Yellow flip/flop',Color=Color3.fromRGB(180,
-132,85)},[176]={Name='Red flip/flop',Color=Color3.fromRGB(151,105,91)},[168]={
-Name='Gun metallic',Color=Color3.fromRGB(117,108,98)},[158]={Name='Tr. Flu. Red'
-,Color=Color3.fromRGB(225,164,194)},[157]={Name='Tr. Flu. Yellow',Color=Color3.
-fromRGB(255,246,123)},[154]={Name='Dark red',Color=Color3.fromRGB(123,46,47)},[
-153]={Name='Sand red',Color=Color3.fromRGB(149,121,119)},[151]={Name=
-'Sand green',Color=Color3.fromRGB(120,144,130)},[150]={Name=
-'Light grey metallic',Color=Color3.fromRGB(171,173,172)},[149]={Name=
-'Black metallic',Color=Color3.fromRGB(22,29,50)},[148]={Name=
-'Dark grey metallic',Color=Color3.fromRGB(87,88,87)},[147]={Name=
-'Sand yellow metallic',Color=Color3.fromRGB(147,135,103)},[146]={Name=
-'Sand violet metallic',Color=Color3.fromRGB(149,142,163)},[145]={Name=
-'Sand blue metallic',Color=Color3.fromRGB(121,136,161)},[143]={Name=
-'Tr. Flu. Blue',Color=Color3.fromRGB(207,226,247)},[141]={Name='Earth green',
-Color=Color3.fromRGB(39,70,45)},[140]={Name='Earth blue',Color=Color3.fromRGB(32
-,58,86)},[138]={Name='Sand yellow',Color=Color3.fromRGB(149,138,115)},[137]={
-Name='Medium orange',Color=Color3.fromRGB(224,152,100)},[136]={Name=
-'Sand violet',Color=Color3.fromRGB(135,124,144)},[135]={Name='Sand blue',Color=
-Color3.fromRGB(116,134,157)},[134]={Name='Neon green',Color=Color3.fromRGB(216,
-221,86)},[133]={Name='Neon orange',Color=Color3.fromRGB(213,115,61)},[131]={Name
-='Silver',Color=Color3.fromRGB(156,163,168)},[128]={Name='Dark nougat',Color=
-Color3.fromRGB(174,122,89)},[127]={Name='Gold',Color=Color3.fromRGB(220,188,129)
-},[126]={Name='Tr. Bright bluish violet',Color=Color3.fromRGB(165,165,203)},[125
-]={Name='Light orange',Color=Color3.fromRGB(234,184,146)},[124]={Name=
-'Bright reddish violet',Color=Color3.fromRGB(146,57,120)},[123]={Name=
-'Br. reddish orange',Color=Color3.fromRGB(211,111,76)},[121]={Name=
-'Med. yellowish orange',Color=Color3.fromRGB(231,172,88)},[120]={Name=
-'Lig. yellowish green',Color=Color3.fromRGB(217,228,167)},[119]={Name=
-'Br. yellowish green',Color=Color3.fromRGB(164,189,71)},[118]={Name=
-'Light bluish green',Color=Color3.fromRGB(183,215,213)},[116]={Name=
-'Med. bluish green',Color=Color3.fromRGB(85,165,175)},[115]={Name=
-'Med. yellowish green',Color=Color3.fromRGB(199,210,60)},[113]={Name=
-'Tr. Medi. reddish violet',Color=Color3.fromRGB(229,173,200)},[112]={Name=
-'Medium bluish violet',Color=Color3.fromRGB(104,116,172)},[111]={Name=
-'Tr. Brown',Color=Color3.fromRGB(191,183,177)},[110]={Name=
-'Bright bluish violet',Color=Color3.fromRGB(67,84,147)},[108]={Name=
-'Earth yellow',Color=Color3.fromRGB(104,92,67)},[107]={Name=
-'Bright bluish green',Color=Color3.fromRGB(0,143,156)},[106]={Name=
-'Bright orange',Color=Color3.fromRGB(218,133,65)},[105]={Name=
-'Br. yellowish orange',Color=Color3.fromRGB(226,155,64)},[104]={Name=
-'Bright violet',Color=Color3.fromRGB(107,50,124)},[103]={Name='Light grey',Color
-=Color3.fromRGB(199,193,183)},[102]={Name='Medium blue',Color=Color3.fromRGB(110
-,153,202)},[101]={Name='Medium red',Color=Color3.fromRGB(218,134,122)},[100]={
-Name='Light red',Color=Color3.fromRGB(238,196,182)},[50]={Name='Phosph. White',
-Color=Color3.fromRGB(236,232,222)},[49]={Name='Tr. Flu. Green',Color=Color3.
-fromRGB(248,241,132)},[48]={Name='Tr. Green',Color=Color3.fromRGB(132,182,141)},
-[47]={Name='Tr. Flu. Reddish orange',Color=Color3.fromRGB(217,133,108)},[45]={
-Name='Light blue',Color=Color3.fromRGB(180,210,228)},[44]={Name='Tr. Yellow',
-Color=Color3.fromRGB(247,241,141)},[43]={Name='Tr. Blue',Color=Color3.fromRGB(
-123,182,232)},[42]={Name='Tr. Lg blue',Color=Color3.fromRGB(193,223,240)},[41]={
-Name='Tr. Red',Color=Color3.fromRGB(205,84,75)},[40]={Name='Transparent',Color=
-Color3.fromRGB(236,236,236)},[39]={Name='Light bluish violet',Color=Color3.
-fromRGB(193,202,222)},[38]={Name='Dark orange',Color=Color3.fromRGB(160,95,53)},
-[37]={Name='Bright green',Color=Color3.fromRGB(75,151,75)},[36]={Name=
-'Lig. Yellowich orange',Color=Color3.fromRGB(243,207,155)},[29]={Name=
-'Medium green',Color=Color3.fromRGB(161,196,140)},[28]={Name='Dark green',Color=
-Color3.fromRGB(40,127,71)},[27]={Name='Dark grey',Color=Color3.fromRGB(109,110,
-108)},[26]={Name='Black',Color=Color3.fromRGB(27,42,53)},[25]={Name=
-'Earth orange',Color=Color3.fromRGB(98,71,50)},[24]={Name='Bright yellow',Color=
-Color3.fromRGB(245,205,48)},[23]={Name='Bright blue',Color=Color3.fromRGB(13,105
-,172)},[22]={Name='Med. reddish violet',Color=Color3.fromRGB(196,112,160)},[21]=
-{Name='Bright red',Color=Color3.fromRGB(196,40,28)},[18]={Name='Nougat',Color=
-Color3.fromRGB(204,142,105)},[12]={Name='Light orange brown',Color=Color3.
-fromRGB(203,132,66)},[11]={Name='Pastel Blue',Color=Color3.fromRGB(128,187,219)}
-,[9]={Name='Light reddish violet',Color=Color3.fromRGB(232,186,200)},[6]={Name=
-'Light green (Mint)',Color=Color3.fromRGB(194,218,184)},[5]={Name='Brick yellow'
-,Color=Color3.fromRGB(215,197,154)},[4]={Name='Medium stone grey',Color=Color3.
-fromRGB(163,162,165)},[3]={Name='Light yellow',Color=Color3.fromRGB(249,233,153)
-},[2]={Name='Grey',Color=Color3.fromRGB(161,165,162)},[1]={Name='White',Color=
-Color3.fromRGB(242,243,243)}}}do local Lookup={}do for Index,Object in pairs(
-BrickColor.Palette)do Lookup[Object.Name:lower()]=Index end end local Indices={}
-do for Index in BrickColor.Palette do table.insert(Indices,Index)end end
-function BrickColor.new(Argument)local This=setmetatable({},BrickColor)if type(
-Argument)=='number'then local Object=BrickColor.Palette[Argument]or BrickColor.
-Palette[4]This.Name=Object.Name This.Color=Object.Color This.Index=Argument
-elseif type(Argument)=='string'then local Index=Lookup[Argument:lower()]if Index
-then local Object=BrickColor.Palette[Index]This.Index=Index This.Color=Object.
-Color This.Name=Object.Name else error(`invalid BrickColor: {Argument}`)end
-elseif type(Argument)=='table'then if not Argument[1]or not Argument[2]or not
-Argument[3]then error(`can't initialize BrickColor, invalid Color`)end local
-Closest,Distance=nil,math.huge for Index,Object in BrickColor.Palette do local
-Magnitude=Object.Color:distance(Argument)if Distance>Magnitude then Closest=
-Object Distance=Magnitude end end return BrickColor.new(Closest.Name)end return
-This end function BrickColor.random()return BrickColor.new(Indices[math.random(1
-,#Indices)])end function BrickColor.__tostring(This)return This.Name end
-BrickColor.__index=BrickColor end _G.BrickColor=BrickColor _G.Color3=Color3
+'IntConstrainedValue'},'Value',{getter=function(f)return getvalue(f.Data)end,
+setter=function(f,g:any)setvalue(f.Data,g)end})end do d.declare('property',{
+'UnionOperation','MeshPart','TrussPart','Part'},'Size',{getter=function(f)local
+g=getsize(f.Data)return vector.create(g.x,g.y,g.z)end})d.declare('property',{
+'UnionOperation','MeshPart','TrussPart','Part','Camera'},'Position',{getter=
+function(f)local g=getposition(f.Data)return vector.create(g.x,g.y,g.z)end,
+setter=function(f,g:vector|{x:number,y:number,z:number})assert('table'==type(g)
+and g.x and g.y and g.z,`Instance:Position: value must be a Vector3, got {type(g
+)}`)setposition(f.Data,g)end})d.declare('property',{'UnionOperation','MeshPart',
+'TrussPart','Part','Camera'},'CFrame',{getter=function(f)local g=getposition(f.
+Data)local h=getupvector(f.Data)local i=getrightvector(f.Data)local j=
+getlookvector(f.Data)return{Position=vector.create(g.x,g.y,g.z),UpVector=vector.
+create(h.x,h.y,h.z),RightVector=vector.create(i.x,i.y,i.z),LookVector=vector.
+create(j.x,j.y,j.z)}end,setter=function(f,g:any)setcframe(f.Data,g)end})d.
+declare('property',{'UnionOperation','MeshPart','TrussPart','Part'},
+'Transparency',{getter=function(f)return gettransparency(f.Data)end,setter=
+function(f,g:number)settransparency(f.Data,g)end})end do d.declare('property',
+'Player','Character',{getter=function(f)return e(getcharacter(f.Data))end})d.
+declare('property','Player','Team',{getter=function(f)return e(getteam(f.Data))
+end})d.declare('property','Player','DisplayName',{getter=function(f)return
+getdisplayname(f.Data)end})d.declare('property','Player','UserId',{getter=
+function(f)return getuserid(f.Data)end})end do d.declare('property','Workspace',
+'CurrentCamera',{getter=function(f)local g:any=findfirstchildofclass(f.Data,
+'Camera')return g and e(g)end})end do d.declare('property','Camera',
+'FieldOfView',{getter=function(f)return getcamerafov(f.Data)end})d.declare(
+'method','Camera','SetCameraSubject',function(f,g)assert(type(g)=='table'and g.
+Data,`Camera:SetCameraSubject: subject must be an Instance, got {type(g)}`)
+return setcamerasubject(g.Data)end)end do d.declare('property',{'UnionOperation'
+,'MeshPart','TrussPart','Part'},'CanCollide',{getter=function(f)return
+getcancollide(f.Data)end,setter=function(f,g:boolean)assert(type(g)=='boolean',`Instance:CanCollide: value must be a boolean, got {
+type(g)}`)setcancollide(f.Data,g)end})d.declare('property',{'UnionOperation',
+'MeshPart','TrussPart','Part'},'Velocity',{getter=function(f)local g=
+getvelocity(f.Data)return vector.create(g.x,g.y,g.z)end,setter=function(f,g:
+vector|{x:number,y:number,z:number})assert('table'==type(g)and g.x and g.y and g
+.z,`Instance:Velocity: value must be a Vector3, got {type(g)}`)setvelocity(f.
+Data,g)end})end do d.declare('property','MeshPart','TextureID',{getter=function(
+f)return gettextureid(f.Data)end})d.declare('property','MeshPart','MeshID',{
+getter=function(f)return getmeshid(f.Data)end})end do d.declare('property',
+'Humanoid','Health',{getter=function(f)return gethealth(f.Data)end})d.declare(
+'property','Humanoid','MaxHealth',{getter=function(f)return getmaxhealth(f.Data)
+end})end do d.declare('property','Model','PrimaryPart',{getter=function(f)local
+g:any=getprimarypart(f.Data)return g and e(g)end})end do d.declare('property',
+'BillboardGui','Adornee',{getter=function(f)local g:any=getadornee(f.Data)return
+g and e(g)end})end do d.declare('property','Players','LocalPlayer',{getter=
+function(f)local g:any=getlocalplayer()return g and e(g)end})end do d.declare(
+'method','MouseService','GetMousePosition',function(f)local g=getmouseposition()
+return vector.create(g.x,g.y)end)d.declare('method','MouseService',
+'GetMouseLocation',function(f)local g=getmouselocation(f.Data)return vector.
+create(g.x,g.y)end)d.declare('method','MouseService','GetMouseBehavior',function
+(f)return getmousebehavior(f.Data)end)d.declare('method','MouseService',
+'GetMouseDeltaSensitivity',function(f)return getmousedeltasensitivity(f.Data)end
+)d.declare('method','MouseService','IsMouseIconEnabled',function(f)return
+ismouseiconenabled(f.Data)end)d.declare('method','MouseService',
+'SetMouseLocation',function(f,g,h)assert('number'==type(g),`MouseService:SetMouseLocation: x must be a number, got {
+type(g)}`)assert('number'==type(h),`MouseService:SetMouseLocation: y must be a number, got {
+type(h)}`)setmouselocation(f.Data,g,h)end)d.declare('method','MouseService',
+'SetMouseIconEnabled',function(f,g)assert('boolean'==type(g),`MouseService:SetMouseIconEnabled: enabled must be a boolean, got {
+type(g)}`)setmouseiconenabled(f.Data,g)end)d.declare('method','MouseService',
+'SetMouseBehavior',function(f,g)assert('number'==type(g),`MouseService:SetMouseBehavior: behavior must be a number, got {
+type(g)}`)setmousebehaviour(f.Data,g)end)d.declare('method','MouseService',
+'SetMouseDeltaSensitivity',function(f,g)assert('number'==type(g),`MouseService:SetMouseDeltaSensitivity: sensitivity must be a number, got {
+type(g)}`)setmousedeltasensitivity(f.Data,g)end)d.declare('method',
+'MouseService','SmoothMouseExponential',function(f,g,h,i)assert('table'==type(g)
+and#g>=2,`MouseService:SmoothMouseExponential: origin must be a table with at least 2 numbers, got {
+type(g)}`)assert('table'==type(h)and#h>=2,`MouseService:SmoothMouseExponential: point must be a table with at least 2 numbers, got {
+type(h)}`)assert('number'==type(i),`MouseService:SmoothMouseExponential: speed must be a number, got {
+type(i)}`)local j=smoothmouse_exponential(g,h,i)return vector.create(j.x,j.y)end
+)d.declare('method','MouseService','SmoothMouseLinear',function(f,g,h,i,j)
+assert('table'==type(g)and#g>=2,`MouseService:SmoothMouseLinear: origin must be a table with at least 2 numbers, got {
+type(g)}`)assert('table'==type(h)and#h>=2,`MouseService:SmoothMouseLinear: point must be a table with at least 2 numbers, got {
+type(h)}`)assert('number'==type(i),`MouseService:SmoothMouseLinear: sensitivity must be a number, got {
+type(i)}`)assert('number'==type(j),`MouseService:SmoothMouseLinear: smoothness must be a number, got {
+type(j)}`)local k=smoothmouse_linear(g,h,i,j)return vector.create(k.x,k.y)end)
+end end _G.Instance=d _G.workspace=d.new(Workspace)_G.game=d.new(Game)return{
+Instance=d,workspace=_G.workspace,game=_G.game}end end if not _G.websocket then
+_G.websocket=a.load'a'end if not _G.memory then _G.memory=a.load'c'end _G.signal
+=a.load'd'a.load'j'
