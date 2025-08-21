@@ -481,6 +481,9 @@ end
 ---- globalization ----
 
 _G.Instance = Instance
+_G.Vector3 = Vector3
+_G.Vector2 = Vector2
+_G.CFrame = CFrame
 
 _G.workspace = Instance.new(Workspace)
 _G.game = Instance.new(Game)
