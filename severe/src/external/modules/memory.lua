@@ -99,6 +99,28 @@ local set = function(pointer: any, offset: number, spec: string, value: any)
         return true
     end
 
+    if "Vector2" == spec and type(value) == "table" and "Vector2" == getmetatable(value) then
+        local x = value.X or value[1]
+        local y = value.Y or value[2]
+
+        setmemoryvalue(pointer,     offset, x, "float")
+        setmemoryvalue(pointer, offset + 4, y, "float")
+
+        return true
+    end
+
+    if "Vector3" == spec and type(value) == "table" and "Vector3" == getmetatable(value) then
+        local x = value.X or value[1]
+        local y = value.Y or value[2]
+        local z = value.Z or value[3]
+
+        setmemoryvalue(pointer,     offset, x, "float")
+        setmemoryvalue(pointer, offset + 4, y, "float")
+        setmemoryvalue(pointer, offset + 8, z, "float")
+
+        return true
+    end
+
     return setmemoryvalue(pointer, offset, value, spec :: any)
 end
 

@@ -325,11 +325,16 @@ match'^0x'then i=tonumber(i:sub(3),16)end return setmemoryvalue(f,g,'qword',i)
 end if'buffer'==h and'buffer'==type(i)then return setmemoryvalue(f,g,i,'qword')
 end if'vector'==h and'vector'==type(i)then local j=i.X or i[1]local k=i.Y or i[2
 ]local l=i.Z or i[3]setmemoryvalue(f,g,j,'float')setmemoryvalue(f,g+4,k,'float')
-setmemoryvalue(f,g+8,l,'float')return true end return setmemoryvalue(f,g,i,h::
-any)end local g={}do function g.read(h:number|any,i:number|string,j:string?)if
-'table'==type(h)and rawget(h,'Data')then h=h.Data end if'userdata'==type(h)then
-assert('number'==type(i),`memory.read: offset must be a number, got {type(i)}`)
-assert('string'==type(j)or not j,`memory.read: spec must be a string or nil, got {
+setmemoryvalue(f,g+8,l,'float')return true end if'Vector2'==h and type(i)==
+'table'and'Vector2'==getmetatable(i)then local j=i.X or i[1]local k=i.Y or i[2]
+setmemoryvalue(f,g,j,'float')setmemoryvalue(f,g+4,k,'float')return true end if
+'Vector3'==h and type(i)=='table'and'Vector3'==getmetatable(i)then local j=i.X
+or i[1]local k=i.Y or i[2]local l=i.Z or i[3]setmemoryvalue(f,g,j,'float')
+setmemoryvalue(f,g+4,k,'float')setmemoryvalue(f,g+8,l,'float')return true end
+return setmemoryvalue(f,g,i,h::any)end local g={}do function g.read(h:number|any
+,i:number|string,j:string?)if'table'==type(h)and rawget(h,'Data')then h=h.Data
+end if'userdata'==type(h)then assert('number'==type(i),`memory.read: offset must be a number, got {
+type(i)}`)assert('string'==type(j)or not j,`memory.read: spec must be a string or nil, got {
 type(j)}`)return e(h,i,j::any)end if'number'==type(h)then if'string'==type(i)
 then return e(pointer_to_user_data(h),0,i::any)else assert('number'==type(i),`memory.read: offset must be a number or a string, got {
 type(i)}`)assert('string'==type(j)or not j,`memory.read: spec must be a string or nil, got {
