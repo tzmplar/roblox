@@ -5,9 +5,9 @@ local memory = require("@external/modules/memory")
 
 ---- declarations ----
 
-local Vector3 = require("@roblox/classes/vector3")
-local Vector2 = require("@roblox/classes/vector2")
-local CFrame  = require("@roblox/classes/cframe")
+local Vector3 = require("@roblox/data/vector3")
+local Vector2 = require("@roblox/data/vector2")
+local CFrame  = require("@roblox/data/cframe")
 
 local Instance = require("@roblox/classes/instance"); do
     local constructor = Instance.new
