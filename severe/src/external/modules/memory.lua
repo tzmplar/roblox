@@ -12,14 +12,16 @@ local get = function(pointer: any, offset: number, spec: string)
 
     if "userdata" == spec then
         local q = getmemoryvalue(pointer, offset, "qword")
-
         return q and pointer_to_user_data(q)
     end
 
     if "object" == spec then
-        local q = getmemoryvalue(pointer, offset, "qword")
+        assert(Instance, `memory.get: 'Instance' is not available, can't read object`)
 
-        return q and Instance and Instance.new(pointer_to_user_data(q))
+        local q = getmemoryvalue(pointer, offset, "qword")
+        local userdata = q and pointer_to_user_data(q)
+
+        return userdata and "none" ~= getclassname(userdata):lower() and Instance.new(userdata)
     end
 
     if "buffer" == spec then
@@ -54,7 +56,7 @@ local set = function(pointer: any, offset: number, spec: string, value: any)
         return setmemoryvalue(pointer, offset, "qword", value)
     end
 
-    if "object" == spec and type(value) == "table" then
+    if "object" == spec and type(value) == "table" and value.Data then
         value = tostring(value.Data)
         
         if "string" == type(value) and value:match("^0x") then
@@ -93,7 +95,7 @@ local memory = {}; do
 
         if "userdata" == type(pointer) then
             assert("number" == type(offset), `memory.read: offset must be a number, got {type(offset)}`)
-            assert("string" == type(spec) or not spec, `memory.read: data_type must be a string or nil, got {type(spec)}`)
+            assert("string" == type(spec) or not spec, `memory.read: spec must be a string or nil, got {type(spec)}`)
 
             return get(pointer, offset, spec :: any)
         end
@@ -103,7 +105,7 @@ local memory = {}; do
                 return get(pointer_to_user_data(pointer), 0, offset :: any)
             else
                 assert("number" == type(offset), `memory.read: offset must be a number or a string, got {type(offset)}`)
-                assert("string" == type(spec) or not spec, `memory.read: data_type must be a string or nil, got {type(spec)}`)
+                assert("string" == type(spec) or not spec, `memory.read: spec must be a string or nil, got {type(spec)}`)
 
                 return get(pointer_to_user_data(pointer), offset, spec :: any)
             end 
@@ -112,16 +114,16 @@ local memory = {}; do
         return nil
     end
 
-    function memory.write(pointer: number | any, offset: number | string, data_type: string?, value: any)
+    function memory.write(pointer: number | any, offset: number | string, spec: string?, value: any)
         if "table" == type(pointer) and rawget(pointer, "Data") then
             pointer = pointer.Data
         end
 
         if "userdata" == type(pointer) then
             assert("number" == type(offset), `memory.write: offset must be a number, got {type(offset)}`)
-            assert("string" == type(data_type) or not data_type, `memory.write: data_type must be a string or nil, got {type(data_type)}`)
+            assert("string" == type(spec) or not spec, `memory.write: spec must be a string or nil, got {type(spec)}`)
 
-            return set(pointer, offset, data_type :: any, value)
+            return set(pointer, offset, spec :: any, value)
         end
 
         if "number" == type(pointer) then
@@ -129,9 +131,9 @@ local memory = {}; do
                 return set(pointer_to_user_data(pointer), 0, offset :: any, value)
             else
                 assert("number" == type(offset), `memory.write: offset must be a number or a string, got {type(offset)}`)
-                assert("string" == type(data_type) or not data_type, `memory.write: data_type must be a string or nil, got {type(data_type)}`)
+                assert("string" == type(spec) or not spec, `memory.write: spec must be a string or nil, got {type(spec)}`)
 
-                return set(pointer_to_user_data(pointer), offset, data_type :: any, value)
+                return set(pointer_to_user_data(pointer), offset, spec :: any, value)
             end
         end
 

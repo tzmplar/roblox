@@ -1,6 +1,10 @@
+---- definitions ----
+
+_G.Signal 	 = require("@external/classes/signal")
 _G.websocket = require("@external/classes/websocket")
-_G.memory = require("@external/modules/memory")
-_G.signal = require("@external/classes/signal")
+_G.memory 	 = require("@external/modules/memory")
+
+---- functions ----
 
 _G.print = function(...)
 	local args, count = { ... }, select("#", ...)
@@ -54,4 +58,6 @@ _G.warn = function(...)
 	return warn(output)
 end
 
-require("@roblox")
+---- roblox ----
+
+return require("@roblox")

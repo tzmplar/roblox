@@ -66,6 +66,16 @@ local Color3 = {} do
     end
 
     --- functions ---
+    
+    function Color3.new(red: number, green: number, blue: number): Color3
+        assert("number" == type(red),   `Color3.new: red must be a number, got {type(red)}`)
+        assert("number" == type(green), `Color3.new: green must be a number, got {type(green)}`)
+        assert("number" == type(blue),  `Color3.new: blue must be a number, got {type(blue)}`)
+
+        -- exports --
+
+        return constructor(red * 255, green * 255, blue * 255)
+    end
 
     function Color3.fromRGB(red: number, green: number, blue: number): Color3
         assert("number" == type(red),   `Color3.fromRGB: red must be a number, got {type(red)}`)
@@ -184,6 +194,18 @@ local Color3 = {} do
         -- exports --
 
         return rawget(self, key) or Color3[key]
+    end
+
+    function Color3:__newindex(key: string, value: any)
+        if key:lower() == "r" then
+            self[1] = value
+        elseif key:lower() == "g" then
+            self[2] = value
+        elseif key:lower() == "b" then
+            self[3] = value
+        else
+            rawset(self, key, value)
+        end
     end
 
     function Color3:__eq(other) return self[1] == other[1] and self[2] == other[2] and self[3] == other[3] end
@@ -428,7 +450,7 @@ local BrickColor = {
             end
         elseif type(Argument) == "table" then
             if not Argument[1] or not Argument[2] or not Argument[3] then
-                error(`can't initialize BrickColor, invalid Color`)
+                error(`BrickColor.new: can't initialize BrickColor, invalid Color3`)
             end
 
             local Closest, Distance = nil, math.huge

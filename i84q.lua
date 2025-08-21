@@ -1,6 +1,17 @@
-type connection__DARKLUA_TYPE_a={unbind:()->()}local a a={cache={},load=function
-(b)if not a.cache[b]then a.cache[b]={c=a[b]()}end return a.cache[b].c end}do
-function a.a()local b={}do function b.connect(c:string)local d=
+type connection__DARKLUA_TYPE_a={disconnect:()->()}local a a={cache={},load=
+function(b)if not a.cache[b]then a.cache[b]={c=a[b]()}end return a.cache[b].c
+end}do function a.a()local b={}do local function constructor()return
+setmetatable({_map={}},{__index=b})end b.new=constructor function b.fire<T...>(c
+,...:T...)for d=#c,1,-1 do local e=c[d]if e then if'function'==type(e)then
+coroutine.wrap(e)(...)elseif'thread'==type(e)then coroutine.resume(e,...)end end
+end return c end function b.connect<T...>(c,d:(T...)->()):
+connection__DARKLUA_TYPE_a table.insert(c,d)return{disconnect=function()local e=
+table.find(c,d)if e then table.remove(c,e)end end}end function b.once<T...>(c,d:
+(T...)->()):connection__DARKLUA_TYPE_a local e do e=c:connect(function(...)d(...
+)e:disconnect()end)end return e end function b.wait<T...>(c):T...local d=
+coroutine.running()c:once(function(...)coroutine.resume(d,...)end)return
+coroutine.yield()end setmetatable(b,{__call=constructor})end return b end
+function a.b()local b={}do function b.connect(c:string)local d=
 websocket_connect(c)local e={}do local f={}function e.send(g,h:string)assert(
 'string'==type(h),`websocket:send: message must be a string, got {type(h)}`)
 websocket_send(d,h)end function e.on(g,h)assert('function'==type(h),`websocket:on: callback must be a function, got {
@@ -8,7 +19,7 @@ type(h)}`)table.insert(f,h)return{disconnect=function()assert('function'==type(h
 ),`connection:disconnect: callback must be a function, got {type(h)}`)local i=
 table.find(f,h)if i then table.remove(f,i)end end}end function e.close(g)
 websocket_close(d)end websocket_onmessage(d,function(...)for g,h in f do h(...)
-end end)end return e end end return b end function a.b()local b={}do
+end end)end return e end end return b end function a.c()local b={}do
 local function constructor(c:number,d:number,e:number)assert('number'==type(c),`Color3.new: red must be a number, got {
 type(c)}`)assert('number'==type(d),`Color3.new: green must be a number, got {
 type(d)}`)assert('number'==type(e),`Color3.new: blue must be a number, got {
@@ -205,25 +216,29 @@ if not f[1]or not f[2]or not f[3]then error(`can't initialize BrickColor, invali
 )end local h,i=(math.huge)for j,k in c.Palette do local l=k.Color:distance(f)if
 h>l then i=k h=l end end return c.new(i.Name)end return g end function c.random(
 )return c.new(e[math.random(1,#e)])end function c.__tostring(f)return f.Name end
-c.__index=c end _G.BrickColor=c return b end function a.c()local b=a.load'b'
+c.__index=c end _G.BrickColor=c return b end function a.d()local b=a.load'c'
 local c=function(c:any,d:number,e:string)if'color'==e then local f=
 getmemoryvalue(c,d,'dword')return f and b.dword(f)end if'userdata'==e then local
-f=getmemoryvalue(c,d,'qword')return f and pointer_to_user_data(f)end if'buffer'
-==e then local f=getmemoryvalue(c,d,'qword')return f and buffer.fromstring(
-string.pack('<I8',f))end if'vector'==e then local f=getmemoryvalue(c,d,'float')
-local g=getmemoryvalue(c,d+4,'float')local h=getmemoryvalue(c,d+8,'float')return
-vector.create(f,g,h)end return getmemoryvalue(c,d,e::any)end local d=function(d:
-any,e:number,f:string,g:any)if'color'==f and'table'==type(g)and g.dword then
-return setmemoryvalue(d,e,'dword',g:dword())end if'userdata'==f then g=tostring(
-g)if'string'==type(g)and g:match'^0x'then g=tonumber(g:sub(3),16)end return
-setmemoryvalue(d,e,'qword',g)end if'buffer'==f and'buffer'==type(g)then return
-setmemoryvalue(d,e,g,'qword')end if'vector'==f and'vector'==type(g)then local h=
-g.X or g[1]local i=g.Y or g[2]local j=g.Z or g[3]setmemoryvalue(d,e,h,'float')
-setmemoryvalue(d,e+4,i,'float')setmemoryvalue(d,e+8,j,'float')return true end
-return setmemoryvalue(d,e,g,f::any)end local e={}do function e.read(f:number|any
-,g:number|string,h:string?)if'table'==type(f)and rawget(f,'Data')then f=f.Data
-end if'userdata'==type(f)then assert('number'==type(g),`memory.read: offset must be a number, got {
-type(g)}`)assert('string'==type(h)or not h,`memory.read: data_type must be a string or nil, got {
+f=getmemoryvalue(c,d,'qword')return f and pointer_to_user_data(f)end if'object'
+==e then local f=getmemoryvalue(c,d,'qword')return f and Instance and Instance.
+new(pointer_to_user_data(f))end if'buffer'==e then local f=getmemoryvalue(c,d,
+'qword')return f and buffer.fromstring(string.pack('<I8',f))end if'vector'==e
+then local f=getmemoryvalue(c,d,'float')local g=getmemoryvalue(c,d+4,'float')
+local h=getmemoryvalue(c,d+8,'float')return vector.create(f,g,h)end return
+getmemoryvalue(c,d,e::any)end local d=function(d:any,e:number,f:string,g:any)if
+'color'==f and'table'==type(g)and g.dword then return setmemoryvalue(d,e,'dword'
+,g:dword())end if'userdata'==f then g=tostring(g)if'string'==type(g)and g:match
+'^0x'then g=tonumber(g:sub(3),16)end return setmemoryvalue(d,e,'qword',g)end if
+'object'==f and type(g)=='table'then g=tostring(g.Data)if'string'==type(g)and g:
+match'^0x'then g=tonumber(g:sub(3),16)end return setmemoryvalue(d,e,'qword',g)
+end if'buffer'==f and'buffer'==type(g)then return setmemoryvalue(d,e,g,'qword')
+end if'vector'==f and'vector'==type(g)then local h=g.X or g[1]local i=g.Y or g[2
+]local j=g.Z or g[3]setmemoryvalue(d,e,h,'float')setmemoryvalue(d,e+4,i,'float')
+setmemoryvalue(d,e+8,j,'float')return true end return setmemoryvalue(d,e,g,f::
+any)end local e={}do function e.read(f:number|any,g:number|string,h:string?)if
+'table'==type(f)and rawget(f,'Data')then f=f.Data end if'userdata'==type(f)then
+assert('number'==type(g),`memory.read: offset must be a number, got {type(g)}`)
+assert('string'==type(h)or not h,`memory.read: data_type must be a string or nil, got {
 type(h)}`)return c(f,g,h::any)end if'number'==type(f)then if'string'==type(g)
 then return c(pointer_to_user_data(f),0,g::any)else assert('number'==type(g),`memory.read: offset must be a number or a string, got {
 type(g)}`)assert('string'==type(h)or not h,`memory.read: data_type must be a string or nil, got {
@@ -236,18 +251,7 @@ and rawget(f,'Data')then f=f.Data end if'userdata'==type(f)then assert('number'
 return d(pointer_to_user_data(f),0,g::any,i)else assert('number'==type(g),`memory.write: offset must be a number or a string, got {
 type(g)}`)assert('string'==type(h)or not h,`memory.write: data_type must be a string or nil, got {
 type(h)}`)return d(pointer_to_user_data(f),g,h::any,i)end end return nil end end
-return e end function a.d()local b={}do local function constructor()return
-setmetatable({_map={}},{__index=b})end b.new=constructor function b.emit<T...>(c
-,...:T...)for d=#c,1,-1 do local e=c[d]if e then if'function'==type(e)then
-coroutine.wrap(e)(...)elseif'thread'==type(e)then coroutine.resume(e,...)end end
-end return c end function b.bind<T...>(c,d:(T...)->()):
-connection__DARKLUA_TYPE_a table.insert(c,d)return{unbind=function()local e=
-table.find(c,d)if e then table.remove(c,e)end end}end function b.once<T...>(c,d:
-(T...)->()):connection__DARKLUA_TYPE_a local e do e=c:bind(function(...)d(...)e:
-unbind()end)end return e end function b.wait<T...>(c):T...local d=coroutine.
-running()c:once(function(...)coroutine.resume(d,...)end)return coroutine.yield()
-end setmetatable(b,{__call=constructor})end return b end function a.e()return
-function(b,c)assert('table'==type(b),`map(t, callback): expected a table, got {
+return e end function a.e()return function(b,c)assert('table'==type(b),`map(t, callback): expected a table, got {
 type(b)}`)assert('function'==type(c),`map(t, callback): expected a function, got {
 type(c)}`)local d={}do for e,f in b do d[e]=c(f,e,b)end end return d end end
 function a.f()local b={}local c={__index=b}function c.__add(d,e)return b.new(d.x
@@ -308,7 +312,7 @@ return j end end end return rawget(e,f)or rawget(e,'Data')and e:FindFirstChild(f
 type(f)}`)do local h=e.ClassName local i=d.global[f]or(d[h]and d[h][f])if i and
 i.property and i.property.setter then return i.property.setter(e,g)end end
 return rawset(e,f,g)end end return c end function a.j()local b=a.load'e'local c=
-a.load'c'do _G.Vector3=a.load'f'_G.Vector2=a.load'g'_G.Color3=a.load'b'end local
+a.load'd'do _G.Vector3=a.load'f'_G.Vector2=a.load'g'_G.Color3=a.load'c'end local
 d=a.load'i'do local e=d.new do d.declare('property','global','Name',{getter=
 function(f)return getname(f.Data)end})d.declare('property','global','Parent',{
 getter=function(f)local g:any=getparent(f.Data)return g and e(g)end})d.declare(
@@ -423,5 +427,15 @@ type(h)}`)assert('number'==type(i),`MouseService:SmoothMouseLinear: sensitivity 
 type(i)}`)assert('number'==type(j),`MouseService:SmoothMouseLinear: smoothness must be a number, got {
 type(j)}`)local k=smoothmouse_linear(g,h,i,j)return vector.create(k.x,k.y)end)
 end end _G.Instance=d _G.workspace=d.new(Workspace)_G.game=d.new(Game)return{
-Instance=d,workspace=_G.workspace,game=_G.game}end end _G.websocket=a.load'a'_G.
-memory=a.load'c'_G.signal=a.load'd'a.load'j'
+Instance=d,workspace=_G.workspace,game=_G.game}end end _G.Signal=a.load'a'_G.
+websocket=a.load'b'_G.memory=a.load'd'_G.print=function(...)local b,c={...},
+select('#',...)local d=''for e=1,c do local f=b[e]if type(f)=='table'then if f.
+Name and f.Data then d=d..f.Name..' | 'end elseif type(f)=='userdata'then d=d..
+getname(f)..' | 'end local g=tostring(f)if type(g)~='string'then error
+"'tostring' must return a string - print function"end d=d..g..' 'end return
+print(d)end _G.warn=function(...)local b,c={...},select('#',...)local d=''for e=
+1,c do local f=b[e]if type(f)=='table'then if f.Name and f.Data then d=d..f.Name
+..' | 'end elseif type(f)=='userdata'then d=d..getname(f)..' | 'end local g=
+tostring(f)if type(g)~='string'then error
+"'tostring' must return a string - warn function"end d=d..g..' 'end return warn(
+d)end return a.load'j'

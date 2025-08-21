@@ -28,7 +28,7 @@ local Instance = {}; do
 
     function Instance.declare<T>(value: "property" | "method", class: string | { string }, name: string, definition: T | (self: typeof(Instance)) -> any)
         -- assertions --
-
+        
         assert("string" == type(name), `Instance.declare: name must be a string, got {type(name)}`)
         assert("property" == value or "method" == value, `Instance.declare: value must be "property" or "method", got {value}`)
         assert("table" == type(class) or "string" == type(class), `Instance.declare: class must be a string or a table of strings, got {type(class)}`)

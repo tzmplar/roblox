@@ -5,11 +5,9 @@ local memory = require("@external/modules/memory")
 
 ---- declarations ----
 
-do
-    _G.Vector3 = require("@roblox/classes/vector3");
-    _G.Vector2 = require("@roblox/classes/vector2");
-    _G.Color3 = require("@roblox/classes/color");
-end
+local Vector3 = require("@roblox/classes/vector3")
+local Vector2 = require("@roblox/classes/vector2")
+local CFrame  = require("@roblox/classes/cframe")
 
 local Instance = require("@roblox/classes/instance"); do
     local constructor = Instance.new
@@ -174,7 +172,7 @@ local Instance = require("@roblox/classes/instance"); do
             getter = function(self)
                 local size = getsize(self.Data)
 
-                return vector.create(size.x, size.y, size.z)
+                return Vector3.new(size.x, size.y, size.z)
             end
         })
 
@@ -182,7 +180,7 @@ local Instance = require("@roblox/classes/instance"); do
             getter = function(self)
                 local position = getposition(self.Data)
 
-                return vector.create(position.x, position.y, position.z)
+                return Vector3.new(position.x, position.y, position.z)
             end,
 
             setter = function(self, value: vector | { x: number, y: number, z: number })
@@ -199,12 +197,12 @@ local Instance = require("@roblox/classes/instance"); do
                 local right_vector = getrightvector(self.Data)
                 local look_vector = getlookvector(self.Data)
 
-                return {
-                    Position = vector.create(position.x, position.y, position.z),
-                    UpVector = vector.create(up_vector.x, up_vector.y, up_vector.z),
-                    RightVector = vector.create(right_vector.x, right_vector.y, right_vector.z),
-                    LookVector = vector.create(look_vector.x, look_vector.y, look_vector.z)
-                }
+                return CFrame.new(
+                    tonumber(position.x), tonumber(position.y), tonumber(position.z),
+                    tonumber(right_vector.x), tonumber(up_vector.x), -tonumber(look_vector.x) :: number,
+                    tonumber(right_vector.y), tonumber(up_vector.y), -tonumber(look_vector.y) :: number,
+                    tonumber(right_vector.z), tonumber(up_vector.z), -tonumber(look_vector.z) :: number
+                )
             end,
 
             setter = function(self, value: any)
@@ -297,7 +295,7 @@ local Instance = require("@roblox/classes/instance"); do
             getter = function(self)
                 local velocity = getvelocity(self.Data)
 
-                return vector.create(velocity.x, velocity.y, velocity.z)
+                return Vector3.new(velocity.x, velocity.y, velocity.z)
             end,
 
             setter = function(self, value: vector | { x: number, y: number, z: number })
@@ -378,12 +376,12 @@ local Instance = require("@roblox/classes/instance"); do
 
         Instance.declare("method", "MouseService", "GetMousePosition", function(self)
             local position = getmouseposition()
-            return vector.create(position.x, position.y)
+            return Vector2.new(position.x, position.y)
         end)
 
         Instance.declare("method", "MouseService", "GetMouseLocation", function(self)
             local location = getmouselocation(self.Data)
-            return vector.create(location.x, location.y)
+            return Vector2.new(location.x, location.y)
         end)
 
         Instance.declare("method", "MouseService", "GetMouseBehavior", function(self)
@@ -429,7 +427,7 @@ local Instance = require("@roblox/classes/instance"); do
             assert("number" == type(speed), `MouseService:SmoothMouseExponential: speed must be a number, got {type(speed)}`)
             
             local result = smoothmouse_exponential(origin, point, speed)
-            return vector.create(result.x, result.y)
+            return Vector2.new(result.x, result.y)
         end)
 
         Instance.declare("method", "MouseService", "SmoothMouseLinear", function(self, origin, point, sensitivity, smoothness)
@@ -439,7 +437,7 @@ local Instance = require("@roblox/classes/instance"); do
             assert("number" == type(smoothness), `MouseService:SmoothMouseLinear: smoothness must be a number, got {type(smoothness)}`)
             
             local result = smoothmouse_linear(origin, point, sensitivity, smoothness)
-            return vector.create(result.x, result.y)
+            return Vector2.new(result.x, result.y)
         end)
     end
 end
@@ -453,8 +451,4 @@ _G.game = Instance.new(Game)
 
 ---- exports ----
 
-return {
-    Instance  = Instance,
-    workspace = _G.workspace,
-    game      = _G.game
-}
+return Instance
