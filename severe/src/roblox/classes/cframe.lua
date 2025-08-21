@@ -389,15 +389,15 @@ do
 
 		if nil ~= vZ then assert(isVector3(vZ), `CFrame.fromMatrix: expected Vector3 for vZ, got {type(vZ)}`) end
 
-		local xCol = vX
-		local yCol = vY
-		local zCol = vZ or xCol:cross(yCol).unit
+		local x = vX
+		local y = vY
+		local z = vZ or x:cross(y).unit
 
 		return constructor(
 			pos.x, pos.y, pos.z,
-			xCol.x, yCol.x, zCol.x,
-			xCol.y, yCol.y, zCol.y,
-			xCol.z, yCol.z, zCol.z
+			x.x, y.x, z.x,
+			x.y, y.y, z.y,
+			x.z, y.z, z.z
 		)
 	end
 

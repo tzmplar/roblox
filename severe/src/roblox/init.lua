@@ -198,7 +198,7 @@ local Instance = require("@roblox/classes/instance"); do
                 local look_vector = getlookvector(self.Data)
 
                 return CFrame.new(
-                    tonumber(position.x), tonumber(position.y), tonumber(position.z),
+                    tonumber(position.x),     tonumber(position.y),   tonumber(position.z),
                     tonumber(right_vector.x), tonumber(up_vector.x), -tonumber(look_vector.x) :: number,
                     tonumber(right_vector.y), tonumber(up_vector.y), -tonumber(look_vector.y) :: number,
                     tonumber(right_vector.z), tonumber(up_vector.z), -tonumber(look_vector.z) :: number
@@ -207,6 +207,42 @@ local Instance = require("@roblox/classes/instance"); do
 
             setter = function(self, value: any)
                 setcframe(self.Data, value)
+            end
+        })
+
+        Instance.declare("property", { "UnionOperation", "MeshPart", "TrussPart", "Part" }, "Rotation", {
+            getter = function(self)
+                local up_vector = getupvector(self.Data)
+                local right_vector = getrightvector(self.Data)
+                local look_vector = getlookvector(self.Data)
+
+                local cf = CFrame.fromMatrix(
+                    Vector3.zero,
+                    Vector3.new(right_vector.x, right_vector.y, right_vector.z),
+                    Vector3.new(up_vector.x, up_vector.y, up_vector.z),
+                    -Vector3.new(look_vector.x, look_vector.y, look_vector.z)
+                )
+
+                local rx, ry, rz = cf:ToEulerAnglesXYZ()
+                return Vector3.new(math.deg(rx), math.deg(ry), math.deg(rz))
+            end,
+
+            setter = function(self, value: any)
+                assert(type(value) == "table" and getmetatable(value) == "Vector3", `Instance.Rotation: value must be a Vector3`)
+
+                local rx = math.rad(value.x)
+                local ry = math.rad(value.y)
+                local rz = math.rad(value.z)
+
+                local rot = CFrame.fromEulerAnglesXYZ(rx, ry, rz)
+
+                local right = Vector3.new(rot.r00, rot.r10, rot.r20)
+                local up    = Vector3.new(rot.r01, rot.r11, rot.r21)
+                local look  = Vector3.new(-rot.r02, -rot.r12, -rot.r22)
+
+                setrightvector(self.Data, right)
+                setupvector(self.Data, up)
+                setlookvector(self.Data, look)
             end
         })
 
