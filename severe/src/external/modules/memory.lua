@@ -23,12 +23,11 @@ local get = function(pointer: any, offset: number, spec: string)
         local q = getmemoryvalue(pointer, offset, "qword")
         local userdata = q and pointer_to_user_data(q)
 
-        return userdata and "none" ~= getclassname(userdata):lower() and Instance.new(userdata)
+        return userdata and Instance.new(userdata)
     end
 
     if "buffer" == spec then
         local q = getmemoryvalue(pointer, offset, "qword")
-
         return q and buffer.fromstring(string.pack("<I8", q))
     end
 
