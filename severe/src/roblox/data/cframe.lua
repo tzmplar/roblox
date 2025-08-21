@@ -1,6 +1,6 @@
 ---- environment ----
 
-local Vector3             = require("@roblox/classes/vector3")
+local Vector3             = require("@roblox/data/vector3")
 local abs, sqrt, sin, cos = math.abs, math.sqrt, math.sin, math.cos
 local acos, atan, clamp   = math.acos, math.atan2, math.clamp
 

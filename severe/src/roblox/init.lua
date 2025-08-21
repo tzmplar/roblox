@@ -2,12 +2,22 @@
 
 local map    = require("@external/functions/map")
 local memory = require("@external/modules/memory")
-
----- declarations ----
+local http   = require("@external/modules/http")
+local json   = require("@external/modules/json")
 
 local Vector3 = require("@roblox/data/vector3")
 local Vector2 = require("@roblox/data/vector2")
 local CFrame  = require("@roblox/data/cframe")
+
+---- variables ----
+
+local dump; do
+    http.get({ "https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/refs/heads/roblox/Full-API-Dump.json", "application/json" }, function(response)
+        dump = json.decode(response)
+    end)
+end
+
+---- declarations ----
 
 local Instance = require("@roblox/classes/instance"); do
     local constructor = Instance.new
@@ -121,17 +131,16 @@ local Instance = require("@roblox/classes/instance"); do
             return userdata and constructor(userdata)
         end)
 
-        Instance.declare("method", "DataModel", "HttpGet", function(self, url: string)
+        Instance.declare("method", "DataModel", "HttpGet", function(self, url: string, ...)
             assert("string" == type(url), `DataModel:HttpGet: url must be a string, got {type(url)}`)
 
-            return httpget(url)
+            return httpget(url, ...)
         end)
 
-        Instance.declare("method", "DataModel", "HttpPost", function(self, url: string, data: string, ...)
+        Instance.declare("method", "DataModel", "HttpPost", function(self, url: string, ...)
             assert("string" == type(url), `DataModel:HttpPost: url must be a string, got {type(url)}`)
-            assert("string" == type(data), `DataModel:HttpPost: data must be a string, got {type(data)}`)
 
-            return httppost(url, data, ...)
+            return httppost(url, ...)
         end)
     end
 
@@ -141,13 +150,13 @@ local Instance = require("@roblox/classes/instance"); do
         Instance.declare("method", "HttpService", "JSONEncode", function(self, value: any)
             assert("table" == type(value), `HttpService:JSONEncode: value must be a table, got {type(value)}`)
 
-            return JSONEncode(value)
+            return json.encode(value)
         end)
 
         Instance.declare("method", "HttpService", "JSONDecode", function(self, value: string)
             assert("string" == type(value), `HttpService:JSONDecode: value must be a string, got {type(value)}`)
 
-            return JSONDecode(value)
+            return json.decode(value)
         end)
     end
 

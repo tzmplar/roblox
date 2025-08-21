@@ -1,13 +1,15 @@
 ---- environment ----
 
-local color = require("@roblox/classes/color")
+local Color3 = require("@roblox/data/color")
+local Vector2 = require("@roblox/data/vector2")
+local Vector3 = require("@roblox/data/vector3")
 
 ---- functions ----
 
 local get = function(pointer: any, offset: number, spec: string)
     if "color" == spec then
         local dword = getmemoryvalue(pointer, offset, "dword")
-        return dword and color.dword(dword)
+        return dword and Color3.dword(dword)
     end
 
     if "userdata" == spec then
@@ -36,6 +38,21 @@ local get = function(pointer: any, offset: number, spec: string)
         local z = getmemoryvalue(pointer, offset + 8, "float")
 
         return vector.create(x, y, z)
+    end
+
+    if "Vector2" == spec then
+        local x = getmemoryvalue(pointer,     offset, "float")
+        local y = getmemoryvalue(pointer, offset + 4, "float")
+
+        return Vector2.create(x, y)
+    end
+
+    if "Vector3" == spec then
+        local x = getmemoryvalue(pointer,     offset, "float")
+        local y = getmemoryvalue(pointer, offset + 4, "float")
+        local z = getmemoryvalue(pointer, offset + 8, "float")
+
+        return Vector3.create(x, y, z)
     end
 
     return getmemoryvalue(pointer, offset, spec :: any)
