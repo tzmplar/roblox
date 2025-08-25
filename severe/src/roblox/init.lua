@@ -2,14 +2,22 @@
 
 local map    = require("@external/functions/map")
 local memory = require("@external/modules/memory")
+local http   = require("@external/modules/http")
+local json   = require("@external/modules/json")
+
+local Vector3 = require("@roblox/data/vector3")
+local Vector2 = require("@roblox/data/vector2")
+local CFrame  = require("@roblox/data/cframe")
+
+---- variables ----
+
+local dump; do
+    http.get({ "https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/refs/heads/roblox/Full-API-Dump.json", "application/json" }, function(response)
+        dump = json.decode(response)
+    end)
+end
 
 ---- declarations ----
-
-do
-    _G.Vector3 = require("@roblox/classes/vector3");
-    _G.Vector2 = require("@roblox/classes/vector2");
-    _G.Color3 = require("@roblox/classes/color");
-end
 
 local Instance = require("@roblox/classes/instance"); do
     local constructor = Instance.new
@@ -123,17 +131,16 @@ local Instance = require("@roblox/classes/instance"); do
             return userdata and constructor(userdata)
         end)
 
-        Instance.declare("method", "DataModel", "HttpGet", function(self, url: string)
+        Instance.declare("method", "DataModel", "HttpGet", function(self, url: string, ...)
             assert("string" == type(url), `DataModel:HttpGet: url must be a string, got {type(url)}`)
 
-            return httpget(url)
+            return httpget(url, ...)
         end)
 
-        Instance.declare("method", "DataModel", "HttpPost", function(self, url: string, data: string, ...)
+        Instance.declare("method", "DataModel", "HttpPost", function(self, url: string, ...)
             assert("string" == type(url), `DataModel:HttpPost: url must be a string, got {type(url)}`)
-            assert("string" == type(data), `DataModel:HttpPost: data must be a string, got {type(data)}`)
 
-            return httppost(url, data, ...)
+            return httppost(url, ...)
         end)
     end
 
@@ -143,13 +150,13 @@ local Instance = require("@roblox/classes/instance"); do
         Instance.declare("method", "HttpService", "JSONEncode", function(self, value: any)
             assert("table" == type(value), `HttpService:JSONEncode: value must be a table, got {type(value)}`)
 
-            return JSONEncode(value)
+            return json.encode(value)
         end)
 
         Instance.declare("method", "HttpService", "JSONDecode", function(self, value: string)
             assert("string" == type(value), `HttpService:JSONDecode: value must be a string, got {type(value)}`)
 
-            return JSONDecode(value)
+            return json.decode(value)
         end)
     end
 
@@ -174,7 +181,7 @@ local Instance = require("@roblox/classes/instance"); do
             getter = function(self)
                 local size = getsize(self.Data)
 
-                return vector.create(size.x, size.y, size.z)
+                return Vector3.new(size.x, size.y, size.z)
             end
         })
 
@@ -182,7 +189,7 @@ local Instance = require("@roblox/classes/instance"); do
             getter = function(self)
                 local position = getposition(self.Data)
 
-                return vector.create(position.x, position.y, position.z)
+                return Vector3.new(position.x, position.y, position.z)
             end,
 
             setter = function(self, value: vector | { x: number, y: number, z: number })
@@ -199,16 +206,52 @@ local Instance = require("@roblox/classes/instance"); do
                 local right_vector = getrightvector(self.Data)
                 local look_vector = getlookvector(self.Data)
 
-                return {
-                    Position = vector.create(position.x, position.y, position.z),
-                    UpVector = vector.create(up_vector.x, up_vector.y, up_vector.z),
-                    RightVector = vector.create(right_vector.x, right_vector.y, right_vector.z),
-                    LookVector = vector.create(look_vector.x, look_vector.y, look_vector.z)
-                }
+                return CFrame.new(
+                    tonumber(position.x),     tonumber(position.y),   tonumber(position.z),
+                    tonumber(right_vector.x), tonumber(up_vector.x), -tonumber(look_vector.x) :: number,
+                    tonumber(right_vector.y), tonumber(up_vector.y), -tonumber(look_vector.y) :: number,
+                    tonumber(right_vector.z), tonumber(up_vector.z), -tonumber(look_vector.z) :: number
+                )
             end,
 
             setter = function(self, value: any)
                 setcframe(self.Data, value)
+            end
+        })
+
+        Instance.declare("property", { "UnionOperation", "MeshPart", "TrussPart", "Part" }, "Rotation", {
+            getter = function(self)
+                local up_vector = getupvector(self.Data)
+                local right_vector = getrightvector(self.Data)
+                local look_vector = getlookvector(self.Data)
+
+                local cf = CFrame.fromMatrix(
+                    Vector3.zero,
+                    Vector3.new(right_vector.x, right_vector.y, right_vector.z),
+                    Vector3.new(up_vector.x, up_vector.y, up_vector.z),
+                    -Vector3.new(look_vector.x, look_vector.y, look_vector.z)
+                )
+
+                local rx, ry, rz = cf:ToEulerAnglesXYZ()
+                return Vector3.new(math.deg(rx), math.deg(ry), math.deg(rz))
+            end,
+
+            setter = function(self, value: any)
+                assert(type(value) == "table" and getmetatable(value) == "Vector3", `Instance.Rotation: value must be a Vector3`)
+
+                local rx = math.rad(value.x)
+                local ry = math.rad(value.y)
+                local rz = math.rad(value.z)
+
+                local rot = CFrame.fromEulerAnglesXYZ(rx, ry, rz)
+
+                local right = Vector3.new(rot.r00, rot.r10, rot.r20)
+                local up    = Vector3.new(rot.r01, rot.r11, rot.r21)
+                local look  = Vector3.new(-rot.r02, -rot.r12, -rot.r22)
+
+                setrightvector(self.Data, right)
+                setupvector(self.Data, up)
+                setlookvector(self.Data, look)
             end
         })
 
@@ -297,7 +340,7 @@ local Instance = require("@roblox/classes/instance"); do
             getter = function(self)
                 local velocity = getvelocity(self.Data)
 
-                return vector.create(velocity.x, velocity.y, velocity.z)
+                return Vector3.new(velocity.x, velocity.y, velocity.z)
             end,
 
             setter = function(self, value: vector | { x: number, y: number, z: number })
@@ -378,12 +421,12 @@ local Instance = require("@roblox/classes/instance"); do
 
         Instance.declare("method", "MouseService", "GetMousePosition", function(self)
             local position = getmouseposition()
-            return vector.create(position.x, position.y)
+            return Vector2.new(position.x, position.y)
         end)
 
         Instance.declare("method", "MouseService", "GetMouseLocation", function(self)
             local location = getmouselocation(self.Data)
-            return vector.create(location.x, location.y)
+            return Vector2.new(location.x, location.y)
         end)
 
         Instance.declare("method", "MouseService", "GetMouseBehavior", function(self)
@@ -429,7 +472,7 @@ local Instance = require("@roblox/classes/instance"); do
             assert("number" == type(speed), `MouseService:SmoothMouseExponential: speed must be a number, got {type(speed)}`)
             
             local result = smoothmouse_exponential(origin, point, speed)
-            return vector.create(result.x, result.y)
+            return Vector2.new(result.x, result.y)
         end)
 
         Instance.declare("method", "MouseService", "SmoothMouseLinear", function(self, origin, point, sensitivity, smoothness)
@@ -439,7 +482,7 @@ local Instance = require("@roblox/classes/instance"); do
             assert("number" == type(smoothness), `MouseService:SmoothMouseLinear: smoothness must be a number, got {type(smoothness)}`)
             
             local result = smoothmouse_linear(origin, point, sensitivity, smoothness)
-            return vector.create(result.x, result.y)
+            return Vector2.new(result.x, result.y)
         end)
     end
 end
@@ -447,14 +490,13 @@ end
 ---- globalization ----
 
 _G.Instance = Instance
+_G.Vector3 = Vector3
+_G.Vector2 = Vector2
+_G.CFrame = CFrame
 
 _G.workspace = Instance.new(Workspace)
 _G.game = Instance.new(Game)
 
 ---- exports ----
 
-return {
-    Instance  = Instance,
-    workspace = _G.workspace,
-    game      = _G.game
-}
+return Instance

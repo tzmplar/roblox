@@ -1,30 +1,33 @@
 ---- environment ----
 
-local color = require("@roblox/classes/color")
+local Color3 = require("@roblox/data/color")
+local Vector2 = require("@roblox/data/vector2")
+local Vector3 = require("@roblox/data/vector3")
 
 ---- functions ----
 
 local get = function(pointer: any, offset: number, spec: string)
     if "color" == spec then
         local dword = getmemoryvalue(pointer, offset, "dword")
-        return dword and color.dword(dword)
+        return dword and Color3.dword(dword)
     end
 
     if "userdata" == spec then
         local q = getmemoryvalue(pointer, offset, "qword")
-
         return q and pointer_to_user_data(q)
     end
 
     if "object" == spec then
-        local q = getmemoryvalue(pointer, offset, "qword")
+        assert(Instance, `memory.get: 'Instance' is not available, can't read object`)
 
-        return q and Instance and Instance.new(pointer_to_user_data(q))
+        local q = getmemoryvalue(pointer, offset, "qword")
+        local userdata = q and pointer_to_user_data(q)
+
+        return userdata and Instance.new(userdata)
     end
 
     if "buffer" == spec then
         local q = getmemoryvalue(pointer, offset, "qword")
-
         return q and buffer.fromstring(string.pack("<I8", q))
     end
 
@@ -34,6 +37,21 @@ local get = function(pointer: any, offset: number, spec: string)
         local z = getmemoryvalue(pointer, offset + 8, "float")
 
         return vector.create(x, y, z)
+    end
+
+    if "Vector2" == spec then
+        local x = getmemoryvalue(pointer,     offset, "float")
+        local y = getmemoryvalue(pointer, offset + 4, "float")
+
+        return Vector2.create(x, y)
+    end
+
+    if "Vector3" == spec then
+        local x = getmemoryvalue(pointer,     offset, "float")
+        local y = getmemoryvalue(pointer, offset + 4, "float")
+        local z = getmemoryvalue(pointer, offset + 8, "float")
+
+        return Vector3.create(x, y, z)
     end
 
     return getmemoryvalue(pointer, offset, spec :: any)
@@ -54,7 +72,7 @@ local set = function(pointer: any, offset: number, spec: string, value: any)
         return setmemoryvalue(pointer, offset, "qword", value)
     end
 
-    if "object" == spec and type(value) == "table" then
+    if "object" == spec and type(value) == "table" and value.Data then
         value = tostring(value.Data)
         
         if "string" == type(value) and value:match("^0x") then
@@ -80,6 +98,28 @@ local set = function(pointer: any, offset: number, spec: string, value: any)
         return true
     end
 
+    if "Vector2" == spec and type(value) == "table" and "Vector2" == getmetatable(value) then
+        local x = value.X or value[1]
+        local y = value.Y or value[2]
+
+        setmemoryvalue(pointer,     offset, x, "float")
+        setmemoryvalue(pointer, offset + 4, y, "float")
+
+        return true
+    end
+
+    if "Vector3" == spec and type(value) == "table" and "Vector3" == getmetatable(value) then
+        local x = value.X or value[1]
+        local y = value.Y or value[2]
+        local z = value.Z or value[3]
+
+        setmemoryvalue(pointer,     offset, x, "float")
+        setmemoryvalue(pointer, offset + 4, y, "float")
+        setmemoryvalue(pointer, offset + 8, z, "float")
+
+        return true
+    end
+
     return setmemoryvalue(pointer, offset, value, spec :: any)
 end
 
@@ -93,7 +133,7 @@ local memory = {}; do
 
         if "userdata" == type(pointer) then
             assert("number" == type(offset), `memory.read: offset must be a number, got {type(offset)}`)
-            assert("string" == type(spec) or not spec, `memory.read: data_type must be a string or nil, got {type(spec)}`)
+            assert("string" == type(spec) or not spec, `memory.read: spec must be a string or nil, got {type(spec)}`)
 
             return get(pointer, offset, spec :: any)
         end
@@ -103,7 +143,7 @@ local memory = {}; do
                 return get(pointer_to_user_data(pointer), 0, offset :: any)
             else
                 assert("number" == type(offset), `memory.read: offset must be a number or a string, got {type(offset)}`)
-                assert("string" == type(spec) or not spec, `memory.read: data_type must be a string or nil, got {type(spec)}`)
+                assert("string" == type(spec) or not spec, `memory.read: spec must be a string or nil, got {type(spec)}`)
 
                 return get(pointer_to_user_data(pointer), offset, spec :: any)
             end 
@@ -112,16 +152,16 @@ local memory = {}; do
         return nil
     end
 
-    function memory.write(pointer: number | any, offset: number | string, data_type: string?, value: any)
+    function memory.write(pointer: number | any, offset: number | string, spec: string?, value: any)
         if "table" == type(pointer) and rawget(pointer, "Data") then
             pointer = pointer.Data
         end
 
         if "userdata" == type(pointer) then
             assert("number" == type(offset), `memory.write: offset must be a number, got {type(offset)}`)
-            assert("string" == type(data_type) or not data_type, `memory.write: data_type must be a string or nil, got {type(data_type)}`)
+            assert("string" == type(spec) or not spec, `memory.write: spec must be a string or nil, got {type(spec)}`)
 
-            return set(pointer, offset, data_type :: any, value)
+            return set(pointer, offset, spec :: any, value)
         end
 
         if "number" == type(pointer) then
@@ -129,9 +169,9 @@ local memory = {}; do
                 return set(pointer_to_user_data(pointer), 0, offset :: any, value)
             else
                 assert("number" == type(offset), `memory.write: offset must be a number or a string, got {type(offset)}`)
-                assert("string" == type(data_type) or not data_type, `memory.write: data_type must be a string or nil, got {type(data_type)}`)
+                assert("string" == type(spec) or not spec, `memory.write: spec must be a string or nil, got {type(spec)}`)
 
-                return set(pointer_to_user_data(pointer), offset, data_type :: any, value)
+                return set(pointer_to_user_data(pointer), offset, spec :: any, value)
             end
         end
 

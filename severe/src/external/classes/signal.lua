@@ -1,6 +1,6 @@
 ---- definitions ----
 
-type connection = { unbind: () -> () }
+type connection = { disconnect: () -> () }
 
 ---- module ----
 
@@ -17,7 +17,7 @@ local signal = {}; do
 
 	--- public methods ---
 
-	function signal:emit<T...>(...: T...)
+	function signal:fire<T...>(...: T...)
 		for i = #self, 1, -1 do
 			local callback = self[i]
 
@@ -33,11 +33,11 @@ local signal = {}; do
 		return self
 	end
 
-	function signal:bind<T...>(f: (T...) -> ()): connection
+	function signal:connect<T...>(f: (T...) -> ()): connection
 		table.insert(self, f)
 
 		return {
-			unbind = function()
+			disconnect = function()
 				local index = table.find(self, f)
 
 				if index then
@@ -49,10 +49,10 @@ local signal = {}; do
 
 	function signal:once<T...>(f: (T...) -> ()): connection
 		local connection; do
-			connection = self:bind(function(...)
+			connection = self:connect(function(...)
 				f(...)
 
-				connection:unbind()
+				connection:disconnect()
 			end)
 		end
 

@@ -1,4 +1,3 @@
-
 return function(t, into): any
     if not t then return into end
     if not into then return t end
