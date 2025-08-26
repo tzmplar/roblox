@@ -308,33 +308,33 @@ function(e:any,f:number,g:string)if'color'==g then local h=getmemoryvalue(e,f,
 ,f,'qword')return h and pointer_to_user_data(h)end if'object'==g then assert(
 Instance,`memory.get: 'Instance' is not available, can't read object`)local h=
 getmemoryvalue(e,f,'qword')local i=h and pointer_to_user_data(h)return i and
-'none'~=getclassname(i):lower()and Instance.new(i)end if'buffer'==g then local h
-=getmemoryvalue(e,f,'qword')return h and buffer.fromstring(string.pack('<I8',h))
-end if'vector'==g then local h=getmemoryvalue(e,f,'float')local i=
-getmemoryvalue(e,f+4,'float')local j=getmemoryvalue(e,f+8,'float')return vector.
-create(h,i,j)end if'Vector2'==g then local h=getmemoryvalue(e,f,'float')local i=
-getmemoryvalue(e,f+4,'float')return c.create(h,i)end if'Vector3'==g then local h
-=getmemoryvalue(e,f,'float')local i=getmemoryvalue(e,f+4,'float')local j=
-getmemoryvalue(e,f+8,'float')return d.create(h,i,j)end return getmemoryvalue(e,f
-,g::any)end local f=function(f:any,g:number,h:string,i:any)if'color'==h and
-'table'==type(i)and i.dword then return setmemoryvalue(f,g,'dword',i:dword())end
-if'userdata'==h then i=tostring(i)if'string'==type(i)and i:match'^0x'then i=
-tonumber(i:sub(3),16)end return setmemoryvalue(f,g,'qword',i)end if'object'==h
-and type(i)=='table'and i.Data then i=tostring(i.Data)if'string'==type(i)and i:
-match'^0x'then i=tonumber(i:sub(3),16)end return setmemoryvalue(f,g,'qword',i)
-end if'buffer'==h and'buffer'==type(i)then return setmemoryvalue(f,g,i,'qword')
-end if'vector'==h and'vector'==type(i)then local j=i.X or i[1]local k=i.Y or i[2
-]local l=i.Z or i[3]setmemoryvalue(f,g,j,'float')setmemoryvalue(f,g+4,k,'float')
-setmemoryvalue(f,g+8,l,'float')return true end if'Vector2'==h and type(i)==
-'table'and'Vector2'==getmetatable(i)then local j=i.X or i[1]local k=i.Y or i[2]
-setmemoryvalue(f,g,j,'float')setmemoryvalue(f,g+4,k,'float')return true end if
-'Vector3'==h and type(i)=='table'and'Vector3'==getmetatable(i)then local j=i.X
-or i[1]local k=i.Y or i[2]local l=i.Z or i[3]setmemoryvalue(f,g,j,'float')
-setmemoryvalue(f,g+4,k,'float')setmemoryvalue(f,g+8,l,'float')return true end
-return setmemoryvalue(f,g,i,h::any)end local g={}do function g.read(h:number|any
-,i:number|string,j:string?)if'table'==type(h)and rawget(h,'Data')then h=h.Data
-end if'userdata'==type(h)then assert('number'==type(i),`memory.read: offset must be a number, got {
-type(i)}`)assert('string'==type(j)or not j,`memory.read: spec must be a string or nil, got {
+Instance.new(i)end if'buffer'==g then local h=getmemoryvalue(e,f,'qword')return
+h and buffer.fromstring(string.pack('<I8',h))end if'vector'==g then local h=
+getmemoryvalue(e,f,'float')local i=getmemoryvalue(e,f+4,'float')local j=
+getmemoryvalue(e,f+8,'float')return vector.create(h,i,j)end if'Vector2'==g then
+local h=getmemoryvalue(e,f,'float')local i=getmemoryvalue(e,f+4,'float')return c
+.create(h,i)end if'Vector3'==g then local h=getmemoryvalue(e,f,'float')local i=
+getmemoryvalue(e,f+4,'float')local j=getmemoryvalue(e,f+8,'float')return d.
+create(h,i,j)end return getmemoryvalue(e,f,g::any)end local f=function(f:any,g:
+number,h:string,i:any)if'color'==h and'table'==type(i)and i.dword then return
+setmemoryvalue(f,g,'dword',i:dword())end if'userdata'==h then i=tostring(i)if
+'string'==type(i)and i:match'^0x'then i=tonumber(i:sub(3),16)end return
+setmemoryvalue(f,g,'qword',i)end if'object'==h and type(i)=='table'and i.Data
+then i=tostring(i.Data)if'string'==type(i)and i:match'^0x'then i=tonumber(i:sub(
+3),16)end return setmemoryvalue(f,g,'qword',i)end if'buffer'==h and'buffer'==
+type(i)then return setmemoryvalue(f,g,i,'qword')end if'vector'==h and'vector'==
+type(i)then local j=i.X or i[1]local k=i.Y or i[2]local l=i.Z or i[3]
+setmemoryvalue(f,g,j,'float')setmemoryvalue(f,g+4,k,'float')setmemoryvalue(f,g+8
+,l,'float')return true end if'Vector2'==h and type(i)=='table'and'Vector2'==
+getmetatable(i)then local j=i.X or i[1]local k=i.Y or i[2]setmemoryvalue(f,g,j,
+'float')setmemoryvalue(f,g+4,k,'float')return true end if'Vector3'==h and type(i
+)=='table'and'Vector3'==getmetatable(i)then local j=i.X or i[1]local k=i.Y or i[
+2]local l=i.Z or i[3]setmemoryvalue(f,g,j,'float')setmemoryvalue(f,g+4,k,'float'
+)setmemoryvalue(f,g+8,l,'float')return true end return setmemoryvalue(f,g,i,h::
+any)end local g={}do function g.read(h:number|any,i:number|string,j:string?)if
+'table'==type(h)and rawget(h,'Data')then h=h.Data end if'userdata'==type(h)then
+assert('number'==type(i),`memory.read: offset must be a number, got {type(i)}`)
+assert('string'==type(j)or not j,`memory.read: spec must be a string or nil, got {
 type(j)}`)return e(h,i,j::any)end if'number'==type(h)then if'string'==type(i)
 then return e(pointer_to_user_data(h),0,i::any)else assert('number'==type(i),`memory.read: offset must be a number or a string, got {
 type(i)}`)assert('string'==type(j)or not j,`memory.read: spec must be a string or nil, got {
@@ -351,63 +351,64 @@ return g end function a.g()return{decode=function(b)return JSONDecode(b)end,
 encode=function(b)return JSONEncode(b)end}end function a.h()return{get=function(
 b,c)assert('table'==type(b),`http.get: settings must be a table, got {type(b)}`)
 assert('function'==type(c),`http.get: callback must be a function, got {type(c)}`
-)spawn(function()return c(httpget(unpack(b)))end)end,post=function(b,c)assert(
-'table'==type(b),`http.get: settings must be a table, got {type(b)}`)assert(
-'function'==type(c),`http.get: callback must be a function, got {type(c)}`)
-spawn(function()return c(httpget(unpack(b)))end)end}end function a.i()return
-function(b,c)assert('table'==type(b),`map(t, callback): expected a table, got {
-type(b)}`)assert('function'==type(c),`map(t, callback): expected a function, got {
-type(c)}`)local d={}do for e,f in b do d[e]=c(f,e,b)end end return d end end
-function a.j()local b=a.load'e'local c,d,e,f=math.abs,math.sqrt,math.sin,math.
-cos local g,h,i=math.acos,math.atan2,math.clamp local function isVector3(j)
-return'table'==type(j)and getmetatable(j)=='Vector3'end local function isCFrame(
-j)return'table'==type(j)and getmetatable(j)=='CFrame'end local j={}do
-local function constructor(k:number,l:number,m:number,n:number?,o:number?,p:
-number?,q:number?,r:number?,s:number?,t:number?,u:number?,v:number?)assert(
-'number'==type(k),`CFrame.new: expected a number for x, got {type(k)}`)assert(
-'number'==type(l),`CFrame.new: expected a number for y, got {type(l)}`)assert(
-'number'==type(m),`CFrame.new: expected a number for z, got {type(m)}`)n=n or 1
-o=o or 0 p=p or 0 q=q or 0 r=r or 1 s=s or 0 t=t or 0 u=u or 0 v=v or 1 return
-setmetatable({x=k,y=l,z=m,r00=n,r01=o,r02=p,r10=q,r11=r,r12=s,r20=t,r21=u,r22=v}
-,j)end local function fromQuaternion(k,l,m,n,o,p,q)local r=d(n*n+o*o+p*p+q*q)if
-r==0 then return constructor(k,l,m)end n,o,p,q=n/r,o/r,p/r,q/r local s,t,u=n*n,o
-*o,p*p local v,w,x=n*o,n*p,o*p local y,z,A=q*n,q*o,q*p local B=1-2*(t+u)local C=
-2*(v+A)local D=2*(w-z)local E=2*(v-A)local F=1-2*(s+u)local G=2*(x+y)local H=2*(
-w+z)local I=2*(x-y)local J=1-2*(s+t)return constructor(k,l,m,B,C,D,E,F,G,H,I,J)
-end local function toQuaternion(k)local l,m,n=k.r00,k.r01,k.r02 local o,p,q=k.
-r10,k.r11,k.r12 local r,s,t=k.r20,k.r21,k.r22 local u=l+p+t local v,w,x,y if u>0
-then local z=d(u+1)*2 v=0.25*z w=(s-q)/z x=(n-r)/z y=(o-m)/z elseif l>p and l>t
-then local z=d(1+l-p-t)*2 v=(s-q)/z w=0.25*z x=(m+o)/z y=(n+r)/z elseif p>t then
-local z=d(1+p-l-t)*2 v=(n-r)/z w=(m+o)/z x=0.25*z y=(q+s)/z else local z=d(1+t-l
--p)*2 v=(o-m)/z w=(n+r)/z x=(q+s)/z y=0.25*z end local z=d(w*w+x*x+y*y+v*v)if z
-==0 then return 0,0,0,1 end return w/z,x/z,y/z,v/z end local function slerp(k,l,
-m,n,o,p,q,r,s)local t=k*o+l*p+m*q+n*r if t<0 then o,p,q,r=-o,-p,-q,-r t=-t end
-local u=1e-6 if t>1-u then local v=k+(o-k)*s local w=l+(p-l)*s local x=m+(q-m)*s
-local y=n+(r-n)*s local z=d(v*v+w*w+x*x+y*y)return v/z,w/z,x/z,y/z end local v=
-g(i(t,-1,1))local w=e(v)local x=v*s local y=e(x)local z=f(x)-t*y/w local A=y/w
-local B=z*k+A*o local C=z*l+A*p local D=z*m+A*q local E=z*n+A*r return B,C,D,E
-end local function matMul(k,l)return k.r00*l.r00+k.r01*l.r10+k.r02*l.r20,k.r00*l
-.r01+k.r01*l.r11+k.r02*l.r21,k.r00*l.r02+k.r01*l.r12+k.r02*l.r22,k.r10*l.r00+k.
-r11*l.r10+k.r12*l.r20,k.r10*l.r01+k.r11*l.r11+k.r12*l.r21,k.r10*l.r02+k.r11*l.
-r12+k.r12*l.r22,k.r20*l.r00+k.r21*l.r10+k.r22*l.r20,k.r20*l.r01+k.r21*l.r11+k.
-r22*l.r21,k.r20*l.r02+k.r21*l.r12+k.r22*l.r22 end local function rotTranspose(k)
-return k.r00,k.r10,k.r20,k.r01,k.r11,k.r21,k.r02,k.r12,k.r22 end local function
-rotateVec(k,l)return b.new(k.r00*l.x+k.r01*l.y+k.r02*l.z,k.r10*l.x+k.r11*l.y+k.
-r12*l.z,k.r20*l.x+k.r21*l.y+k.r22*l.z)end local function rotateVecT(k,l)return b
-.new(k.r00*l.x+k.r10*l.y+k.r20*l.z,k.r01*l.x+k.r11*l.y+k.r21*l.z,k.r02*l.x+k.r12
-*l.y+k.r22*l.z)end local function columnsFromEuler(k,l,m,n)n=string.upper(n or
-'XYZ')local o,p=f(k),e(k)local q,r=f(l),e(l)local s,t=f(m),e(m)local function
-matXYZ()local u=q*s local v=o*t+p*r*s local w=p*t-o*r*s local x=-q*t local y=o*s
--p*r*t local z=p*s+o*r*t local A=r local B=-p*q local C=o*q return u,v,w,x,y,z,A
-,B,C end local function matYXZ()local u=q*s+r*p*t local v=o*t local w=q*p*t-r*s
-local x=r*s-q*p*t local y=o*s local z=r*p*t+q*s local A=p*r local B=-p local C=o
-*q return u,v,w,x,y,z,A,B,C end if n=='XYZ'then return matXYZ()elseif n=='YXZ'
-then return matYXZ()else return matXYZ()end end j.new=function(...)local k=
-select('#',...)if k==0 then return constructor(0,0,0)end local l=select(1,...)if
-k==1 and isVector3(l)then return constructor(l.x,l.y,l.z)end if k==2 and
-isVector3(l)and isVector3(select(2,...))then local m=l::any local n=select(2,...
-)::any return j.lookAt(m,n)end if k==3 then local m,n,o=l,select(2,...),select(3
-,...)assert('number'==type(m)and'number'==type(n)and'number'==type(o),`CFrame.new: expected numbers for x,y,z, got {
+)if c then return spawn(function()return c(httpget(unpack(b)))end)else return
+httpget(unpack(b))end end,post=function(b,c)assert('table'==type(b),`http.get: settings must be a table, got {
+type(b)}`)assert('function'==type(c),`http.get: callback must be a function, got {
+type(c)}`)if c then return spawn(function()return c(httppost(unpack(b)))end)else
+return httppost(unpack(b))end end}end function a.i()return function(b,c)assert(
+'table'==type(b),`map(t, callback): expected a table, got {type(b)}`)assert(
+'function'==type(c),`map(t, callback): expected a function, got {type(c)}`)local
+d={}do for e,f in b do d[e]=c(f,e,b)end end return d end end function a.j()local
+b=a.load'e'local c,d,e,f=math.abs,math.sqrt,math.sin,math.cos local g,h,i=math.
+acos,math.atan2,math.clamp local function isVector3(j)return'table'==type(j)and
+getmetatable(j)=='Vector3'end local function isCFrame(j)return'table'==type(j)
+and getmetatable(j)=='CFrame'end local j={}do local function constructor(k:
+number,l:number,m:number,n:number?,o:number?,p:number?,q:number?,r:number?,s:
+number?,t:number?,u:number?,v:number?)assert('number'==type(k),`CFrame.new: expected a number for x, got {
+type(k)}`)assert('number'==type(l),`CFrame.new: expected a number for y, got {
+type(l)}`)assert('number'==type(m),`CFrame.new: expected a number for z, got {
+type(m)}`)n=n or 1 o=o or 0 p=p or 0 q=q or 0 r=r or 1 s=s or 0 t=t or 0 u=u or
+0 v=v or 1 return setmetatable({x=k,y=l,z=m,r00=n,r01=o,r02=p,r10=q,r11=r,r12=s,
+r20=t,r21=u,r22=v},j)end local function fromQuaternion(k,l,m,n,o,p,q)local r=d(n
+*n+o*o+p*p+q*q)if r==0 then return constructor(k,l,m)end n,o,p,q=n/r,o/r,p/r,q/r
+local s,t,u=n*n,o*o,p*p local v,w,x=n*o,n*p,o*p local y,z,A=q*n,q*o,q*p local B=
+1-2*(t+u)local C=2*(v+A)local D=2*(w-z)local E=2*(v-A)local F=1-2*(s+u)local G=2
+*(x+y)local H=2*(w+z)local I=2*(x-y)local J=1-2*(s+t)return constructor(k,l,m,B,
+C,D,E,F,G,H,I,J)end local function toQuaternion(k)local l,m,n=k.r00,k.r01,k.r02
+local o,p,q=k.r10,k.r11,k.r12 local r,s,t=k.r20,k.r21,k.r22 local u=l+p+t local
+v,w,x,y if u>0 then local z=d(u+1)*2 v=0.25*z w=(s-q)/z x=(n-r)/z y=(o-m)/z
+elseif l>p and l>t then local z=d(1+l-p-t)*2 v=(s-q)/z w=0.25*z x=(m+o)/z y=(n+r
+)/z elseif p>t then local z=d(1+p-l-t)*2 v=(n-r)/z w=(m+o)/z x=0.25*z y=(q+s)/z
+else local z=d(1+t-l-p)*2 v=(o-m)/z w=(n+r)/z x=(q+s)/z y=0.25*z end local z=d(w
+*w+x*x+y*y+v*v)if z==0 then return 0,0,0,1 end return w/z,x/z,y/z,v/z end
+local function slerp(k,l,m,n,o,p,q,r,s)local t=k*o+l*p+m*q+n*r if t<0 then o,p,q
+,r=-o,-p,-q,-r t=-t end local u=1e-6 if t>1-u then local v=k+(o-k)*s local w=l+(
+p-l)*s local x=m+(q-m)*s local y=n+(r-n)*s local z=d(v*v+w*w+x*x+y*y)return v/z,
+w/z,x/z,y/z end local v=g(i(t,-1,1))local w=e(v)local x=v*s local y=e(x)local z=
+f(x)-t*y/w local A=y/w local B=z*k+A*o local C=z*l+A*p local D=z*m+A*q local E=z
+*n+A*r return B,C,D,E end local function matMul(k,l)return k.r00*l.r00+k.r01*l.
+r10+k.r02*l.r20,k.r00*l.r01+k.r01*l.r11+k.r02*l.r21,k.r00*l.r02+k.r01*l.r12+k.
+r02*l.r22,k.r10*l.r00+k.r11*l.r10+k.r12*l.r20,k.r10*l.r01+k.r11*l.r11+k.r12*l.
+r21,k.r10*l.r02+k.r11*l.r12+k.r12*l.r22,k.r20*l.r00+k.r21*l.r10+k.r22*l.r20,k.
+r20*l.r01+k.r21*l.r11+k.r22*l.r21,k.r20*l.r02+k.r21*l.r12+k.r22*l.r22 end
+local function rotTranspose(k)return k.r00,k.r10,k.r20,k.r01,k.r11,k.r21,k.r02,k
+.r12,k.r22 end local function rotateVec(k,l)return b.new(k.r00*l.x+k.r01*l.y+k.
+r02*l.z,k.r10*l.x+k.r11*l.y+k.r12*l.z,k.r20*l.x+k.r21*l.y+k.r22*l.z)end
+local function rotateVecT(k,l)return b.new(k.r00*l.x+k.r10*l.y+k.r20*l.z,k.r01*l
+.x+k.r11*l.y+k.r21*l.z,k.r02*l.x+k.r12*l.y+k.r22*l.z)end local function
+columnsFromEuler(k,l,m,n)n=string.upper(n or'XYZ')local o,p=f(k),e(k)local q,r=
+f(l),e(l)local s,t=f(m),e(m)local function matXYZ()local u=q*s local v=o*t+p*r*s
+local w=p*t-o*r*s local x=-q*t local y=o*s-p*r*t local z=p*s+o*r*t local A=r
+local B=-p*q local C=o*q return u,v,w,x,y,z,A,B,C end local function matYXZ()
+local u=q*s+r*p*t local v=o*t local w=q*p*t-r*s local x=r*s-q*p*t local y=o*s
+local z=r*p*t+q*s local A=p*r local B=-p local C=o*q return u,v,w,x,y,z,A,B,C
+end if n=='XYZ'then return matXYZ()elseif n=='YXZ'then return matYXZ()else
+return matXYZ()end end j.new=function(...)local k=select('#',...)if k==0 then
+return constructor(0,0,0)end local l=select(1,...)if k==1 and isVector3(l)then
+return constructor(l.x,l.y,l.z)end if k==2 and isVector3(l)and isVector3(select(
+2,...))then local m=l::any local n=select(2,...)::any return j.lookAt(m,n)end if
+k==3 then local m,n,o=l,select(2,...),select(3,...)assert('number'==type(m)and
+'number'==type(n)and'number'==type(o),`CFrame.new: expected numbers for x,y,z, got {
 type(m)},{type(n)},{type(o)}`)return constructor(m,n,o)end if k==7 then local m,
 n,o,p,q,r,s=l,select(2,...),select(3,...),select(4,...),select(5,...),select(6,
 ...),select(7,...)assert('number'==type(p)and'number'==type(q)and'number'==type(
@@ -519,8 +520,9 @@ k.r02,k.r12,k.r22)*-1 end return rawget(j,l)or k[l]end function j.__tostring(k)
 return`({k.x}, {k.y}, {k.z}, {k.r00}, {k.r01}, {k.r02}, {k.r10}, {k.r11}, {k.r12
 }, {k.r20}, {k.r21}, {k.r22})`end end return table.freeze(j)end function a.k()
 return function(b,c):any if not b then return c end if not c then return b end
-for d,e in c do b[d]=e end return b end end function a.l()local b=a.load'k'local
-c={}do local d={global={}}local function constructor(e:any)e='userdata'==type(e)
+for d,e in c do b[d]=e end return b end end function a.l()local b=a.load'k'
+local function normalize(c:string)return string.lower(c):gsub('_','')end local c
+={}do local d={global={}}local function constructor(e:any)e='userdata'==type(e)
 and e or'table'==type(e)and rawget(e,'Data')assert('userdata'==type(e),`Instance.new: userdata must be a userdata, got {
 type(e)}`)return setmetatable({ClassName=getclassname(e),Data=e},{__index=c.
 __index,__newindex=c.__newindex})end c.new=constructor function c.declare<T>(e:
@@ -528,18 +530,19 @@ __index,__newindex=c.__newindex})end c.new=constructor function c.declare<T>(e:
 assert('string'==type(g),`Instance.declare: name must be a string, got {type(g)}`
 )assert('property'==e or'method'==e,`Instance.declare: value must be "property" or "method", got {
 e}`)assert('table'==type(f)or'string'==type(f),`Instance.declare: class must be a string or a table of strings, got {
-type(f)}`)if'string'==type(f)then d[f]=b(d[f],{[g]={[e]=h}})else for i,j in f do
-d[j]=b(d[j],{[g]={[e]=h}})end end end function c.__index(e,f:string)assert(
-'string'==type(f),`Instance:__index: key must be a string, got {type(f)}`)do
-local g=e.ClassName local h=d.global[f]or(d[g]and d[g][f])if h then local i=h.
-property local j=h.method if i and i.getter then return i.getter(e)elseif j then
-return j end end end return rawget(e,f)or rawget(e,'Data')and e:FindFirstChild(f
-)or c[f]end function c.__newindex(e,f:string,g:any)assert('string'==type(f),`Instance:__newindex: key must be a string, got {
-type(f)}`)do local h=e.ClassName local i=d.global[f]or(d[h]and d[h][f])if i and
-i.property and i.property.setter then return i.property.setter(e,g)end end
-return rawset(e,f,g)end end return c end function a.m()local b=a.load'i'local c=
-a.load'f'local d=a.load'h'local e=a.load'g'local f=a.load'e'local g=a.load'd'
-local h=a.load'j'local i do d.get({
+type(f)}`)local i=normalize(g)if'string'==type(f)then d[f]=b(d[f],{[i]={[e]=h}})
+else for j,k in f do d[k]=b(d[k],{[i]={[e]=h}})end end end function c.__index(e,
+f:string)assert('string'==type(f),`Instance:__index: key must be a string, got {
+type(f)}`)do local g=normalize(f)local h=e.ClassName local i=d.global[g]or(d[h]
+and d[h][g])if i then local j=i.property local k=i.method if j and j.getter then
+return j.getter(e)elseif k then return k end end end return rawget(e,f)or
+rawget(e,'Data')and e:FindFirstChild(f)or c[f]end function c.__newindex(e,f:
+string,g:any)assert('string'==type(f),`Instance:__newindex: key must be a string, got {
+type(f)}`)do f=string.lower(f)local h=e.ClassName local i=d.global[f]or(d[h]and
+d[h][f])if i and i.property and i.property.setter then return i.property.setter(
+e,g)end end return rawset(e,f,g)end end return c end function a.m()local b=a.
+load'i'local c=a.load'f'local d=a.load'h'local e=a.load'g'local f=a.load'e'local
+g=a.load'd'local h=a.load'j'local i do d.get({
 [[https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/refs/heads/roblox/Full-API-Dump.json]]
 ,'application/json'},function(j)i=e.decode(j)end)end local j=a.load'l'do local k
 =j.new do j.declare('property','global','Name',{getter=function(l)return
@@ -549,6 +552,7 @@ local m:any=getparent(l.Data)return m and k(m)end})j.declare('method','global',
 'global','GetDescendants',function(l)return b(getdescendants(l.Data),k)end)do
 local l=function(l)return function(m,...)local n:any=l(m.Data,...)return n and
 k(n)end end j.declare('method','global','FindFirstChild',l(findfirstchild))j.
+declare('method','global','FindFirstDescendant',l(findfirstdescendant))j.
 declare('method','global','FindFirstAncestor',l(findfirstancestor))j.declare(
 'method','global','FindFirstChildOfClass',l(findfirstchildofclass))j.declare(
 'method','global','FindFirstAncestorOfClass',l(findfirstancestorofclass))j.
