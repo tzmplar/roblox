@@ -57,6 +57,7 @@ local Instance = require("@roblox/classes/instance"); do
             end
 
             Instance.declare("method", "global", "FindFirstChild", generate(findfirstchild))
+            Instance.declare("method", "global", "FindFirstDescendant", generate(findfirstdescendant))
             Instance.declare("method", "global", "FindFirstAncestor", generate(findfirstancestor))
             Instance.declare("method", "global", "FindFirstChildOfClass", generate(findfirstchildofclass))
             Instance.declare("method", "global", "FindFirstAncestorOfClass", generate(findfirstancestorofclass))
