@@ -2,7 +2,7 @@
 
 local map    = require("@external/functions/map")
 local memory = require("@external/modules/memory")
-local http   = require("@external/modules/http")
+-- local http   = require("@external/modules/http")
 local json   = require("@external/modules/json")
 
 local Vector3 = require("@roblox/data/vector3")
@@ -11,11 +11,15 @@ local CFrame  = require("@roblox/data/cframe")
 
 ---- variables ----
 
-local dump; do
-    http.get({ "https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/refs/heads/roblox/Full-API-Dump.json", "application/json" }, function(response)
-        dump = json.decode(response)
-    end)
-end
+-- todo: parse dump, extract enumerations, and class hierarchy
+-- why? this allow for the better implementation of Instance:IsA, and also who doesn't love enums?
+-- probably also renew the dump every week or so to keep it up to date with roblox's api changes
+
+-- local dump; do
+--     http.get({ "https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/refs/heads/roblox/Full-API-Dump.json", "application/json" }, function(response)
+--         dump = json.decode(response)
+--     end)
+-- end
 
 ---- declarations ----
 
