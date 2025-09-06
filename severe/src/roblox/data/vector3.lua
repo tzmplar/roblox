@@ -1,225 +1,198 @@
----- environment ----
+---- declarations ----
 
-local abs, ceil, floor, sign = math.abs, math.ceil, math.floor, math.sign
-local max, min               = math.max, math.min
+type Vector3 = vector & {
+    angle: (v: Vector3, axis: Vector3?) -> number,
+    ceil: () -> Vector3,
+    floor: () -> Vector3,
+    sign: () -> Vector3,
+}
 
----- module ----
+local constructor: (x: number, y: number, z: number) -> Vector3
 
-local Vector3 = {}; do
-	--- constructor ---
+---- reference ----
 
-	local function constructor(x: number, y: number, z: number)
-		assert("number" == type(x), `Vector3.new: expected a number for x, got {type(x)}`)
-		assert("number" == type(y), `Vector3.new: expected a number for y, got {type(y)}`)
-		assert("number" == type(z), `Vector3.new: expected a number for z, got {type(z)}`)
+local reference = {}; do
+    function reference:dot(v: Vector3): number
+        assert("userdata" == type(v) and getmetatable(v).__vector, `bad argument #1 to 'Vector3:dot' (Vector3 expected, got {type(v)})`)
 
-		return setmetatable({
-			x = x,
-			y = y,
-			z = z,
-		}, Vector3)
-	end
+        return vector.dot(getmetatable(self).__vector, getmetatable(v).__vector)
+    end
 
-	--- functions ---
+    function reference:cross(v: Vector3): Vector3
+        assert("userdata" == type(v) and getmetatable(v).__vector, `bad argument #1 to 'Vector3:cross' (Vector3 expected, got {type(v)})`)
 
-	Vector3.new = constructor
+        local r: vector = vector.cross(getmetatable(self).__vector, getmetatable(v).__vector)
+        return constructor(r.x, r.y, r.z)
+    end
 
-	--- methods ---
+    function reference:angle(v: Vector3, axis: Vector3?): number
+        assert("userdata" == type(v) and getmetatable(v).__vector, `bad argument #1 to 'Vector3:angle' (Vector3 expected, got {type(v)})`)
+        assert(axis == nil or ("userdata" == type(axis) and getmetatable(axis).__vector), `bad argument #2 to 'Vector3:angle' (Vector3 expected, got {type(axis)})`)
 
-	function Vector3:abs()
-		return constructor(abs(self.x), abs(self.y), abs(self.z))
-	end
+        return vector.angle(getmetatable(self).__vector, getmetatable(v).__vector, axis and getmetatable(axis).__vector or nil)
+    end
 
-	function Vector3:cross(other)
-		assert("table" == type(other) and getmetatable(other) == "Vector3", `Vector3.cross: expected a Vector3, got {type(other)}`)
+    function reference:ceil(): Vector3
+        local r: vector = vector.ceil(getmetatable(self).__vector)
+        return constructor(r.x, r.y, r.z)
+    end
 
-		-- exports --
+    function reference:floor(): Vector3
+        local r: vector = vector.floor(getmetatable(self).__vector)
+        return constructor(r.x, r.y, r.z)
+    end
 
-		return constructor(
-			self.y * other.z - self.z * other.y,
-			self.z * other.x - self.x * other.z,
-			self.x * other.y - self.y * other.x
-		)
-	end
+    function reference:sign(): Vector3
+        local r: vector = vector.sign(getmetatable(self).__vector)
+        return constructor(r.x, r.y, r.z)
+    end
 
-	function Vector3:ceil()
-		return constructor(ceil(self.x), ceil(self.y), ceil(self.z))
-	end
+    function reference:lerp(v: Vector3, alpha: number): Vector3
+        assert("userdata" == type(v) and getmetatable(v).__vector, `bad argument #1 to 'Vector3:lerp' (Vector3 expected, got {type(v)})`)
+        assert("number" == type(alpha), `bad argument #2 to 'Vector3:lerp' (number expected, got {type(alpha)})`)
 
-	function Vector3:floor()
-		return constructor(floor(self.x), floor(self.y), floor(self.z))
-	end
+        local r: vector = vector.lerp(getmetatable(self).__vector, getmetatable(v).__vector, alpha)
+        return constructor(r.x, r.y, r.z)
+    end
 
-	function Vector3:sign()
-		return constructor(sign(self.x), sign(self.y), sign(self.z))
-	end
+    function reference:array(): { number }
+        local v: vector = getmetatable(self).__vector
+        return { v.x, v.y, v.z }
+    end
+end
 
-	function Vector3:angle(other, signed: boolean?)
-		assert("table" == type(other) and getmetatable(other) == "Vector3", `Vector3.angle: expected a Vector3, got {type(other)}`)
+---- constructor ----
 
-		local dot = self:dot(other)
-		local product = self.magnitude * other.magnitude
-		if product == 0 then return 0 end
+function constructor(x: number, y: number, z: number): Vector3
+    --- assertions ---
 
-		local angle = math.acos(dot / product)
-		if signed then
-			local cross = self:cross(other).z
-			if cross < 0 then
-				angle = -angle
-			end
-		end
+    assert("number" == type(x), `bad argument #1 to 'Vector3.new' (number expected, got {type(x)})`)
+    assert("number" == type(y), `bad argument #2 to 'Vector3.new' (number expected, got {type(y)})`)
+    assert("number" == type(z), `bad argument #3 to 'Vector3.new' (number expected, got {type(z)})`)
 
-		-- exports --
+    --- userdata ---
 
-		return angle
-	end
+    local proxy = newproxy(true); do
+        local mt = getmetatable(proxy)
 
-	function Vector3:dot(other)
-		assert("table" == type(other) and getmetatable(other) == "Vector3", `Vector3.dot: expected a Vector3, got {type(other)}`)
+        mt.__vector = vector.create(x, y, z)
 
-		-- exports --
+        -- metatables --
 
-		return self.x * other.x + self.y * other.y + self.z * other.z
-	end
+        function mt:__index(key: string): any
+            key = string.lower(key)
 
-	function Vector3:lerp(other, alpha: number)
-		assert("table" == type(other) and getmetatable(other) == "Vector3", `Vector3.lerp: expected a Vector3, got {type(other)}`)
-		assert("number" == type(alpha), 					   				`Vector3.lerp: expected a number for alpha, got {type(alpha)}`)
+            if key == "unit" then
+                return vector.normalize(mt.__vector)
+            elseif key == "magnitude" then
+                return vector.magnitude(mt.__vector)
+            end
 
-		-- exports --
+            return reference[key] or mt.__vector[key]
+        end
 
-		return constructor(
-			self.x + (other.x - self.x) * alpha,
-			self.y + (other.y - self.y) * alpha,
-			self.z + (other.z - self.z) * alpha
-		)
-	end
+        function mt:__newindex(key: string, value: any): ()
+            key = string.lower(key)
 
-	function Vector3:max(...)
-		for index, vector in { ... } do
-			assert("table" == type(vector) and getmetatable(vector) == "Vector3", `Vector3.max: expected a Vector3, got {type(vector)}`)
+            assert("number" == type(value), `can't assign '{type(value)}' to '{key}' (number expected)`)
+            assert(key == "x" or key == "y" or key == "z", `attempt to index Vector3 with '{key}'`)
 
-			self = constructor(
-				max(self.x, vector.x),
-				max(self.y, vector.y),
-				max(self.z, vector.z)
-			)
-		end
+            local v: vector = mt.__vector
+            mt.__vector = vector.create(
+                key == "x" and value or v.x,
+                key == "y" and value or v.y,
+                key == "z" and value or v.z
+            )
+        end
 
-		-- exports --
+        function mt:__add(v: Vector3): Vector3
+            assert("userdata" == type(v) and getmetatable(v).__vector, `bad argument #1 to 'Vector3 + Vector3' (Vector3 expected, got {type(v)})`)
 
-		return self
-	end
+            local r: vector = mt.__vector + getmetatable(v).__vector
+            return constructor(r.x, r.y, r.z)
+        end
 
-	function Vector3:min(...)
-		for index, vector in { ... } do
-			assert("table" == type(vector) and getmetatable(vector) == "Vector3", `Vector3.min: expected a Vector3, got {type(vector)}`)
+        function mt:__sub(v: Vector3): Vector3
+            assert("userdata" == type(v) and getmetatable(v).__vector, `bad argument #1 to 'Vector3 - Vector3' (Vector3 expected, got {type(v)})`)
 
-			self = constructor(
-				min(self.x, vector.x),
-				min(self.y, vector.y),
-				min(self.z, vector.z)
-			)
-		end
+            local r: vector = mt.__vector - getmetatable(v).__vector
+            return constructor(r.x, r.y, r.z)
+        end
 
-		-- exports --
+        function mt:__mul(n: number | Vector3): Vector3
+            if "number" == type(n) then
+                local r: vector = mt.__vector * n
+                return constructor(r.x, r.y, r.z)
+            elseif "userdata" == type(n) and getmetatable(n).__vector then
+                local r: vector = vector.mul(mt.__vector, getmetatable(n).__vector)
+                return constructor(r.x, r.y, r.z)
+            else
+                error(`bad argument #1 to 'Vector3 * (number | Vector3)' (number | Vector3 expected, got {type(n)})`, 2)
+            end
+        end
 
-		return self
-	end
+        function mt:__div(n: number | Vector3): Vector3
+            if "number" == type(n) then
+                local r: vector = mt.__vector / n
+                return constructor(r.x, r.y, r.z)
+            elseif "userdata" == type(n) and getmetatable(n).__vector then
+                local r: vector = vector.div(mt.__vector, getmetatable(n).__vector)
+                return constructor(r.x, r.y, r.z)
+            else
+                error(`bad argument #1 to 'Vector3 / (number | Vector3)' (number | Vector3 expected, got {type(n)})`, 2)
+            end
+        end
 
-	function Vector3:fuzzyeq(other, epsilon: number?)
-		assert("table" == type(other) and getmetatable(other) == "Vector3", `Vector3.fuzzyeq: expected a Vector3, got {type(other)}`)
-		assert("number" == type(epsilon) or "nil" == type(epsilon), `Vector3.fuzzyeq: expected a number for epsilon, got {type(epsilon)}`)
+        function mt:__idiv(n: number | Vector3): Vector3
+            if "number" == type(n) then
+                local r: vector = vector.idiv(mt.__vector, n)
+                return constructor(r.x, r.y, r.z)
+            elseif "userdata" == type(n) and getmetatable(n).__vector then
+                local r: vector = vector.idiv(mt.__vector, getmetatable(n).__vector)
+                return constructor(r.x, r.y, r.z)
+            else
+                error(`bad argument #1 to 'Vector3 // (number | Vector3)' (number | Vector3 expected, got {type(n)})`, 2)
+            end
+        end
 
-		epsilon = epsilon or 0.0001
+        function mt:__unm(): Vector3
+            local r: vector = -mt.__vector
+            return constructor(r.x, r.y, r.z)
+        end
 
-		return abs(self.x - other.x) <= epsilon and
-		       abs(self.y - other.y) <= epsilon and
-		       abs(self.z - other.z) <= epsilon
-	end
+        function mt:__eq(v: Vector3): boolean
+            assert("userdata" == type(v) and getmetatable(v).__vector, `bad argument #1 to 'Vector3 == Vector3' (Vector3 expected, got {type(v)})`)
 
-	--- properties ---
+            return mt.__vector == getmetatable(v).__vector
+        end
 
-	Vector3.zero  		= constructor(0, 0, 0)
-	Vector3.one   		= constructor(1, 1, 1)
-	Vector3.xAxis 		= constructor(1, 0, 0)
-	Vector3.yAxis 		= constructor(0, 1, 0)
-	Vector3.zAxis 		= constructor(0, 0, 1)
-	Vector3.__metatable = "Vector3"
+        function mt:__tostring(): string
+            local v: vector = mt.__vector
+            return `{v.x}, {v.y}, {v.z}`
+        end
+    end
 
-	--- metatables ---
+    --- exports ---
 
-	function Vector3:__add(other)
-		if "number" == type(other) then
-			return constructor(self.x + other, self.y + other, self.z + other)
-		end
-
-		-- exports --
-
-		return constructor(self.x + other.x, self.y + other.y, self.z + other.z)
-	end
-
-	function Vector3:__sub(other)
-		if "number" == type(other) then
-			return constructor(self.x - other, self.y - other, self.z - other)
-		end
-
-		-- exports --
-
-		return constructor(self.x - other.x, self.y - other.y, self.z - other.z)
-	end
-
-	function Vector3:__mul(other)
-		if "number" == type(other) then
-			return constructor(self.x * other, self.y * other, self.z * other)
-		end
-
-		-- exports --
-
-		return constructor(self.x * other.x, self.y * other.y, self.z * other.z)
-	end
-
-	function Vector3:__div(other)
-		if "number" == type(other) then
-			return constructor(self.x / other, self.y / other, self.z / other)
-		end
-
-		-- exports --
-
-		return constructor(self.x / other.x, self.y / other.y, self.z / other.z)
-	end
-
-	function Vector3:__idiv(other)
-		if "number" == type(other) then
-			return constructor(floor(self.x // other), floor(self.y // other), floor(self.z // other))
-		end
-
-		-- exports --
-
-		return constructor(floor(self.x // other.x), floor(self.y // other.y), floor(self.z // other.z))
-	end
-
-	function Vector3:__index(index)
-		index = string.lower(index)
-		if "magnitude" == index then
-			return math.sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
-		end
-
-		if "unit" == index then
-			local magnitude = self.magnitude
-			return magnitude ~= 0 and constructor(self.x / magnitude, self.y / magnitude, self.z / magnitude) or self
-		end
-
-		-- exports --
-
-		return rawget(Vector3, index) or self[index]
-	end
-
-	function Vector3:__tostring()
-		return `{self.x}, {self.y}, {self.z}`
-	end
+    return proxy
 end
 
 ---- exports ----
 
-return table.freeze(Vector3)
+return table.freeze {
+    one   = constructor(1, 1, 1),
+    zero  = constructor(0, 0, 0),
+    xAxis = constructor(1, 0, 0),
+    yAxis = constructor(0, 1, 0),
+    zAxis = constructor(0, 0, 1),
+    new   = constructor,
+    array = function(array: { number}): Vector3
+        assert("table" == type(array), `bad argument #1 to 'Vector3.array' (table expected, got {type(array)})`)
+
+        local x: number = array[1] or array.x
+        local y: number = array[2] or array.y
+        local z: number = array[3] or array.z
+
+        return constructor(x, y, z)
+    end
+}

@@ -2,6 +2,12 @@
 
 local merge = require("@external/functions/merge")
 
+---- functions ----
+
+local function normalize(key: string)
+    return string.lower(key):gsub("_", "")
+end
+
 ---- module ----
 
 local Instance = {}; do
@@ -35,16 +41,17 @@ local Instance = {}; do
 
         -- declaration --
 
+        local normalized = normalize(name)
         if "string" == type(class) then
             declarations[class] = merge(declarations[class], {
-                [name] = {
+                [normalized] = {
                     [value] = definition
                 }
             })
         else
             for index, class in class do
                 declarations[class] = merge(declarations[class], {
-                    [name] = {
+                    [normalized] = {
                         [value] = definition
                     }
                 })
@@ -62,8 +69,10 @@ local Instance = {}; do
         -- exports --
         
         do
+            local normalized = normalize(key)
+
             local class = self.ClassName
-            local declaration = declarations.global[key] or (declarations[class] and declarations[class][key])
+            local declaration = declarations.global[normalized] or (declarations[class] and declarations[class][normalized])
 
             if declaration then
                 local property = declaration.property
@@ -90,6 +99,8 @@ local Instance = {}; do
         -- exports --
 
         do
+            key = string.lower(key)
+
             local class = self.ClassName
             local declaration = declarations.global[key] or (declarations[class] and declarations[class][key])
 

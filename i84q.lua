@@ -1,16 +1,18 @@
-type connection__DARKLUA_TYPE_a={disconnect:()->()}local a a={cache={},load=
-function(b)if not a.cache[b]then a.cache[b]={c=a[b]()}end return a.cache[b].c
-end}do function a.a()local b={}do local function constructor()return
-setmetatable({_map={}},{__index=b})end b.new=constructor function b.fire<T...>(c
-,...:T...)for d=#c,1,-1 do local e=c[d]if e then if'function'==type(e)then
-coroutine.wrap(e)(...)elseif'thread'==type(e)then coroutine.resume(e,...)end end
-end return c end function b.connect<T...>(c,d:(T...)->()):
-connection__DARKLUA_TYPE_a table.insert(c,d)return{disconnect=function()local e=
-table.find(c,d)if e then table.remove(c,e)end end}end function b.once<T...>(c,d:
-(T...)->()):connection__DARKLUA_TYPE_a local e do e=c:connect(function(...)d(...
-)e:disconnect()end)end return e end function b.wait<T...>(c):T...local d=
-coroutine.running()c:once(function(...)coroutine.resume(d,...)end)return
-coroutine.yield()end setmetatable(b,{__call=constructor})end return b end
+type connection__DARKLUA_TYPE_a={disconnect:()->()}type Vector3__DARKLUA_TYPE_b=
+vector&{angle:(v:Vector3__DARKLUA_TYPE_b,axis:Vector3__DARKLUA_TYPE_b?)->number,
+ceil:()->Vector3__DARKLUA_TYPE_b,floor:()->Vector3__DARKLUA_TYPE_b,sign:()->
+Vector3__DARKLUA_TYPE_b}local a a={cache={},load=function(b)if not a.cache[b]
+then a.cache[b]={c=a[b]()}end return a.cache[b].c end}do function a.a()local b={
+}do local function constructor()return setmetatable({_map={}},{__index=b})end b.
+new=constructor function b.fire<T...>(c,...:T...)for d=#c,1,-1 do local e=c[d]if
+e then if'function'==type(e)then coroutine.wrap(e)(...)elseif'thread'==type(e)
+then coroutine.resume(e,...)end end end return c end function b.connect<T...>(c,
+d:(T...)->()):connection__DARKLUA_TYPE_a table.insert(c,d)return{disconnect=
+function()local e=table.find(c,d)if e then table.remove(c,e)end end}end function
+b.once<T...>(c,d:(T...)->()):connection__DARKLUA_TYPE_a local e do e=c:connect(
+function(...)d(...)e:disconnect()end)end return e end function b.wait<T...>(c):T
+...local d=coroutine.running()c:once(function(...)coroutine.resume(d,...)end)
+return coroutine.yield()end setmetatable(b,{__call=constructor})end return b end
 function a.b()local b={}do function b.connect(c:string)local d=
 websocket_connect(c)local e={}do local f={}function e.send(g,h:string)assert(
 'string'==type(h),`websocket:send: message must be a string, got {type(h)}`)
@@ -257,84 +259,104 @@ return constructor(i.x/j.x,i.y/j.y)end function h.__index(i,j)j=string.lower(j)
 if'magnitude'==j then return math.sqrt(i.x*i.x+i.y*i.y)end if'unit'==j then
 local k=i.magnitude return k~=0 and constructor(i.x/k,i.y/k)or i end return
 rawget(h,j)or i[j]end function h.__tostring(i)return`{i.x}, {i.y}`end end return
-table.freeze(h)end function a.e()local b,c,d,e=math.abs,math.ceil,math.floor,
-math.sign local f,g=math.max,math.min local h={}do local function constructor(i:
-number,j:number,k:number)assert('number'==type(i),`Vector3.new: expected a number for x, got {
-type(i)}`)assert('number'==type(j),`Vector3.new: expected a number for y, got {
-type(j)}`)assert('number'==type(k),`Vector3.new: expected a number for z, got {
-type(k)}`)return setmetatable({x=i,y=j,z=k},h)end h.new=constructor function h.
-abs(i)return constructor(b(i.x),b(i.y),b(i.z))end function h.cross(i,j)assert(
-'table'==type(j)and getmetatable(j)=='Vector3',`Vector3.cross: expected a Vector3, got {
-type(j)}`)return constructor(i.y*j.z-i.z*j.y,i.z*j.x-i.x*j.z,i.x*j.y-i.y*j.x)end
-function h.ceil(i)return constructor(c(i.x),c(i.y),c(i.z))end function h.floor(i
-)return constructor(d(i.x),d(i.y),d(i.z))end function h.sign(i)return
-constructor(e(i.x),e(i.y),e(i.z))end function h.angle(i,j,k:boolean?)assert(
-'table'==type(j)and getmetatable(j)=='Vector3',`Vector3.angle: expected a Vector3, got {
-type(j)}`)local l=i:dot(j)local m=i.magnitude*j.magnitude if m==0 then return 0
-end local n=math.acos(l/m)if k then local o=i:cross(j).z if o<0 then n=-n end
-end return n end function h.dot(i,j)assert('table'==type(j)and getmetatable(j)==
-'Vector3',`Vector3.dot: expected a Vector3, got {type(j)}`)return i.x*j.x+i.y*j.
-y+i.z*j.z end function h.lerp(i,j,k:number)assert('table'==type(j)and
-getmetatable(j)=='Vector3',`Vector3.lerp: expected a Vector3, got {type(j)}`)
-assert('number'==type(k),`Vector3.lerp: expected a number for alpha, got {type(k
-)}`)return constructor(i.x+(j.x-i.x)*k,i.y+(j.y-i.y)*k,i.z+(j.z-i.z)*k)end
-function h.max(i,...)for j,k in{...}do assert('table'==type(k)and getmetatable(k
-)=='Vector3',`Vector3.max: expected a Vector3, got {type(k)}`)i=constructor(f(i.
-x,k.x),f(i.y,k.y),f(i.z,k.z))end return i end function h.min(i,...)for j,k in{
-...}do assert('table'==type(k)and getmetatable(k)=='Vector3',`Vector3.min: expected a Vector3, got {
-type(k)}`)i=constructor(g(i.x,k.x),g(i.y,k.y),g(i.z,k.z))end return i end
-function h.fuzzyeq(i,j,k:number?)assert('table'==type(j)and getmetatable(j)==
-'Vector3',`Vector3.fuzzyeq: expected a Vector3, got {type(j)}`)assert('number'==
-type(k)or'nil'==type(k),`Vector3.fuzzyeq: expected a number for epsilon, got {
-type(k)}`)k=k or 0.0001 return b(i.x-j.x)<=k and b(i.y-j.y)<=k and b(i.z-j.z)<=k
-end h.zero=constructor(0,0,0)h.one=constructor(1,1,1)h.xAxis=constructor(1,0,0)h
-.yAxis=constructor(0,1,0)h.zAxis=constructor(0,0,1)h.__metatable='Vector3'
-function h.__add(i,j)if'number'==type(j)then return constructor(i.x+j,i.y+j,i.z+
-j)end return constructor(i.x+j.x,i.y+j.y,i.z+j.z)end function h.__sub(i,j)if
-'number'==type(j)then return constructor(i.x-j,i.y-j,i.z-j)end return
-constructor(i.x-j.x,i.y-j.y,i.z-j.z)end function h.__mul(i,j)if'number'==type(j)
-then return constructor(i.x*j,i.y*j,i.z*j)end return constructor(i.x*j.x,i.y*j.y
-,i.z*j.z)end function h.__div(i,j)if'number'==type(j)then return constructor(i.x
-/j,i.y/j,i.z/j)end return constructor(i.x/j.x,i.y/j.y,i.z/j.z)end function h.
-__idiv(i,j)if'number'==type(j)then return constructor(d(i.x//j),d(i.y//j),d(i.z
-//j))end return constructor(d(i.x//j.x),d(i.y//j.y),d(i.z//j.z))end function h.
-__index(i,j)j=string.lower(j)if'magnitude'==j then return math.sqrt(i.x*i.x+i.y*
-i.y+i.z*i.z)end if'unit'==j then local k=i.magnitude return k~=0 and
-constructor(i.x/k,i.y/k,i.z/k)or i end return rawget(h,j)or i[j]end function h.
-__tostring(i)return`{i.x}, {i.y}, {i.z}`end end return table.freeze(h)end
-function a.f()local b=a.load'c'local c=a.load'd'local d=a.load'e'local e=
-function(e:any,f:number,g:string)if'color'==g then local h=getmemoryvalue(e,f,
-'dword')return h and b.dword(h)end if'userdata'==g then local h=getmemoryvalue(e
-,f,'qword')return h and pointer_to_user_data(h)end if'object'==g then assert(
-Instance,`memory.get: 'Instance' is not available, can't read object`)local h=
-getmemoryvalue(e,f,'qword')local i=h and pointer_to_user_data(h)return i and
-'none'~=getclassname(i):lower()and Instance.new(i)end if'buffer'==g then local h
-=getmemoryvalue(e,f,'qword')return h and buffer.fromstring(string.pack('<I8',h))
-end if'vector'==g then local h=getmemoryvalue(e,f,'float')local i=
-getmemoryvalue(e,f+4,'float')local j=getmemoryvalue(e,f+8,'float')return vector.
-create(h,i,j)end if'Vector2'==g then local h=getmemoryvalue(e,f,'float')local i=
-getmemoryvalue(e,f+4,'float')return c.create(h,i)end if'Vector3'==g then local h
-=getmemoryvalue(e,f,'float')local i=getmemoryvalue(e,f+4,'float')local j=
-getmemoryvalue(e,f+8,'float')return d.create(h,i,j)end return getmemoryvalue(e,f
-,g::any)end local f=function(f:any,g:number,h:string,i:any)if'color'==h and
-'table'==type(i)and i.dword then return setmemoryvalue(f,g,'dword',i:dword())end
-if'userdata'==h then i=tostring(i)if'string'==type(i)and i:match'^0x'then i=
-tonumber(i:sub(3),16)end return setmemoryvalue(f,g,'qword',i)end if'object'==h
-and type(i)=='table'and i.Data then i=tostring(i.Data)if'string'==type(i)and i:
-match'^0x'then i=tonumber(i:sub(3),16)end return setmemoryvalue(f,g,'qword',i)
-end if'buffer'==h and'buffer'==type(i)then return setmemoryvalue(f,g,i,'qword')
-end if'vector'==h and'vector'==type(i)then local j=i.X or i[1]local k=i.Y or i[2
-]local l=i.Z or i[3]setmemoryvalue(f,g,j,'float')setmemoryvalue(f,g+4,k,'float')
-setmemoryvalue(f,g+8,l,'float')return true end if'Vector2'==h and type(i)==
-'table'and'Vector2'==getmetatable(i)then local j=i.X or i[1]local k=i.Y or i[2]
-setmemoryvalue(f,g,j,'float')setmemoryvalue(f,g+4,k,'float')return true end if
-'Vector3'==h and type(i)=='table'and'Vector3'==getmetatable(i)then local j=i.X
-or i[1]local k=i.Y or i[2]local l=i.Z or i[3]setmemoryvalue(f,g,j,'float')
-setmemoryvalue(f,g+4,k,'float')setmemoryvalue(f,g+8,l,'float')return true end
-return setmemoryvalue(f,g,i,h::any)end local g={}do function g.read(h:number|any
-,i:number|string,j:string?)if'table'==type(h)and rawget(h,'Data')then h=h.Data
-end if'userdata'==type(h)then assert('number'==type(i),`memory.read: offset must be a number, got {
-type(i)}`)assert('string'==type(j)or not j,`memory.read: spec must be a string or nil, got {
+table.freeze(h)end function a.e()local b:(x:number,y:number,z:number)->
+Vector3__DARKLUA_TYPE_b local c={}do function c.dot(d,e:Vector3__DARKLUA_TYPE_b)
+:number assert('userdata'==type(e)and getmetatable(e).__vector,`bad argument #1 to 'Vector3:dot' (Vector3 expected, got {
+type(e)})`)return vector.dot(getmetatable(d).__vector,getmetatable(e).__vector)
+end function c.cross(d,e:Vector3__DARKLUA_TYPE_b):Vector3__DARKLUA_TYPE_b
+assert('userdata'==type(e)and getmetatable(e).__vector,`bad argument #1 to 'Vector3:cross' (Vector3 expected, got {
+type(e)})`)local f:vector=vector.cross(getmetatable(d).__vector,getmetatable(e).
+__vector)return b(f.x,f.y,f.z)end function c.angle(d,e:Vector3__DARKLUA_TYPE_b,f
+:Vector3__DARKLUA_TYPE_b?):number assert('userdata'==type(e)and getmetatable(e).
+__vector,`bad argument #1 to 'Vector3:angle' (Vector3 expected, got {type(e)})`)
+assert(f==nil or('userdata'==type(f)and getmetatable(f).__vector),`bad argument #2 to 'Vector3:angle' (Vector3 expected, got {
+type(f)})`)return vector.angle(getmetatable(d).__vector,getmetatable(e).__vector
+,f and getmetatable(f).__vector or nil)end function c.ceil(d):
+Vector3__DARKLUA_TYPE_b local e:vector=vector.ceil(getmetatable(d).__vector)
+return b(e.x,e.y,e.z)end function c.floor(d):Vector3__DARKLUA_TYPE_b local e:
+vector=vector.floor(getmetatable(d).__vector)return b(e.x,e.y,e.z)end function c
+.sign(d):Vector3__DARKLUA_TYPE_b local e:vector=vector.sign(getmetatable(d).
+__vector)return b(e.x,e.y,e.z)end function c.lerp(d,e:Vector3__DARKLUA_TYPE_b,f:
+number):Vector3__DARKLUA_TYPE_b assert('userdata'==type(e)and getmetatable(e).
+__vector,`bad argument #1 to 'Vector3:lerp' (Vector3 expected, got {type(e)})`)
+assert('number'==type(f),`bad argument #2 to 'Vector3:lerp' (number expected, got {
+type(f)})`)local g:vector=vector.lerp(getmetatable(d).__vector,getmetatable(e).
+__vector,f)return b(g.x,g.y,g.z)end function c.array(d):{number}local e:vector=
+getmetatable(d).__vector return{e.x,e.y,e.z}end end function b(d:number,e:number
+,f:number):Vector3__DARKLUA_TYPE_b assert('number'==type(d),`bad argument #1 to 'Vector3.new' (number expected, got {
+type(d)})`)assert('number'==type(e),`bad argument #2 to 'Vector3.new' (number expected, got {
+type(e)})`)assert('number'==type(f),`bad argument #3 to 'Vector3.new' (number expected, got {
+type(f)})`)local g=newproxy(true)do local h=getmetatable(g)h.__vector=vector.
+create(d,e,f)function h.__index(i,j:string):any j=string.lower(j)if j=='unit'
+then return vector.normalize(h.__vector)elseif j=='magnitude'then return vector.
+magnitude(h.__vector)end return c[j]or h.__vector[j]end function h.__newindex(i,
+j:string,k:any):()j=string.lower(j)assert('number'==type(k),`can't assign '{
+type(k)}' to '{j}' (number expected)`)assert(j=='x'or j=='y'or j=='z',`attempt to index Vector3 with '{
+j}'`)local l:vector=h.__vector h.__vector=vector.create(j=='x'and k or l.x,j==
+'y'and k or l.y,j=='z'and k or l.z)end function h.__add(i,j:
+Vector3__DARKLUA_TYPE_b):Vector3__DARKLUA_TYPE_b assert('userdata'==type(j)and
+getmetatable(j).__vector,`bad argument #1 to 'Vector3 + Vector3' (Vector3 expected, got {
+type(j)})`)local k:vector=h.__vector+getmetatable(j).__vector return b(k.x,k.y,k
+.z)end function h.__sub(i,j:Vector3__DARKLUA_TYPE_b):Vector3__DARKLUA_TYPE_b
+assert('userdata'==type(j)and getmetatable(j).__vector,`bad argument #1 to 'Vector3 - Vector3' (Vector3 expected, got {
+type(j)})`)local k:vector=h.__vector-getmetatable(j).__vector return b(k.x,k.y,k
+.z)end function h.__mul(i,j:number|Vector3__DARKLUA_TYPE_b):
+Vector3__DARKLUA_TYPE_b if'number'==type(j)then local k:vector=h.__vector*j
+return b(k.x,k.y,k.z)elseif'userdata'==type(j)and getmetatable(j).__vector then
+local k:vector=vector.mul(h.__vector,getmetatable(j).__vector)return b(k.x,k.y,k
+.z)else error(`bad argument #1 to 'Vector3 * (number | Vector3)' (number | Vector3 expected, got {
+type(j)})`,2)end end function h.__div(i,j:number|Vector3__DARKLUA_TYPE_b):
+Vector3__DARKLUA_TYPE_b if'number'==type(j)then local k:vector=h.__vector/j
+return b(k.x,k.y,k.z)elseif'userdata'==type(j)and getmetatable(j).__vector then
+local k:vector=vector.div(h.__vector,getmetatable(j).__vector)return b(k.x,k.y,k
+.z)else error(`bad argument #1 to 'Vector3 / (number | Vector3)' (number | Vector3 expected, got {
+type(j)})`,2)end end function h.__idiv(i,j:number|Vector3__DARKLUA_TYPE_b):
+Vector3__DARKLUA_TYPE_b if'number'==type(j)then local k:vector=vector.idiv(h.
+__vector,j)return b(k.x,k.y,k.z)elseif'userdata'==type(j)and getmetatable(j).
+__vector then local k:vector=vector.idiv(h.__vector,getmetatable(j).__vector)
+return b(k.x,k.y,k.z)else error(`bad argument #1 to 'Vector3 // (number | Vector3)' (number | Vector3 expected, got {
+type(j)})`,2)end end function h.__unm(i):Vector3__DARKLUA_TYPE_b local j:vector=
+-h.__vector return b(j.x,j.y,j.z)end function h.__eq(i,j:Vector3__DARKLUA_TYPE_b
+):boolean assert('userdata'==type(j)and getmetatable(j).__vector,`bad argument #1 to 'Vector3 == Vector3' (Vector3 expected, got {
+type(j)})`)return h.__vector==getmetatable(j).__vector end function h.__tostring
+(i):string local j:vector=h.__vector return`{j.x}, {j.y}, {j.z}`end end return g
+end return table.freeze{one=b(1,1,1),zero=b(0,0,0),xAxis=b(1,0,0),yAxis=b(0,1,0)
+,zAxis=b(0,0,1),new=b,array=function(d:{number}):Vector3__DARKLUA_TYPE_b assert(
+'table'==type(d),`bad argument #1 to 'Vector3.array' (table expected, got {type(
+d)})`)local e:number=d[1]or d.x local f:number=d[2]or d.y local g:number=d[3]or
+d.z return b(e,f,g)end}end function a.f()local b=a.load'c'local c=a.load'd'local
+d=a.load'e'local e=function(e:any,f:number,g:string)if'color'==g then local h=
+getmemoryvalue(e,f,'dword')return h and b.dword(h)end if'userdata'==g then local
+h=getmemoryvalue(e,f,'qword')return h and pointer_to_user_data(h)end if'object'
+==g then assert(Instance,`memory.get: 'Instance' is not available, can't read object`
+)local h=getmemoryvalue(e,f,'qword')local i=h and pointer_to_user_data(h)return
+i and Instance.new(i)end if'buffer'==g then local h=getmemoryvalue(e,f,'qword')
+return h and buffer.fromstring(string.pack('<I8',h))end if'vector'==g then local
+h=getmemoryvalue(e,f,'float')local i=getmemoryvalue(e,f+4,'float')local j=
+getmemoryvalue(e,f+8,'float')return vector.create(h,i,j)end if'Vector2'==g then
+local h=getmemoryvalue(e,f,'float')local i=getmemoryvalue(e,f+4,'float')return c
+.create(h,i)end if'Vector3'==g then local h=getmemoryvalue(e,f,'float')local i=
+getmemoryvalue(e,f+4,'float')local j=getmemoryvalue(e,f+8,'float')return d.
+create(h,i,j)end return getmemoryvalue(e,f,g::any)end local f=function(f:any,g:
+number,h:string,i:any)if'color'==h and'table'==type(i)and i.dword then return
+setmemoryvalue(f,g,'dword',i:dword())end if'userdata'==h then i=tostring(i)if
+'string'==type(i)and i:match'^0x'then i=tonumber(i:sub(3),16)end return
+setmemoryvalue(f,g,'qword',i)end if'object'==h and type(i)=='table'and i.Data
+then i=tostring(i.Data)if'string'==type(i)and i:match'^0x'then i=tonumber(i:sub(
+3),16)end return setmemoryvalue(f,g,'qword',i)end if'buffer'==h and'buffer'==
+type(i)then return setmemoryvalue(f,g,i,'qword')end if'vector'==h and'vector'==
+type(i)then local j=i.X or i[1]local k=i.Y or i[2]local l=i.Z or i[3]
+setmemoryvalue(f,g,j,'float')setmemoryvalue(f,g+4,k,'float')setmemoryvalue(f,g+8
+,l,'float')return true end if'Vector2'==h and type(i)=='table'and'Vector2'==
+getmetatable(i)then local j=i.X or i[1]local k=i.Y or i[2]setmemoryvalue(f,g,j,
+'float')setmemoryvalue(f,g+4,k,'float')return true end if'Vector3'==h and type(i
+)=='table'and'Vector3'==getmetatable(i)then local j=i.X or i[1]local k=i.Y or i[
+2]local l=i.Z or i[3]setmemoryvalue(f,g,j,'float')setmemoryvalue(f,g+4,k,'float'
+)setmemoryvalue(f,g+8,l,'float')return true end return setmemoryvalue(f,g,i,h::
+any)end local g={}do function g.read(h:number|any,i:number|string,j:string?)if
+'table'==type(h)and rawget(h,'Data')then h=h.Data end if'userdata'==type(h)then
+assert('number'==type(i),`memory.read: offset must be a number, got {type(i)}`)
+assert('string'==type(j)or not j,`memory.read: spec must be a string or nil, got {
 type(j)}`)return e(h,i,j::any)end if'number'==type(h)then if'string'==type(i)
 then return e(pointer_to_user_data(h),0,i::any)else assert('number'==type(i),`memory.read: offset must be a number or a string, got {
 type(i)}`)assert('string'==type(j)or not j,`memory.read: spec must be a string or nil, got {
@@ -351,63 +373,64 @@ return g end function a.g()return{decode=function(b)return JSONDecode(b)end,
 encode=function(b)return JSONEncode(b)end}end function a.h()return{get=function(
 b,c)assert('table'==type(b),`http.get: settings must be a table, got {type(b)}`)
 assert('function'==type(c),`http.get: callback must be a function, got {type(c)}`
-)spawn(function()return c(httpget(unpack(b)))end)end,post=function(b,c)assert(
-'table'==type(b),`http.get: settings must be a table, got {type(b)}`)assert(
-'function'==type(c),`http.get: callback must be a function, got {type(c)}`)
-spawn(function()return c(httpget(unpack(b)))end)end}end function a.i()return
-function(b,c)assert('table'==type(b),`map(t, callback): expected a table, got {
-type(b)}`)assert('function'==type(c),`map(t, callback): expected a function, got {
-type(c)}`)local d={}do for e,f in b do d[e]=c(f,e,b)end end return d end end
-function a.j()local b=a.load'e'local c,d,e,f=math.abs,math.sqrt,math.sin,math.
-cos local g,h,i=math.acos,math.atan2,math.clamp local function isVector3(j)
-return'table'==type(j)and getmetatable(j)=='Vector3'end local function isCFrame(
-j)return'table'==type(j)and getmetatable(j)=='CFrame'end local j={}do
-local function constructor(k:number,l:number,m:number,n:number?,o:number?,p:
-number?,q:number?,r:number?,s:number?,t:number?,u:number?,v:number?)assert(
-'number'==type(k),`CFrame.new: expected a number for x, got {type(k)}`)assert(
-'number'==type(l),`CFrame.new: expected a number for y, got {type(l)}`)assert(
-'number'==type(m),`CFrame.new: expected a number for z, got {type(m)}`)n=n or 1
-o=o or 0 p=p or 0 q=q or 0 r=r or 1 s=s or 0 t=t or 0 u=u or 0 v=v or 1 return
-setmetatable({x=k,y=l,z=m,r00=n,r01=o,r02=p,r10=q,r11=r,r12=s,r20=t,r21=u,r22=v}
-,j)end local function fromQuaternion(k,l,m,n,o,p,q)local r=d(n*n+o*o+p*p+q*q)if
-r==0 then return constructor(k,l,m)end n,o,p,q=n/r,o/r,p/r,q/r local s,t,u=n*n,o
-*o,p*p local v,w,x=n*o,n*p,o*p local y,z,A=q*n,q*o,q*p local B=1-2*(t+u)local C=
-2*(v+A)local D=2*(w-z)local E=2*(v-A)local F=1-2*(s+u)local G=2*(x+y)local H=2*(
-w+z)local I=2*(x-y)local J=1-2*(s+t)return constructor(k,l,m,B,C,D,E,F,G,H,I,J)
-end local function toQuaternion(k)local l,m,n=k.r00,k.r01,k.r02 local o,p,q=k.
-r10,k.r11,k.r12 local r,s,t=k.r20,k.r21,k.r22 local u=l+p+t local v,w,x,y if u>0
-then local z=d(u+1)*2 v=0.25*z w=(s-q)/z x=(n-r)/z y=(o-m)/z elseif l>p and l>t
-then local z=d(1+l-p-t)*2 v=(s-q)/z w=0.25*z x=(m+o)/z y=(n+r)/z elseif p>t then
-local z=d(1+p-l-t)*2 v=(n-r)/z w=(m+o)/z x=0.25*z y=(q+s)/z else local z=d(1+t-l
--p)*2 v=(o-m)/z w=(n+r)/z x=(q+s)/z y=0.25*z end local z=d(w*w+x*x+y*y+v*v)if z
-==0 then return 0,0,0,1 end return w/z,x/z,y/z,v/z end local function slerp(k,l,
-m,n,o,p,q,r,s)local t=k*o+l*p+m*q+n*r if t<0 then o,p,q,r=-o,-p,-q,-r t=-t end
-local u=1e-6 if t>1-u then local v=k+(o-k)*s local w=l+(p-l)*s local x=m+(q-m)*s
-local y=n+(r-n)*s local z=d(v*v+w*w+x*x+y*y)return v/z,w/z,x/z,y/z end local v=
-g(i(t,-1,1))local w=e(v)local x=v*s local y=e(x)local z=f(x)-t*y/w local A=y/w
-local B=z*k+A*o local C=z*l+A*p local D=z*m+A*q local E=z*n+A*r return B,C,D,E
-end local function matMul(k,l)return k.r00*l.r00+k.r01*l.r10+k.r02*l.r20,k.r00*l
-.r01+k.r01*l.r11+k.r02*l.r21,k.r00*l.r02+k.r01*l.r12+k.r02*l.r22,k.r10*l.r00+k.
-r11*l.r10+k.r12*l.r20,k.r10*l.r01+k.r11*l.r11+k.r12*l.r21,k.r10*l.r02+k.r11*l.
-r12+k.r12*l.r22,k.r20*l.r00+k.r21*l.r10+k.r22*l.r20,k.r20*l.r01+k.r21*l.r11+k.
-r22*l.r21,k.r20*l.r02+k.r21*l.r12+k.r22*l.r22 end local function rotTranspose(k)
-return k.r00,k.r10,k.r20,k.r01,k.r11,k.r21,k.r02,k.r12,k.r22 end local function
-rotateVec(k,l)return b.new(k.r00*l.x+k.r01*l.y+k.r02*l.z,k.r10*l.x+k.r11*l.y+k.
-r12*l.z,k.r20*l.x+k.r21*l.y+k.r22*l.z)end local function rotateVecT(k,l)return b
-.new(k.r00*l.x+k.r10*l.y+k.r20*l.z,k.r01*l.x+k.r11*l.y+k.r21*l.z,k.r02*l.x+k.r12
-*l.y+k.r22*l.z)end local function columnsFromEuler(k,l,m,n)n=string.upper(n or
-'XYZ')local o,p=f(k),e(k)local q,r=f(l),e(l)local s,t=f(m),e(m)local function
-matXYZ()local u=q*s local v=o*t+p*r*s local w=p*t-o*r*s local x=-q*t local y=o*s
--p*r*t local z=p*s+o*r*t local A=r local B=-p*q local C=o*q return u,v,w,x,y,z,A
-,B,C end local function matYXZ()local u=q*s+r*p*t local v=o*t local w=q*p*t-r*s
-local x=r*s-q*p*t local y=o*s local z=r*p*t+q*s local A=p*r local B=-p local C=o
-*q return u,v,w,x,y,z,A,B,C end if n=='XYZ'then return matXYZ()elseif n=='YXZ'
-then return matYXZ()else return matXYZ()end end j.new=function(...)local k=
-select('#',...)if k==0 then return constructor(0,0,0)end local l=select(1,...)if
-k==1 and isVector3(l)then return constructor(l.x,l.y,l.z)end if k==2 and
-isVector3(l)and isVector3(select(2,...))then local m=l::any local n=select(2,...
-)::any return j.lookAt(m,n)end if k==3 then local m,n,o=l,select(2,...),select(3
-,...)assert('number'==type(m)and'number'==type(n)and'number'==type(o),`CFrame.new: expected numbers for x,y,z, got {
+)if c then return spawn(function()return c(httpget(unpack(b)))end)else return
+httpget(unpack(b))end end,post=function(b,c)assert('table'==type(b),`http.get: settings must be a table, got {
+type(b)}`)assert('function'==type(c),`http.get: callback must be a function, got {
+type(c)}`)if c then return spawn(function()return c(httppost(unpack(b)))end)else
+return httppost(unpack(b))end end}end function a.i()return function(b,c)assert(
+'table'==type(b),`map(t, callback): expected a table, got {type(b)}`)assert(
+'function'==type(c),`map(t, callback): expected a function, got {type(c)}`)local
+d={}do for e,f in b do d[e]=c(f,e,b)end end return d end end function a.j()local
+b=a.load'e'local c,d,e,f=math.abs,math.sqrt,math.sin,math.cos local g,h,i=math.
+acos,math.atan2,math.clamp local function isVector3(j)return'table'==type(j)and
+getmetatable(j)=='Vector3'end local function isCFrame(j)return'table'==type(j)
+and getmetatable(j)=='CFrame'end local j={}do local function constructor(k:
+number,l:number,m:number,n:number?,o:number?,p:number?,q:number?,r:number?,s:
+number?,t:number?,u:number?,v:number?)assert('number'==type(k),`CFrame.new: expected a number for x, got {
+type(k)}`)assert('number'==type(l),`CFrame.new: expected a number for y, got {
+type(l)}`)assert('number'==type(m),`CFrame.new: expected a number for z, got {
+type(m)}`)n=n or 1 o=o or 0 p=p or 0 q=q or 0 r=r or 1 s=s or 0 t=t or 0 u=u or
+0 v=v or 1 return setmetatable({x=k,y=l,z=m,r00=n,r01=o,r02=p,r10=q,r11=r,r12=s,
+r20=t,r21=u,r22=v},j)end local function fromQuaternion(k,l,m,n,o,p,q)local r=d(n
+*n+o*o+p*p+q*q)if r==0 then return constructor(k,l,m)end n,o,p,q=n/r,o/r,p/r,q/r
+local s,t,u=n*n,o*o,p*p local v,w,x=n*o,n*p,o*p local y,z,A=q*n,q*o,q*p local B=
+1-2*(t+u)local C=2*(v+A)local D=2*(w-z)local E=2*(v-A)local F=1-2*(s+u)local G=2
+*(x+y)local H=2*(w+z)local I=2*(x-y)local J=1-2*(s+t)return constructor(k,l,m,B,
+C,D,E,F,G,H,I,J)end local function toQuaternion(k)local l,m,n=k.r00,k.r01,k.r02
+local o,p,q=k.r10,k.r11,k.r12 local r,s,t=k.r20,k.r21,k.r22 local u=l+p+t local
+v,w,x,y if u>0 then local z=d(u+1)*2 v=0.25*z w=(s-q)/z x=(n-r)/z y=(o-m)/z
+elseif l>p and l>t then local z=d(1+l-p-t)*2 v=(s-q)/z w=0.25*z x=(m+o)/z y=(n+r
+)/z elseif p>t then local z=d(1+p-l-t)*2 v=(n-r)/z w=(m+o)/z x=0.25*z y=(q+s)/z
+else local z=d(1+t-l-p)*2 v=(o-m)/z w=(n+r)/z x=(q+s)/z y=0.25*z end local z=d(w
+*w+x*x+y*y+v*v)if z==0 then return 0,0,0,1 end return w/z,x/z,y/z,v/z end
+local function slerp(k,l,m,n,o,p,q,r,s)local t=k*o+l*p+m*q+n*r if t<0 then o,p,q
+,r=-o,-p,-q,-r t=-t end local u=1e-6 if t>1-u then local v=k+(o-k)*s local w=l+(
+p-l)*s local x=m+(q-m)*s local y=n+(r-n)*s local z=d(v*v+w*w+x*x+y*y)return v/z,
+w/z,x/z,y/z end local v=g(i(t,-1,1))local w=e(v)local x=v*s local y=e(x)local z=
+f(x)-t*y/w local A=y/w local B=z*k+A*o local C=z*l+A*p local D=z*m+A*q local E=z
+*n+A*r return B,C,D,E end local function matMul(k,l)return k.r00*l.r00+k.r01*l.
+r10+k.r02*l.r20,k.r00*l.r01+k.r01*l.r11+k.r02*l.r21,k.r00*l.r02+k.r01*l.r12+k.
+r02*l.r22,k.r10*l.r00+k.r11*l.r10+k.r12*l.r20,k.r10*l.r01+k.r11*l.r11+k.r12*l.
+r21,k.r10*l.r02+k.r11*l.r12+k.r12*l.r22,k.r20*l.r00+k.r21*l.r10+k.r22*l.r20,k.
+r20*l.r01+k.r21*l.r11+k.r22*l.r21,k.r20*l.r02+k.r21*l.r12+k.r22*l.r22 end
+local function rotTranspose(k)return k.r00,k.r10,k.r20,k.r01,k.r11,k.r21,k.r02,k
+.r12,k.r22 end local function rotateVec(k,l)return b.new(k.r00*l.x+k.r01*l.y+k.
+r02*l.z,k.r10*l.x+k.r11*l.y+k.r12*l.z,k.r20*l.x+k.r21*l.y+k.r22*l.z)end
+local function rotateVecT(k,l)return b.new(k.r00*l.x+k.r10*l.y+k.r20*l.z,k.r01*l
+.x+k.r11*l.y+k.r21*l.z,k.r02*l.x+k.r12*l.y+k.r22*l.z)end local function
+columnsFromEuler(k,l,m,n)n=string.upper(n or'XYZ')local o,p=f(k),e(k)local q,r=
+f(l),e(l)local s,t=f(m),e(m)local function matXYZ()local u=q*s local v=o*t+p*r*s
+local w=p*t-o*r*s local x=-q*t local y=o*s-p*r*t local z=p*s+o*r*t local A=r
+local B=-p*q local C=o*q return u,v,w,x,y,z,A,B,C end local function matYXZ()
+local u=q*s+r*p*t local v=o*t local w=q*p*t-r*s local x=r*s-q*p*t local y=o*s
+local z=r*p*t+q*s local A=p*r local B=-p local C=o*q return u,v,w,x,y,z,A,B,C
+end if n=='XYZ'then return matXYZ()elseif n=='YXZ'then return matYXZ()else
+return matXYZ()end end j.new=function(...)local k=select('#',...)if k==0 then
+return constructor(0,0,0)end local l=select(1,...)if k==1 and isVector3(l)then
+return constructor(l.x,l.y,l.z)end if k==2 and isVector3(l)and isVector3(select(
+2,...))then local m=l::any local n=select(2,...)::any return j.lookAt(m,n)end if
+k==3 then local m,n,o=l,select(2,...),select(3,...)assert('number'==type(m)and
+'number'==type(n)and'number'==type(o),`CFrame.new: expected numbers for x,y,z, got {
 type(m)},{type(n)},{type(o)}`)return constructor(m,n,o)end if k==7 then local m,
 n,o,p,q,r,s=l,select(2,...),select(3,...),select(4,...),select(5,...),select(6,
 ...),select(7,...)assert('number'==type(p)and'number'==type(q)and'number'==type(
@@ -517,163 +540,18 @@ end if'xvector'==l or'rightvector'==l then return b.new(k.r00,k.r10,k.r20)end if
 ==l then return b.new(k.r02,k.r12,k.r22)end if'lookvector'==l then return b.new(
 k.r02,k.r12,k.r22)*-1 end return rawget(j,l)or k[l]end function j.__tostring(k)
 return`({k.x}, {k.y}, {k.z}, {k.r00}, {k.r01}, {k.r02}, {k.r10}, {k.r11}, {k.r12
-}, {k.r20}, {k.r21}, {k.r22})`end end return table.freeze(j)end function a.k()
-return function(b,c):any if not b then return c end if not c then return b end
-for d,e in c do b[d]=e end return b end end function a.l()local b=a.load'k'local
-c={}do local d={global={}}local function constructor(e:any)e='userdata'==type(e)
-and e or'table'==type(e)and rawget(e,'Data')assert('userdata'==type(e),`Instance.new: userdata must be a userdata, got {
-type(e)}`)return setmetatable({ClassName=getclassname(e),Data=e},{__index=c.
-__index,__newindex=c.__newindex})end c.new=constructor function c.declare<T>(e:
-'property'|'method',f:string|{string},g:string,h:T|((self:typeof(c))->any))
-assert('string'==type(g),`Instance.declare: name must be a string, got {type(g)}`
-)assert('property'==e or'method'==e,`Instance.declare: value must be "property" or "method", got {
-e}`)assert('table'==type(f)or'string'==type(f),`Instance.declare: class must be a string or a table of strings, got {
-type(f)}`)if'string'==type(f)then d[f]=b(d[f],{[g]={[e]=h}})else for i,j in f do
-d[j]=b(d[j],{[g]={[e]=h}})end end end function c.__index(e,f:string)assert(
-'string'==type(f),`Instance:__index: key must be a string, got {type(f)}`)do
-local g=e.ClassName local h=d.global[f]or(d[g]and d[g][f])if h then local i=h.
-property local j=h.method if i and i.getter then return i.getter(e)elseif j then
-return j end end end return rawget(e,f)or rawget(e,'Data')and e:FindFirstChild(f
-)or c[f]end function c.__newindex(e,f:string,g:any)assert('string'==type(f),`Instance:__newindex: key must be a string, got {
-type(f)}`)do local h=e.ClassName local i=d.global[f]or(d[h]and d[h][f])if i and
-i.property and i.property.setter then return i.property.setter(e,g)end end
-return rawset(e,f,g)end end return c end function a.m()local b=a.load'i'local c=
-a.load'f'local d=a.load'h'local e=a.load'g'local f=a.load'e'local g=a.load'd'
-local h=a.load'j'local i do d.get({
-[[https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/refs/heads/roblox/Full-API-Dump.json]]
-,'application/json'},function(j)i=e.decode(j)end)end local j=a.load'l'do local k
-=j.new do j.declare('property','global','Name',{getter=function(l)return
-getname(l.Data)end})j.declare('property','global','Parent',{getter=function(l)
-local m:any=getparent(l.Data)return m and k(m)end})j.declare('method','global',
-'GetChildren',function(l)return b(getchildren(l.Data),k)end)j.declare('method',
-'global','GetDescendants',function(l)return b(getdescendants(l.Data),k)end)do
-local l=function(l)return function(m,...)local n:any=l(m.Data,...)return n and
-k(n)end end j.declare('method','global','FindFirstChild',l(findfirstchild))j.
-declare('method','global','FindFirstAncestor',l(findfirstancestor))j.declare(
-'method','global','FindFirstChildOfClass',l(findfirstchildofclass))j.declare(
-'method','global','FindFirstAncestorOfClass',l(findfirstancestorofclass))j.
-declare('method','global','WaitForChild',l(waitforchild))end do local l=function
-(l)return function(m,...)return l(m.Data,...)end end j.declare('method','global'
-,'SetMemoryValue',l(c.write))j.declare('method','global','GetMemoryValue',l(c.
-read))j.declare('method','global','Read',l(c.read))j.declare('method','global',
-'Write',l(c.write))end j.declare('method','global','IsA',function(l,m:string)
-assert('string'==type(m),`Instance:IsA: class must be a string, got {type(m)}`)
-return l.ClassName==m end)j.declare('method','global','IsAncestorOf',function(l,
-m)assert('userdata'==type(m)or type(m)=='table'and m.Data,`Instance:IsAncestorOf: other must be a userdata or an Instance, got {
-type(m)}`)return isancestorof(l.Data,type(m)=='userdata'and m or m.Data)end)j.
-declare('method','global','IsDescendantOf',function(l,m)assert('userdata'==type(
-m)or type(m)=='table'and m.Data,`Instance:IsDescendantOf: other must be a userdata or an Instance, got {
-type(m)}`)return isdescendantof(l.Data,type(m)=='userdata'and m or m.Data)end)j.
-declare('method','global','Destroy',function(l)return destroy(l.Data)end)end do
-j.declare('property','DataModel','PlaceId',{getter=function(l)return getplaceid(
-)end})j.declare('property','DataModel','GameId',{getter=function(l)return
-getgameid()end})j.declare('method','DataModel','GetService',function(l,m:string)
-for n,o in getchildren(l.Data)do if getclassname(o)==m then return k(o)end end
-return nil end)j.declare('method','DataModel','FindService',function(l,m:string)
-local n:any=findservice(l.Data,m)return n and k(n)end)j.declare('method',
-'DataModel','HttpGet',function(l,m:string,...)assert('string'==type(m),`DataModel:HttpGet: url must be a string, got {
-type(m)}`)return httpget(m,...)end)j.declare('method','DataModel','HttpPost',
-function(l,m:string,...)assert('string'==type(m),`DataModel:HttpPost: url must be a string, got {
-type(m)}`)return httppost(m,...)end)end do j.declare('method','HttpService',
-'JSONEncode',function(l,m:any)assert('table'==type(m),`HttpService:JSONEncode: value must be a table, got {
-type(m)}`)return e.encode(m)end)j.declare('method','HttpService','JSONDecode',
-function(l,m:string)assert('string'==type(m),`HttpService:JSONDecode: value must be a string, got {
-type(m)}`)return e.decode(m)end)end do j.declare('property',{'BoolValue',
-'IntValue','FloatValue','ObjectValue','StringValue','Vector3Value','ValueBase',
-'BrickColorValue','Color3Value','CFrameValue','DoubleConstrainedValue',
-'IntConstrainedValue'},'Value',{getter=function(l)return getvalue(l.Data)end,
-setter=function(l,m:any)setvalue(l.Data,m)end})end do j.declare('property',{
-'UnionOperation','MeshPart','TrussPart','Part'},'Size',{getter=function(l)local
-m=getsize(l.Data)return f.new(m.x,m.y,m.z)end})j.declare('property',{
-'UnionOperation','MeshPart','TrussPart','Part','Camera'},'Position',{getter=
-function(l)local m=getposition(l.Data)return f.new(m.x,m.y,m.z)end,setter=
-function(l,m:vector|{x:number,y:number,z:number})assert('table'==type(m)and m.x
-and m.y and m.z,`Instance:Position: value must be a Vector3, got {type(m)}`)
-setposition(l.Data,m)end})j.declare('property',{'UnionOperation','MeshPart',
-'TrussPart','Part','Camera'},'CFrame',{getter=function(l)local m=getposition(l.
-Data)local n=getupvector(l.Data)local o=getrightvector(l.Data)local p=
-getlookvector(l.Data)return h.new(tonumber(m.x),tonumber(m.y),tonumber(m.z),
-tonumber(o.x),tonumber(n.x),-tonumber(p.x)::number,tonumber(o.y),tonumber(n.y),-
-tonumber(p.y)::number,tonumber(o.z),tonumber(n.z),-tonumber(p.z)::number)end,
-setter=function(l,m:any)setcframe(l.Data,m)end})j.declare('property',{
-'UnionOperation','MeshPart','TrussPart','Part'},'Rotation',{getter=function(l)
-local m=getupvector(l.Data)local n=getrightvector(l.Data)local o=getlookvector(l
-.Data)local p=h.fromMatrix(f.zero,f.new(n.x,n.y,n.z),f.new(m.x,m.y,m.z),-f.new(o
-.x,o.y,o.z))local q,r,s=p:ToEulerAnglesXYZ()return f.new(math.deg(q),math.deg(r)
-,math.deg(s))end,setter=function(l,m:any)assert(type(m)=='table'and
-getmetatable(m)=='Vector3',`Instance.Rotation: value must be a Vector3`)local n=
-math.rad(m.x)local o=math.rad(m.y)local p=math.rad(m.z)local q=h.
-fromEulerAnglesXYZ(n,o,p)local r=f.new(q.r00,q.r10,q.r20)local s=f.new(q.r01,q.
-r11,q.r21)local t=f.new(-q.r02,-q.r12,-q.r22)setrightvector(l.Data,r)
-setupvector(l.Data,s)setlookvector(l.Data,t)end})j.declare('property',{
-'UnionOperation','MeshPart','TrussPart','Part'},'Transparency',{getter=function(
-l)return gettransparency(l.Data)end,setter=function(l,m:number)settransparency(l
-.Data,m)end})end do j.declare('property','Player','Character',{getter=function(l
-)return k(getcharacter(l.Data))end})j.declare('property','Player','Team',{getter
-=function(l)return k(getteam(l.Data))end})j.declare('property','Player',
-'DisplayName',{getter=function(l)return getdisplayname(l.Data)end})j.declare(
-'property','Player','UserId',{getter=function(l)return getuserid(l.Data)end})end
-do j.declare('property','Workspace','CurrentCamera',{getter=function(l)local m:
-any=findfirstchildofclass(l.Data,'Camera')return m and k(m)end})end do j.
-declare('property','Camera','FieldOfView',{getter=function(l)return
-getcamerafov(l.Data)end})j.declare('method','Camera','SetCameraSubject',function
-(l,m)assert(type(m)=='table'and m.Data,`Camera:SetCameraSubject: subject must be an Instance, got {
-type(m)}`)return setcamerasubject(m.Data)end)end do j.declare('property',{
-'UnionOperation','MeshPart','TrussPart','Part'},'CanCollide',{getter=function(l)
-return getcancollide(l.Data)end,setter=function(l,m:boolean)assert(type(m)==
-'boolean',`Instance:CanCollide: value must be a boolean, got {type(m)}`)
-setcancollide(l.Data,m)end})j.declare('property',{'UnionOperation','MeshPart',
-'TrussPart','Part'},'Velocity',{getter=function(l)local m=getvelocity(l.Data)
-return f.new(m.x,m.y,m.z)end,setter=function(l,m:vector|{x:number,y:number,z:
-number})assert('table'==type(m)and m.x and m.y and m.z,`Instance:Velocity: value must be a Vector3, got {
-type(m)}`)setvelocity(l.Data,m)end})end do j.declare('property','MeshPart',
-'TextureID',{getter=function(l)return gettextureid(l.Data)end})j.declare(
-'property','MeshPart','MeshID',{getter=function(l)return getmeshid(l.Data)end})
-end do j.declare('property','Humanoid','Health',{getter=function(l)return
-gethealth(l.Data)end})j.declare('property','Humanoid','MaxHealth',{getter=
-function(l)return getmaxhealth(l.Data)end})end do j.declare('property','Model',
-'PrimaryPart',{getter=function(l)local m:any=getprimarypart(l.Data)return m and
-k(m)end})end do j.declare('property','BillboardGui','Adornee',{getter=function(l
-)local m:any=getadornee(l.Data)return m and k(m)end})end do j.declare('property'
-,'Players','LocalPlayer',{getter=function(l)local m:any=getlocalplayer()return m
-and k(m)end})end do j.declare('method','MouseService','GetMousePosition',
-function(l)local m=getmouseposition()return g.new(m.x,m.y)end)j.declare('method'
-,'MouseService','GetMouseLocation',function(l)local m=getmouselocation(l.Data)
-return g.new(m.x,m.y)end)j.declare('method','MouseService','GetMouseBehavior',
-function(l)return getmousebehavior(l.Data)end)j.declare('method','MouseService',
-'GetMouseDeltaSensitivity',function(l)return getmousedeltasensitivity(l.Data)end
-)j.declare('method','MouseService','IsMouseIconEnabled',function(l)return
-ismouseiconenabled(l.Data)end)j.declare('method','MouseService',
-'SetMouseLocation',function(l,m,n)assert('number'==type(m),`MouseService:SetMouseLocation: x must be a number, got {
-type(m)}`)assert('number'==type(n),`MouseService:SetMouseLocation: y must be a number, got {
-type(n)}`)setmouselocation(l.Data,m,n)end)j.declare('method','MouseService',
-'SetMouseIconEnabled',function(l,m)assert('boolean'==type(m),`MouseService:SetMouseIconEnabled: enabled must be a boolean, got {
-type(m)}`)setmouseiconenabled(l.Data,m)end)j.declare('method','MouseService',
-'SetMouseBehavior',function(l,m)assert('number'==type(m),`MouseService:SetMouseBehavior: behavior must be a number, got {
-type(m)}`)setmousebehaviour(l.Data,m)end)j.declare('method','MouseService',
-'SetMouseDeltaSensitivity',function(l,m)assert('number'==type(m),`MouseService:SetMouseDeltaSensitivity: sensitivity must be a number, got {
-type(m)}`)setmousedeltasensitivity(l.Data,m)end)j.declare('method',
-'MouseService','SmoothMouseExponential',function(l,m,n,o)assert('table'==type(m)
-and#m>=2,`MouseService:SmoothMouseExponential: origin must be a table with at least 2 numbers, got {
-type(m)}`)assert('table'==type(n)and#n>=2,`MouseService:SmoothMouseExponential: point must be a table with at least 2 numbers, got {
-type(n)}`)assert('number'==type(o),`MouseService:SmoothMouseExponential: speed must be a number, got {
-type(o)}`)local p=smoothmouse_exponential(m,n,o)return g.new(p.x,p.y)end)j.
-declare('method','MouseService','SmoothMouseLinear',function(l,m,n,o,p)assert(
-'table'==type(m)and#m>=2,`MouseService:SmoothMouseLinear: origin must be a table with at least 2 numbers, got {
-type(m)}`)assert('table'==type(n)and#n>=2,`MouseService:SmoothMouseLinear: point must be a table with at least 2 numbers, got {
-type(n)}`)assert('number'==type(o),`MouseService:SmoothMouseLinear: sensitivity must be a number, got {
-type(o)}`)assert('number'==type(p),`MouseService:SmoothMouseLinear: smoothness must be a number, got {
-type(p)}`)local q=smoothmouse_linear(m,n,o,p)return g.new(q.x,q.y)end)end end _G
-.Instance=j _G.Vector3=f _G.Vector2=g _G.CFrame=h _G.workspace=j.new(Workspace)
-_G.game=j.new(Game)return j end end _G.Signal=a.load'a'_G.websocket=a.load'b'_G.
-memory=a.load'f'_G.json=a.load'g'_G.http=a.load'h'_G.print=function(...)local b,
-c={...},select('#',...)local d=''for e=1,c do local f=b[e]if type(f)=='table'
-then if f.Name and f.Data then d=d..f.Name..' | 'end elseif type(f)=='userdata'
-then d=d..getname(f)..' | 'end local g=tostring(f)if type(g)~='string'then error
+}, {k.r20}, {k.r21}, {k.r22})`end end return table.freeze(j)end function a.k()a.
+load'i'a.load'f'a.load'g'local b=a.load'e'local c=a.load'd'local d=a.load'j'_G.
+Vector3=b _G.Vector2=c _G.CFrame=d return table.freeze{Vector3=b,Vector2=c,
+CFrame=d}end end _G.Signal=a.load'a'_G.websocket=a.load'b'_G.memory=a.load'f'_G.
+json=a.load'g'_G.http=a.load'h'_G.print=function(...)local b,c={...},select('#',
+...)local d=''for e=1,c do local f=b[e]if type(f)=='table'then if f.Name and f.
+Data then d=d..f.Name..' | 'end elseif type(f)=='userdata'then d=d..getname(f)..
+' | 'end local g=tostring(f)if type(g)~='string'then error
 "'tostring' must return a string - print function"end d=d..g..' 'end return
 print(d)end _G.warn=function(...)local b,c={...},select('#',...)local d=''for e=
 1,c do local f=b[e]if type(f)=='table'then if f.Name and f.Data then d=d..f.Name
 ..' | 'end elseif type(f)=='userdata'then d=d..getname(f)..' | 'end local g=
 tostring(f)if type(g)~='string'then error
 "'tostring' must return a string - warn function"end d=d..g..' 'end return warn(
-d)end return a.load'm'
+d)end return a.load'k'
