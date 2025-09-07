@@ -1,7 +1,6 @@
 ---- environment ---
 
 local map    = require("@external/functions/map")
-local memory = require("@external/modules/memory")
 local json   = require("@external/modules/json")
 
 local Vector3 = require("@roblox/data/vector3")

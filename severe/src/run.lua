@@ -2,7 +2,6 @@
 
 _G.Signal 	 = require("@external/classes/signal")
 _G.websocket = require("@external/classes/websocket")
-_G.memory 	 = require("@external/modules/memory")
 _G.json 	 = require("@external/modules/json")
 _G.http 	 = require("@external/modules/http")
 
