@@ -1,11 +1,9 @@
 ---- environment ---
 
-local map    = require("@external/functions/map")
-local json   = require("@external/modules/json")
-
 local Vector3 = require("@roblox/data/vector3")
 local Vector2 = require("@roblox/data/vector2")
 local CFrame  = require("@roblox/data/cframe")
+local Color3  = require("@roblox/data/color")
 
 ---- declarations ----
 
@@ -484,6 +482,7 @@ local CFrame  = require("@roblox/data/cframe")
 _G.Vector3 = Vector3
 _G.Vector2 = Vector2
 _G.CFrame = CFrame
+_G.Color3 = Color3
 
 -- _G.workspace = Instance.new(Workspace)
 -- _G.game = Instance.new(Game)
@@ -495,5 +494,6 @@ _G.CFrame = CFrame
 return table.freeze {
     Vector3 = Vector3,
     Vector2 = Vector2,
-    CFrame  = CFrame
+    CFrame  = CFrame,
+    Color3  = Color3
 }
