@@ -499,4 +499,3 @@ local c=a.load'f'local d=a.load'g'local e=a.load'h'_G.Vector3=b _G.Vector2=c _G.
 CFrame=d _G.Color3=e return table.freeze{Vector3=b,Vector2=c,CFrame=d,Color3=e}
 end end
 _G.Signal=a.load'a'
-return a.load'i'
