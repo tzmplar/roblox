@@ -497,14 +497,6 @@ h>l then i=k h=l end end return c.new(i.Name)end return g end function c.random(
 c.__index=c end _G.BrickColor=c return b end function a.i()local b=a.load'e'
 local c=a.load'f'local d=a.load'g'local e=a.load'h'_G.Vector3=b _G.Vector2=c _G.
 CFrame=d _G.Color3=e return table.freeze{Vector3=b,Vector2=c,CFrame=d,Color3=e}
-end end _G.Signal=a.load'a'_G.websocket=a.load'b'_G.json=a.load'c'_G.http=a.load
-'d'_G.print=function(...)local b,c={...},select('#',...)local d=''for e=1,c do
-local f=b[e]if type(f)=='table'then if f.Name and f.Data then d=d..f.Name..' | '
-end elseif type(f)=='userdata'then d=d..getname(f)..' | 'end local g=tostring(f)
-if type(g)~='string'then error"'tostring' must return a string - print function"
-end d=d..g..' 'end return print(d)end _G.warn=function(...)local b,c={...},
-select('#',...)local d=''for e=1,c do local f=b[e]if type(f)=='table'then if f.
-Name and f.Data then d=d..f.Name..' | 'end elseif type(f)=='userdata'then d=d..
-getname(f)..' | 'end local g=tostring(f)if type(g)~='string'then error
-"'tostring' must return a string - warn function"end d=d..g..' 'end return warn(
-d)end return a.load'i'
+end end
+_G.Signal=a.load'a'
+return a.load'i'
