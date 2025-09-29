@@ -495,7 +495,7 @@ if not f[1]or not f[2]or not f[3]then error(`BrickColor.new: can't initialize Br
 h>l then i=k h=l end end return c.new(i.Name)end return g end function c.random(
 )return c.new(e[math.random(1,#e)])end function c.__tostring(f)return f.Name end
 c.__index=c end _G.BrickColor=c return b end function a.i()local b=a.load'e'
-local c=a.load'f'local d=a.load'g'local e=a.load'h'_G.Vector3=b _G.Vector2=c _G.
-CFrame=d _G.Color3=e return table.freeze{Vector3=b,Vector2=c,CFrame=d,Color3=e}
+local c=a.load'f'local d=a.load'g'local e=a.load'h'
+return table.freeze{Vector3=b,Vector2=c,CFrame=d,Color3=e}
 end end
 _G.Signal=a.load'a'
