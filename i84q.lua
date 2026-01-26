@@ -9,7 +9,7 @@ type EnumItem = {
 type Enum = {
     items: { [string]: EnumItem },
     name: string,
-    
+
     insert: (string, number) -> Enum,
 
     GetEnumItems: () -> { [string]: EnumItem },
@@ -36,7 +36,7 @@ local EnumItem = {}; do
             Value = value,
             Name = name
         }, EnumItem )
-    
+
         -- insertion --
 
         parent.items[name] = self
@@ -76,7 +76,7 @@ local Enum = {}; do
 
     local function constructor(name: string)
         assert('string' == type(name), `bad argument #1 to Enum.new: string expected, got '{type(name)}'`)
-        
+
         local self = setmetatable( {
             items = {},
             name = name
@@ -145,10 +145,10 @@ local time = os.clock()
 
 local function regenerate()
     local content = crypt.json.decode(game:HttpGet('https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/refs/heads/roblox/Full-API-Dump.json'))
-    
+
     content.time = time
     writefile('api.bin', crypt.base64.encode(crypt.json.encode(content)))
-    
+
     return content
 end
 
@@ -166,11 +166,54 @@ end
 
 for index, data in API.Enums do
     local enum = Enum.new(data.Name)
-    
+
     for _, item in data.Items do
         enum:insert(item.Name, item.Value)
     end
 end
+
+Instance.declare {
+    class = 'Instance',
+    name  = 'IsA',
+    callback = {
+        method = function(self, className)
+            local currentClass = self.ClassName
+
+            if currentClass == className then
+                return true
+            end
+
+            for _, classData in API.Classes do
+                if classData.Name == currentClass then
+                    local superclass = classData.Superclass
+
+                    while superclass and superclass ~= "<<<ROOT>>>" do
+                        if superclass == className then
+                            return true
+                        end
+
+                        local found = false
+                        for _, parentClassData in API.Classes do
+                            if parentClassData.Name == superclass then
+                                superclass = parentClassData.Superclass
+                                found = true
+                                break
+                            end
+                        end
+
+                        if not found then
+                            break
+                        end
+                    end
+
+                    break
+                end
+            end
+
+            return false
+        end
+    }
+}
 
 ---- exports ----
 
