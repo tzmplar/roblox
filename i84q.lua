@@ -499,7 +499,7 @@ function Drawing.attach(descriptor: { [any]: {
     Position:    UDim2?,
     AnchorPoint: Vector2?
 } }): Cluster
-    local attachments = setmetatable({}, Weak)
+    local attachments = {}
 
     local cluster = setmetatable(
         {
