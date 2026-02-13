@@ -1,3 +1,388 @@
+--!optimize 2
+
+local max, min, huge = math.max, math.min, math.huge
+
+---- Declarations ----
+
+export type UDim          = { Scale: number, Offset: number }
+export type UDim2         = { X: typeof(UDim), Y: typeof(UDim) }
+
+export type PointInstance = {
+    Destroy: (self: PointInstance) -> (),
+    CFrame: CFrame, Size: Vector3, Active: boolean
+}
+
+export type Point3D = {
+    Destroy: (self: PointInstance) -> (),
+    Position: Vector3, Active: boolean
+}
+
+type Point = PointInstance | Point3D
+
+export type Cluster = {
+    Destroy: (self: Cluster) -> (),
+    Pause:   (self: Cluster) -> (),
+    Resume:  (self: Cluster) -> ()
+}
+
+---- Constants ----
+
+local RunService = game:GetService 'RunService'
+
+Vector2.zero = Vector2.new()
+
+---- Classes ----
+
+local UDim2 = {}; do
+    --- Constructor ---
+
+    function UDim2.new(xScale: number, xOffset: number, yScale: number, yOffset: number): UDim2
+        return setmetatable(
+            {
+                X = { Scale = xScale, Offset = xOffset },
+                Y = { Scale = yScale, Offset = yOffset }
+            },
+
+            UDim2
+        ) :: any
+    end
+
+    function UDim2.fromScale(xScale: number, yScale: number): UDim2
+        return UDim2.new(xScale, 0, yScale, 0)
+    end
+
+    function UDim2.fromOffset(xOffset: number, yOffset: number): UDim2
+        return UDim2.new(0, xOffset, 0, yOffset)
+    end
+
+    --- Metatables ---
+
+    UDim2.__index = UDim2
+end
+
+local Point3D = {}; do
+    --- Constructor ---
+
+    function Point3D.new(Position: Vector3): (Point3D)
+        assert(typeof(Position) == 'Vector3', `invalid argument #1 to 'Point3D.new': expected Vector3, got {type(Position)}`)
+
+        -- Assignments --
+        local This = setmetatable(
+            {
+                Position = Position,
+                Active   = true
+            },
+
+            Point3D
+        )
+
+        -- Exports --
+        return This :: any
+    end
+
+    --- Methods ---
+
+    function Point3D:Destroy(): ()
+        self.Active, self.Position = false, nil
+    end
+
+    --- Metatables ---
+
+    Point3D.__index = Point3D
+end
+
+local PointInstance = {}; do
+    --- Constructor ---
+
+    function PointInstance.new(Instance: BasePart): (PointInstance)
+        assert(typeof(Instance) == 'Instance', `invalid argument #1 to 'PointInstance.new': expected Instance, got {typeof(Instance)}`)
+
+        -- Assignments --
+        local This = setmetatable(
+            {
+                Instance = Instance,
+                Active   = true
+            },
+
+            PointInstance
+        )
+
+        -- Exports --
+        return This :: any
+    end
+
+    --- Methods ---
+
+    function PointInstance:Destroy(): ()
+        self.Active, self.Instance = false, nil
+    end
+
+    --- Metatables ---
+
+    function PointInstance:__index(key: string): (any)
+        if(key == 'CFrame') then
+            return self.Instance and self.Instance.CFrame or nil
+        elseif(key == 'Position') then
+            return self.Instance and self.Instance.Position or nil
+        elseif(key == 'Size') then
+            return self.Instance and self.Instance.Size or nil
+        end
+
+        return PointInstance[key]
+    end
+end
+
+---- Functions ----
+
+@native
+local function Project(Part: BasePart, Camera: Camera): (Vector2)
+    local CFrame  = Part.CFrame   :: CFrame
+    local Half    = Part.Size / 2 :: Vector3
+
+    local Corners = {
+		Vector3.new(-Half.X, -Half.Y, -Half.Z),
+		Vector3.new( Half.X, -Half.Y, -Half.Z),
+		Vector3.new(-Half.X,  Half.Y, -Half.Z),
+		Vector3.new( Half.X,  Half.Y, -Half.Z),
+		Vector3.new(-Half.X, -Half.Y,  Half.Z),
+		Vector3.new( Half.X, -Half.Y,  Half.Z),
+		Vector3.new(-Half.X,  Half.Y,  Half.Z),
+		Vector3.new( Half.X,  Half.Y,  Half.Z),
+	}
+
+	local MinX, MinY = huge, huge
+	local MaxX, MaxY = -huge, -huge
+
+	local Projected = false
+	for _, Local in Corners do
+	    local World = CFrame.Position
+					+ (CFrame.RightVector * Local.X)
+					+ (CFrame.UpVector    * Local.Y)
+					+ (CFrame.LookVector  * Local.Z)
+
+		local Screen = Camera:WorldToScreenPoint(World)
+		if(Screen.Z >= 0) then
+		    Projected = true
+
+			MinX = min(MinX, Screen.X)
+			MinY = min(MinY, Screen.Y)
+			MaxX = max(MaxX, Screen.X)
+			MaxY = max(MaxY, Screen.Y)
+		end
+	end
+
+	if(not Projected) then
+	    return Vector2.zero
+	end
+
+	return Vector2.new(max(0, MaxX - MinX), max(0, MaxY - MinY))
+end
+
+@native
+local function Screen(UDim: UDim, Reference: number): (number)
+    return UDim.Scale * Reference + UDim.Offset
+end
+
+local Prototype = {}; do
+    Prototype.__index = Prototype
+
+    function Prototype:Pause(): ()
+        self.Paused = true
+    end
+
+    function Prototype:Resume(): ()
+        self.Paused = false
+    end
+
+    function Prototype:Destroy(): ()
+        self.Active = false
+
+        if(self.Connection) then
+            self.Connection:Disconnect()
+            self.Connection = nil
+        end
+
+        for _, Attachment in self.Attachments do
+            Attachment.Drawing:Remove()
+        end
+
+        table.clear(self.Attachments)
+    end
+end
+
+---- Drawing ----
+
+function Drawing.attach(Descriptor: { [any]: {
+    Link:        Point?,
+    From:        Point?,
+    To:          Point?,
+    Size:        UDim2?,
+    Position:    UDim2?,
+    AnchorPoint: Vector2?
+} }): Cluster
+    local Cluster = setmetatable(
+        {
+            Attachments = {},
+            Active      = true,
+            Paused      = false,
+            Connection  = nil
+        },
+
+        Prototype
+    )
+
+    for Object, Config in Descriptor do
+        assert(Config.Link or (Config.From and Config.To), `Drawing.attach: 'Link', or 'From' & 'To' are required.`)
+
+        table.insert(Cluster.Attachments, {
+            Drawing     = Object,
+            Link        = Config.Link,
+            From        = Config.From,
+            To          = Config.To,
+            Size        = Config.Size or UDim2.fromScale(1, 1),
+            Position    = Config.Position or UDim2.fromScale(0, 0),
+            AnchorPoint = Config.AnchorPoint or Vector2.new(0, 0)
+        })
+    end
+
+    @native
+    local function Update()
+        if(not Cluster.Active or Cluster.Paused) then return end
+
+        local CurrentCamera = workspace.CurrentCamera
+        local ViewportSize  = CurrentCamera.ViewportSize
+        local Cleanup       = true
+
+        for _, Attachment in Cluster.Attachments do
+            local Drawing = Attachment.Drawing
+            local Link       = Attachment.Link
+            local From       = Attachment.From
+            local To         = Attachment.To
+
+            local Line      = From ~= nil and To ~= nil
+            local Destroyed = false
+
+            if Link and not Link.Active then
+                Destroyed = true
+            end
+
+            if(Line) then
+                if(typeof(From) == 'table' and not From.Active) then
+                    Destroyed = true
+                end
+
+                if(typeof(To) == 'table' and not To.Active) then
+                    Destroyed = true
+                end
+            end
+
+            if(Destroyed) then
+                Drawing.Visible = false
+                continue
+            end
+
+            Cleanup = false
+
+            if(Line) then
+                local wFrom: Vector3? = if(From.CFrame) then From.CFrame.Position elseif(From.Position) then From.Position else nil
+                local wTo: Vector3? = if(To.CFrame) then To.CFrame.Position elseif(To.Position) then To.Position else nil
+
+                if(not wFrom or not wTo) then
+                    Drawing.Visible = false
+
+                    continue
+                end
+
+                local sFrom = CurrentCamera:WorldToScreenPoint(wFrom)
+                local sTo   = CurrentCamera:WorldToScreenPoint(wTo)
+
+                if sFrom.Z < 0 and sTo.Z < 0 then
+                    Drawing.Visible = false
+                    continue
+                end
+
+                Drawing.From    = sFrom
+                Drawing.To      = sTo
+                Drawing.Visible = true
+            else
+                local World: Vector3? = if(Link.CFrame) then Link.CFrame.Position elseif(Link.Position) then Link.Position else nil
+
+                if(not World) then
+                    Drawing.Visible = false
+                    continue
+                end
+
+                local Position = CurrentCamera:WorldToScreenPoint(World)
+                local Visible  = Position.Z >= 0
+
+                if(not Visible) then
+                    Drawing.Visible = false
+                    continue
+                end
+
+                local Size = Vector2.zero
+                if(Link.Instance and typeof(Link.Instance) == 'Instance') then
+                    Size = Project(Link.Instance, CurrentCamera)
+                end
+
+                local Width  = Screen(Attachment.Size.X, Size.X)
+                local Height = Screen(Attachment.Size.Y, Size.Y)
+
+                Drawing.Size     = Vector2.new(Width, Height)
+                Drawing.Position = Vector2.new(
+                    (Position.X + Screen(Attachment.Position.X, ViewportSize.X)) - (Width  * Attachment.AnchorPoint.X),
+                    (Position.Y + Screen(Attachment.Position.Y, ViewportSize.Y)) - (Height * Attachment.AnchorPoint.Y)
+                )
+
+                Drawing.Visible = true
+            end
+        end
+
+        if(Cleanup) then
+            Cluster:Destroy()
+        end
+    end
+
+    Cluster.Connection = RunService.Render:Connect(Update)
+
+    return Cluster :: any
+end
+
+---- Exports ----
+
+_G.UDim2         = UDim2
+_G.PointInstance = PointInstance
+_G.Point3D       = Point3D
+
+---- Test ----
+
+local Head = PointInstance.new(game.Workspace.TCAxXDEMONXx.Head :: BasePart)
+local Mesh = PointInstance.new(game.Workspace.LocalRandomizableMesh :: BasePart)
+
+local Square = Drawing.new 'Square'
+Square.Visible = true
+Square.Filled = true
+Square.Color = Color3.fromRGB(255, 255, 125)
+
+local Line = Drawing.new 'Line'
+Line.Visible = true
+Line.Color = Color3.fromRGB(255, 0, 0)
+Line.Thickness = 2
+
+local Cluster = Drawing.attach {
+	[Square] = {
+		Link = Head,
+		Size = UDim2.fromScale(1, 1),
+		AnchorPoint = Vector2.new(0.5, 0.5)
+	},
+
+	[Line] = {
+		From = Head,
+		To = Mesh,
+	}
+}
+
+
 ---- definitions ----
 
 type EnumItem = {
