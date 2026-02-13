@@ -31,6 +31,19 @@ local RunService = game:GetService 'RunService'
 
 Vector2.zero = Vector2.new()
 
+local Weak = table.freeze { __mode = "k" }
+
+local CornerSigns = table.freeze {
+    table.freeze {-1, -1, -1},
+    table.freeze { 1, -1, -1},
+    table.freeze {-1,  1, -1},
+    table.freeze { 1,  1, -1},
+    table.freeze {-1, -1,  1},
+    table.freeze { 1, -1,  1},
+    table.freeze {-1,  1,  1},
+    table.freeze { 1,  1,  1},
+}
+
 ---- Classes ----
 
 local UDim2 = {}; do
@@ -60,24 +73,25 @@ local UDim2 = {}; do
     UDim2.__index = UDim2
 end
 
+local DefaultSize     = UDim2.fromScale(1, 1)
+local DefaultPosition = UDim2.fromScale(0, 0)
+local DefaultAnchor   = Vector2.new(0, 0)
+
 local Point3D = {}; do
     --- Constructor ---
 
     function Point3D.new(Position: Vector3): (Point3D)
         assert(typeof(Position) == 'Vector3', `invalid argument #1 to 'Point3D.new': expected Vector3, got {type(Position)}`)
 
-        -- Assignments --
-        local This = setmetatable(
+        -- Exports --
+        return setmetatable(
             {
                 Position = Position,
                 Active   = true
             },
 
             Point3D
-        )
-
-        -- Exports --
-        return This :: any
+        ) :: any
     end
 
     --- Methods ---
@@ -97,18 +111,15 @@ local PointInstance = {}; do
     function PointInstance.new(Instance: BasePart): (PointInstance)
         assert(typeof(Instance) == 'Instance', `invalid argument #1 to 'PointInstance.new': expected Instance, got {typeof(Instance)}`)
 
-        -- Assignments --
-        local This = setmetatable(
+        -- Exports --
+        return setmetatable(
             {
                 Instance = Instance,
                 Active   = true
             },
 
             PointInstance
-        )
-
-        -- Exports --
-        return This :: any
+        ) :: any
     end
 
     --- Methods ---
@@ -120,12 +131,12 @@ local PointInstance = {}; do
     --- Metatables ---
 
     function PointInstance:__index(key: string): (any)
-        if(key == 'CFrame') then
-            return self.Instance and self.Instance.CFrame or nil
-        elseif(key == 'Position') then
-            return self.Instance and self.Instance.Position or nil
-        elseif(key == 'Size') then
-            return self.Instance and self.Instance.Size or nil
+        local Instance = rawget(self, 'Instance')
+
+        if key == 'CFrame' then
+            return Instance and Instance.CFrame or nil
+        elseif key == 'Size' then
+            return Instance and Instance.Size or nil
         end
 
         return PointInstance[key]
@@ -136,46 +147,41 @@ end
 
 @native
 local function Project(Part: BasePart, Camera: Camera): (Vector2)
-    local CFrame  = Part.CFrame   :: CFrame
-    local Half    = Part.Size / 2 :: Vector3
+    local CFrame = Part.CFrame   :: CFrame
+    local Half   = Part.Size / 2 :: Vector3
 
-    local Corners = {
-		Vector3.new(-Half.X, -Half.Y, -Half.Z),
-		Vector3.new( Half.X, -Half.Y, -Half.Z),
-		Vector3.new(-Half.X,  Half.Y, -Half.Z),
-		Vector3.new( Half.X,  Half.Y, -Half.Z),
-		Vector3.new(-Half.X, -Half.Y,  Half.Z),
-		Vector3.new( Half.X, -Half.Y,  Half.Z),
-		Vector3.new(-Half.X,  Half.Y,  Half.Z),
-		Vector3.new( Half.X,  Half.Y,  Half.Z),
-	}
+    local Position = CFrame.Position
+    local Right    = CFrame.RightVector
+    local Up       = CFrame.UpVector
+    local Look     = CFrame.LookVector
 
-	local MinX, MinY = huge, huge
-	local MaxX, MaxY = -huge, -huge
+    local hx, hy, hz = Half.X, Half.Y, Half.Z
 
-	local Projected = false
-	for _, Local in Corners do
-	    local World = CFrame.Position
-					+ (CFrame.RightVector * Local.X)
-					+ (CFrame.UpVector    * Local.Y)
-					+ (CFrame.LookVector  * Local.Z)
+    local MinX, MinY = huge, huge
+    local MaxX, MaxY = -huge, -huge
 
-		local Screen, Visible = Camera:WorldToScreenPoint(World)
-		if(Visible) then
-		    Projected = true
+    local Projected = false
+    for _, s in CornerSigns do
+        local lx, ly, lz = s[1] * hx, s[2] * hy, s[3] * hz
+        local World = Position + Right * lx + Up * ly + Look * lz
 
-			MinX = min(MinX, Screen.X)
-			MinY = min(MinY, Screen.Y)
-			MaxX = max(MaxX, Screen.X)
-			MaxY = max(MaxY, Screen.Y)
-		end
-	end
+        local Scr, Visible = Camera:WorldToScreenPoint(World)
+        if Visible then
+            Projected = true
 
-	if(not Projected) then
-	    return Vector2.zero
-	end
+            local sx, sy = Scr.X, Scr.Y
+            MinX = min(MinX, sx)
+            MinY = min(MinY, sy)
+            MaxX = max(MaxX, sx)
+            MaxY = max(MaxY, sy)
+        end
+    end
 
-	return Vector2.new(max(0, MaxX - MinX), max(0, MaxY - MinY))
+    if not Projected then
+        return Vector2.zero
+    end
+
+    return Vector2.new(max(0, MaxX - MinX), max(0, MaxY - MinY))
 end
 
 @native
@@ -197,13 +203,14 @@ local Prototype = {}; do
     function Prototype:Destroy(): ()
         self.Active = false
 
-        if(self.Connection) then
-            self.Connection:Disconnect()
+        local conn = self.Connection
+        if conn then
+            conn:Disconnect()
             self.Connection = nil
         end
 
-        for _, Attachment in self.Attachments do
-            Attachment.Drawing:Remove()
+        for Drawing in self.Attachments do
+            Drawing:Remove()
         end
 
         table.clear(self.Attachments)
@@ -220,9 +227,11 @@ function Drawing.attach(Descriptor: { [any]: {
     Position:    UDim2?,
     AnchorPoint: Vector2?
 } }): Cluster
+    local Attachments = setmetatable( {}, Weak )
+
     local Cluster = setmetatable(
         {
-            Attachments = {},
+            Attachments = Attachments,
             Active      = true,
             Paused      = false,
             Connection  = nil
@@ -234,30 +243,28 @@ function Drawing.attach(Descriptor: { [any]: {
     for Object, Config in Descriptor do
         assert(Config.Link or (Config.From and Config.To), `Drawing.attach: 'Link', or 'From' & 'To' are required.`)
 
-        table.insert(Cluster.Attachments, {
-            Drawing     = Object,
+        Attachments[Object] = {
             Link        = Config.Link,
             From        = Config.From,
             To          = Config.To,
-            Size        = Config.Size or UDim2.fromScale(1, 1),
-            Position    = Config.Position or UDim2.fromScale(0, 0),
-            AnchorPoint = Config.AnchorPoint or Vector2.new(0, 0)
-        })
+            Size        = Config.Size or DefaultSize,
+            Position    = Config.Position or DefaultPosition,
+            AnchorPoint = Config.AnchorPoint or DefaultAnchor
+        }
     end
 
     @native
     local function Update()
-        if(not Cluster.Active or Cluster.Paused) then return end
+        if not Cluster.Active or Cluster.Paused then return end
 
         local CurrentCamera = workspace.CurrentCamera
         local ViewportSize  = CurrentCamera.ViewportSize
         local Cleanup       = true
 
-        for _, Attachment in Cluster.Attachments do
-            local Drawing = Attachment.Drawing
-            local Link       = Attachment.Link
-            local From       = Attachment.From
-            local To         = Attachment.To
+        for Drawing, Attachment in Attachments do
+            local Link = Attachment.Link
+            local From = Attachment.From
+            local To   = Attachment.To
 
             local Line      = From ~= nil and To ~= nil
             local Destroyed = false
@@ -266,30 +273,29 @@ function Drawing.attach(Descriptor: { [any]: {
                 Destroyed = true
             end
 
-            if(Line) then
-                if(typeof(From) == 'table' and not From.Active) then
+            if Line then
+                if not From.Active then
                     Destroyed = true
                 end
 
-                if(typeof(To) == 'table' and not To.Active) then
+                if not To.Active then
                     Destroyed = true
                 end
             end
 
-            if(Destroyed) then
+            if Destroyed then
                 Drawing.Visible = false
                 continue
             end
 
             Cleanup = false
 
-            if(Line) then
-                local wFrom: Vector3? = if(From.CFrame) then From.CFrame.Position elseif(From.Position) then From.Position else nil
-                local wTo: Vector3?   = if(To.CFrame) then To.CFrame.Position elseif(To.Position) then To.Position else nil
+            if Line then
+                local wFrom: Vector3? = if From.CFrame then From.CFrame.Position elseif From.Position then From.Position else nil
+                local wTo: Vector3?   = if To.CFrame then To.CFrame.Position elseif To.Position then To.Position else nil
 
-                if(not wFrom or not wTo) then
+                if not wFrom or not wTo then
                     Drawing.Visible = false
-
                     continue
                 end
 
@@ -305,39 +311,44 @@ function Drawing.attach(Descriptor: { [any]: {
                 Drawing.To      = sTo
                 Drawing.Visible = true
             else
-                local World: Vector3? = if(Link.CFrame) then Link.CFrame.Position elseif(Link.Position) then Link.Position else nil
+                local World: Vector3? = if Link.CFrame then Link.CFrame.Position elseif Link.Position then Link.Position else nil
 
-                if(not World) then
+                if not World then
                     Drawing.Visible = false
                     continue
                 end
 
                 local Position, Visible = CurrentCamera:WorldToScreenPoint(World)
 
-                if(not Visible) then
+                if not Visible then
                     Drawing.Visible = false
                     continue
                 end
 
-                local Size = Vector2.zero
-                if(Link.Instance and typeof(Link.Instance) == 'Instance') then
-                    Size = Project(Link.Instance, CurrentCamera)
+                local Size     = Vector2.zero
+                local Instance = rawget(Link, 'Instance')
+                if Instance and typeof(Instance) == 'Instance' then
+                    Size = Project(Instance, CurrentCamera)
                 end
 
-                local Width  = Screen(Attachment.Size.X, Size.X)
-                local Height = Screen(Attachment.Size.Y, Size.Y)
+                local AttSize = Attachment.Size
+                local AttPos  = Attachment.Position
+                local Anchor  = Attachment.AnchorPoint
+
+                local Width  = Screen(AttSize.X, Size.X)
+                local Height = Screen(AttSize.Y, Size.Y)
 
                 Drawing.Size     = Vector2.new(Width, Height)
                 Drawing.Position = Vector2.new(
-                    (Position.X + Screen(Attachment.Position.X, ViewportSize.X)) - (Width  * Attachment.AnchorPoint.X),
-                    (Position.Y + Screen(Attachment.Position.Y, ViewportSize.Y)) - (Height * Attachment.AnchorPoint.Y)
+                    (Position.X + Screen(AttPos.X, ViewportSize.X)) - (Width  * Anchor.X),
+                    (Position.Y + Screen(AttPos.Y, ViewportSize.Y)) - (Height * Anchor.Y)
                 )
 
                 Drawing.Visible = true
             end
         end
 
-        if(Cleanup) then
+        if Cleanup then
             Cluster:Destroy()
         end
     end
