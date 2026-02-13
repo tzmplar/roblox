@@ -538,7 +538,6 @@ function Drawing.attach(descriptor: { [any]: {
             local from = attach.From
             local to   = attach.To
 
-            -- Auto-wrap raw Model/Folder links into cached PointModel (one-time PCA fit)
             if typeof(link) == 'Instance' then
                 if link:IsA('Model') or link:IsA('Folder') then
                     local wrapped = ModelPointCache[link]
@@ -633,11 +632,11 @@ function Drawing.attach(descriptor: { [any]: {
                 local width  = screen(attSize.X, projectedSize.X)
                 local height = screen(attSize.Y, projectedSize.Y)
 
-                drawObj.Size     = Vector2.new(width, height)
-                drawObj.Position = Vector2.new(
+                drawObj.Size     = vector.ceil(vector.create(width, height))
+                drawObj.Position = vector.ceil(vector.create(
                     (sPos.X + screen(attPos.X, viewportSize.X)) - (width  * anchor.X),
                     (sPos.Y + screen(attPos.Y, viewportSize.Y)) - (height * anchor.Y)
-                )
+                ))
 
                 drawObj.Visible = true
             end
@@ -655,16 +654,10 @@ end
 
 ---- Exports ----
 
-_G.UDim2          = UDim2
-_G.PointInstance  = PointInstance
-_G.Point3D        = Point3D
-_G.PointModel     = PointModel
-
----- Exports ----
-
 _G.UDim2         = UDim2
-_G.PointInstance = PointInstance
+_G.PointInstance  = PointInstance
 _G.Point3D       = Point3D
+_G.PointModel    = PointModel
 
 ---- definitions ----
 
