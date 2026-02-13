@@ -36,7 +36,7 @@ local RunService = game:GetService 'RunService'
 
 Vector2.zero = Vector2.new()
 
-local Weak = table.freeze { __mode = "k" }
+local Weak = table.freeze { __mode = 'k' }
 
 local CornerSigns = table.freeze {
     table.freeze {-1, -1, -1},
@@ -555,6 +555,13 @@ function Drawing.attach(descriptor: { [any]: {
 
             if link and typeof(link) == 'table' and not link.Active then
                 destroyed = true
+            end
+
+            if not destroyed then
+                local inst = if typeof(link) == 'table' then rawget(link, 'Instance') else link
+                if inst and typeof(inst) == 'Instance' and not inst.Parent then
+                    destroyed = true
+                end
             end
 
             if isLine then
