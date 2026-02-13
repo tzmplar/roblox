@@ -160,8 +160,8 @@ local function Project(Part: BasePart, Camera: Camera): (Vector2)
 					+ (CFrame.UpVector    * Local.Y)
 					+ (CFrame.LookVector  * Local.Z)
 
-		local Screen = Camera:WorldToScreenPoint(World)
-		if(Screen.Z >= 0) then
+		local Screen, Visible = Camera:WorldToScreenPoint(World)
+		if(Visible) then
 		    Projected = true
 
 			MinX = min(MinX, Screen.X)
@@ -285,7 +285,7 @@ function Drawing.attach(Descriptor: { [any]: {
 
             if(Line) then
                 local wFrom: Vector3? = if(From.CFrame) then From.CFrame.Position elseif(From.Position) then From.Position else nil
-                local wTo: Vector3? = if(To.CFrame) then To.CFrame.Position elseif(To.Position) then To.Position else nil
+                local wTo: Vector3?   = if(To.CFrame) then To.CFrame.Position elseif(To.Position) then To.Position else nil
 
                 if(not wFrom or not wTo) then
                     Drawing.Visible = false
@@ -293,10 +293,10 @@ function Drawing.attach(Descriptor: { [any]: {
                     continue
                 end
 
-                local sFrom = CurrentCamera:WorldToScreenPoint(wFrom)
-                local sTo   = CurrentCamera:WorldToScreenPoint(wTo)
+                local sFrom, fromVisible = CurrentCamera:WorldToScreenPoint(wFrom)
+                local sTo,   toVisible   = CurrentCamera:WorldToScreenPoint(wTo)
 
-                if sFrom.Z < 0 and sTo.Z < 0 then
+                if not fromVisible or not toVisible then
                     Drawing.Visible = false
                     continue
                 end
@@ -312,8 +312,7 @@ function Drawing.attach(Descriptor: { [any]: {
                     continue
                 end
 
-                local Position = CurrentCamera:WorldToScreenPoint(World)
-                local Visible  = Position.Z >= 0
+                local Position, Visible = CurrentCamera:WorldToScreenPoint(World)
 
                 if(not Visible) then
                     Drawing.Visible = false
@@ -353,35 +352,6 @@ end
 _G.UDim2         = UDim2
 _G.PointInstance = PointInstance
 _G.Point3D       = Point3D
-
----- Test ----
-
-local Head = PointInstance.new(game.Workspace.TCAxXDEMONXx.Head :: BasePart)
-local Mesh = PointInstance.new(game.Workspace.LocalRandomizableMesh :: BasePart)
-
-local Square = Drawing.new 'Square'
-Square.Visible = true
-Square.Filled = true
-Square.Color = Color3.fromRGB(255, 255, 125)
-
-local Line = Drawing.new 'Line'
-Line.Visible = true
-Line.Color = Color3.fromRGB(255, 0, 0)
-Line.Thickness = 2
-
-local Cluster = Drawing.attach {
-	[Square] = {
-		Link = Head,
-		Size = UDim2.fromScale(1, 1),
-		AnchorPoint = Vector2.new(0.5, 0.5)
-	},
-
-	[Line] = {
-		From = Head,
-		To = Mesh,
-	}
-}
-
 
 ---- definitions ----
 
